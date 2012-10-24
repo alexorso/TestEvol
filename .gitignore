@@ -1,2 +1,8 @@
 target/
 projects/
+*.class
+
+# Package Files #
+*.jar
+*.war
+*.ear
