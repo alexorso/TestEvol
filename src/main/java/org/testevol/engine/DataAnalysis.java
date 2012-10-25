@@ -56,7 +56,7 @@ public class DataAnalysis {
 		Compiler compiler = new Compiler(versions);
 //		Instrumenter instrumenter = new Instrumenter(toolroot, subjroot,
 //				regexpVersionNames);
-//		Runner runner = new Runner(toolroot, subjroot, regexpVersionNames);
+		Runner runner = new Runner(versions);
 //		Differ differ = new Differ(toolroot, subjroot, regexpVersionNames);
 //		Classifier classifier = new Classifier(differ, toolroot, subjroot,
 //				regexpVersionNames);
@@ -85,7 +85,10 @@ public class DataAnalysis {
 //					&& Boolean.valueOf(System.getProperty("diff"));
 
 			//if (!onlyDiff) {
-				compiler.go(force);
+			if(compiler.go(force)){
+				runner.go(force);
+			}
+			
 			//}
 
 //			boolean shouldRun = !onlyCompile && !onlyDiff;

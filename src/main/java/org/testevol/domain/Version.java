@@ -208,7 +208,6 @@ public class Version {
 	public boolean setUp() throws Exception{
 		boolean result = true;
 		
-		File buildDir = new File(versionDir,"build");
 		if(buildDir.exists()){
 			FileUtils.deleteDirectory(buildDir);
 		}
@@ -287,5 +286,13 @@ public class Version {
 			dir.delete();
 		}
 		return empty;
+	}
+
+	public File getDirectory() {
+		return versionDir;
+	}
+
+	public File getBuildDir() {
+		return buildDir;
 	}
 }
