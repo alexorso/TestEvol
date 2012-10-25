@@ -12,6 +12,7 @@ public class Project {
 	private String vcs;
 	private String gitUrl;
 	private List<Version> versionsList;
+	private List<String> versionsToExecute;
 	private List<String> branchesToCheckout;
 	
 	public Project() {
@@ -72,6 +73,14 @@ public class Project {
 
 	public VersionControlSystem getVersionControlSystem(){
 		return VersionControlSystem.getInstance(getVcs(), getUrl());
+	}
+	
+	public void setVersionsToExecute(List<String> versionsToExecute) {
+		this.versionsToExecute = versionsToExecute;
+	}
+	
+	public List<String> getVersionsToExecute() {
+		return versionsToExecute;
 	}
 	
 	public boolean validate() {

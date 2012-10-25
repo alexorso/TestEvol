@@ -2,6 +2,8 @@ package org.testevol.controller;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +19,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import org.testevol.domain.Project;
 import org.testevol.domain.ProjectRepository;
+import org.testevol.domain.Version;
+import org.testevol.engine.DataAnalysis;
 import org.testevol.versioncontrol.UpdateResult;
 import org.testevol.versioncontrol.VersionControlSystem;
 
@@ -53,6 +57,23 @@ public class ProjectController {
 		mav.addObject("project", project);
 		mav.setViewName("project");
 		return mav;
+	}
+	
+	@RequestMapping(value="{project}/execute",method = RequestMethod.POST)
+	public String execute(@PathVariable("project") String projectName, @ModelAttribute Project projectModel) throws Exception {
+		System.out.println(projectModel.getVersionsToExecute());
+		Project project = projectRepo.getProject(projectName);
+		List<Version> versionsToExecute = new ArrayList<Version>();
+		for(Version version:project.getVersionsList()){
+			if(projectModel.getVersionsToExecute().contains(version.getName())){
+				versionsToExecute.add(version);
+			}
+		}
+		Collections.reverse(versionsToExecute);
+		DataAnalysis dataAnalysis = new DataAnalysis(null, project, versionsToExecute);
+		dataAnalysis.start();
+		
+		return "redirect:/projects/"+projectName;
 	}
 	
 	@RequestMapping(value="{project}/delete",method = RequestMethod.GET)

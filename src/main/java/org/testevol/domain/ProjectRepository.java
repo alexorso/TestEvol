@@ -12,7 +12,7 @@ public interface ProjectRepository {
 	public Project getProject(String projectName) throws Exception;
 	public List<Project> getProjects();
 	public void deleteProject(String projectName) throws IOException;
-	public void deleteVersion(String projectName, String version) throws IOException;
+	public void deleteVersion(String projectName, String version) throws Exception;
 	public UpdateResult updateRepo(String projectName, String version) throws Exception;
 	
 }

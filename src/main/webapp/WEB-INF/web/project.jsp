@@ -39,14 +39,13 @@
 					<div class="box-header well" data-original-title>
 						<h2><i class="icon-tags"></i> Versions</h2>
 					</div>
+					<form action="${project.name}/execute" method="POST">
 					<div class="box-content">
 						<table class="table table-striped table-bordered bootstrap-datatable">
 						  <thead>
 							  <tr>
 							  	  <th style="100px;text-align: center;">
-							  	  	<a class="btn btn-success" href="javascript:playSong();" title="Execute TestEvol for the selected versions">
-										<i class="icon-play icon-white"></i> Execute
-									</a>
+							  	  	<button type="submit" class="btn btn-success" id="execute" title="Execute TestEvol for the selected versions"><i class="icon-play icon-white"></i> Execute</button>
 							  	  </th>
 								  <th>Name</th>
 								  <th style="width:50px;text-align: center">Config</th>
@@ -56,7 +55,7 @@
 						  <tbody>
 						  <c:forEach var="version" items="${project.versionsList}" varStatus="i">
 							<tr>
-								<td style="width:100px;text-align: center;"><input type="checkbox" name="${version}" value="${i.index}" checked="checked"></td>
+								<td style="width:100px;text-align: center;"><input type="checkbox" name="versionsToExecute" value="${version.name}" checked="checked"></td>
 								<td><strong>${version.name}</strong></td>
 								<td style="width:80px;text-align: center">${version.type}</td>
 								<td style="width:150px;text-align: center" class="center">
@@ -75,6 +74,7 @@
 						  </tbody>
 					  </table>            
 					</div>
+					</form>
 				</div><!--/span-->
 			
 			</div><!--/row-->

@@ -90,7 +90,7 @@ public class ProjectRepoFileSystem implements ProjectRepository {
 		FileUtils.deleteDirectory(projectDir);
 	}
 
-	public void deleteVersion(String projectName, String versionName) throws IOException {
+	public void deleteVersion(String projectName, String versionName) throws Exception {
 		File projectDir = new File(projectsDir, projectName);
 		File versionDir = new File(projectDir,versionName);
 		
