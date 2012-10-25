@@ -57,9 +57,8 @@ public class DataAnalysis {
 //		Instrumenter instrumenter = new Instrumenter(toolroot, subjroot,
 //				regexpVersionNames);
 		Runner runner = new Runner(versions);
-//		Differ differ = new Differ(toolroot, subjroot, regexpVersionNames);
-//		Classifier classifier = new Classifier(differ, toolroot, subjroot,
-//				regexpVersionNames);
+		Differ differ = new Differ(versions,testevolConfigRoot);
+		//Classifier classifier = new Classifier(versions, differ);
 //		ReportGenerator reportGenerator = new ReportGenerator(classifier,
 //				toolroot, subjroot, regexpVersionNames, projectName);
 
@@ -79,29 +78,10 @@ public class DataAnalysis {
 		try {
 			long init = System.currentTimeMillis();
 
-//			boolean onlyCompile = System.getProperty("compile") != null
-//					&& Boolean.valueOf(System.getProperty("compile"));
-//			boolean onlyDiff = System.getProperty("diff") != null
-//					&& Boolean.valueOf(System.getProperty("diff"));
-
-			//if (!onlyDiff) {
-			if(compiler.go(force)){
-				runner.go(force);
-			}
-			
-			//}
-
-//			boolean shouldRun = !onlyCompile && !onlyDiff;
-//			boolean runDiffer = !onlyCompile;
-//			if (shouldRun) {
-//				runDiffer = runner.go(force);
-//			}
-//
-//			if (runDiffer) {
-//				differ.go(force);
-//			}
-//
-//			classifier.go(force);
+			compiler.go(force);
+			runner.go(force);
+			differ.go(force);
+			//classifier.go(force);
 //			reportGenerator.go(force);
 //
 			long end = System.currentTimeMillis();
