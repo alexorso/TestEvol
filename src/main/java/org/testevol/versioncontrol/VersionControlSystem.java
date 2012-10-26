@@ -24,19 +24,7 @@ public abstract class VersionControlSystem {
 		return null;
 	}
 	
-	public abstract List<String> getBranches() throws Exception;
-		
-	protected File getTempDir(){
-		File dir = null;
-		while(dir == null){
-			dir = new File(UUID.randomUUID().toString());
-			if(dir.exists()){
-				dir = null;
-			}			
-		}
-		return dir;
-	}
-	
+	public abstract List<String> getBranches() throws Exception;	
 	public abstract void checkout(File destinationDir, List<String> branchesToClone) throws Exception;
 	public abstract UpdateResult update() throws Exception;
 

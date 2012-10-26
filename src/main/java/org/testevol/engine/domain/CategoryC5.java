@@ -63,7 +63,7 @@ public class CategoryC5 extends Category {
 		}
 		Utils.println(getTestsOnThisCategory().size()+" tests in category C5, starting coverage analysis.");
 		
-		CoverageUtil.deleteCoverageInfo();
+		CoverageUtil.deleteCoverageInfo(version.getBuildDir());
 		
 		List<String> code = new ArrayList<String>();
 		code.add(version.getCodeJar().getAbsolutePath());
@@ -83,14 +83,14 @@ public class CategoryC5 extends Category {
 																			Arrays.asList(version.getTestsJar().getAbsolutePath()),
 																			null,
 																			getTestsOnThisCategory(),
-																			version.getDirectory().getAbsolutePath(),
+																			version.getBuildDir().getAbsolutePath(),
 																			true);
 		
 		System.out.println("\nTest Suite coverageCoverage:"+testSuiteCoverage.toString()+"\n");
         
 		for(String test:getTestsOnThisCategory()){
 			
-	        CoverageUtil.deleteCoverageInfo();
+	        CoverageUtil.deleteCoverageInfo(version.getBuildDir());
 			
 			String testName = test.substring(test.lastIndexOf(".") + 1);
 			
@@ -108,7 +108,7 @@ public class CategoryC5 extends Category {
 																		Arrays.asList(oldVersion.getTestsJar().getAbsolutePath()),
 																		testsToInclude,
 																		null,
-																		version.getDirectory().getAbsolutePath(),
+																		version.getBuildDir().getAbsolutePath(),
 																		true);
 
 			List<String> notCoveredLines = hasDecreasedCoverage(testSuiteCoverage, testCoverage);

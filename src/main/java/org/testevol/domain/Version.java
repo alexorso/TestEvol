@@ -19,6 +19,7 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.testevol.engine.driver.TestCoverageDriver;
 import org.testevol.engine.util.Utils;
 import org.testevol.versioncontrol.UpdateResult;
 import org.testevol.versioncontrol.VersionControlSystem;
@@ -26,7 +27,7 @@ import org.testevol.versioncontrol.VersionControlSystem;
 public class Version {
 
 	private File versionDir;
-	private File buildDir;
+	private File baseBuildDir;
 	private String name;
 	private Properties properties;
 
@@ -35,8 +36,7 @@ public class Version {
 
 	public Version(File versionDir) throws Exception {
 		super();
-		this.versionDir = versionDir;
-		this.buildDir = new File(versionDir, "build");
+		this.versionDir = versionDir;		
 		name = versionDir.getName();
 		properties = new Properties();
 		if (getPropertiesFile().exists()) {
@@ -74,23 +74,26 @@ public class Version {
 	}
 
 	public File getBinDir() {
-		return new File(buildDir, "bin");
+		return new File(getBuildDir(), "bin");
 	}
 
 	public File getBinTestDir() {
-		return new File(buildDir, "bintest");
+		return new File(getBuildDir(), "bintest");
 	}
 
 	public File getBinTestTmpDir() {
-		return new File(buildDir, "bintesttmp");
+		return new File(getBuildDir(), "bintesttmp");
 	}
 
 	public File getBinTmpDir() {
-		return new File(buildDir, "bintmp");
+		return new File(getBuildDir(), "bintmp");
 	}
 
 	public File getBuildDir() {
-		return buildDir;
+		if(baseBuildDir == null){
+			return new File(versionDir,"build");
+		}
+		return new File(baseBuildDir,"build"+File.separator+getName());
 	}
 
 	public String getClassPath() {
@@ -98,7 +101,7 @@ public class Version {
 	}
 
 	public File getCodeJar(){
-		return new File(buildDir, "code.jar");
+		return new File(getBuildDir(), "code.jar");
 	}
 
 	public File getDirectory() {
@@ -167,20 +170,20 @@ public class Version {
 	
 	public File getSrcResourcesDir(){
 		if(isMavenProject()){
-			return new File(buildDir, ".src-resources");
+			return new File(getBuildDir(), ".src-resources");
 		}
 		return new File(versionDir, "src/main/resources");
 	}
 	
 	public File getTestResourcesDir(){
 		if(isMavenProject()){
-			return new File(buildDir, ".src-test-resources");
+			return new File(getBuildDir(), ".src-test-resources");
 		}
 		return new File(versionDir, "src/test/resources");
 	}
 	
 	public File getTestsJar(){
-		return new File(buildDir, "tests.jar");
+		return new File(getBuildDir(), "tests.jar");
 	}
 	
 	public Set<String> getTestsList(){
@@ -214,7 +217,7 @@ public class Version {
 	}
 	
 	public File getTestslistFile() {
-		return new File(buildDir, "data-testslist.txt");
+		return new File(getBuildDir(), "data-testslist.txt");
 	}
 	
 	public File getTestsSourceDir() {
@@ -264,29 +267,40 @@ public class Version {
 		}
 	}
 	
+	public void setBaseBuildDir(File baseBuildDir) {
+		this.baseBuildDir = baseBuildDir;
+	}
+
 	public void setIndex(int index) {
 		properties.setProperty("index", String.valueOf(index));
 	}
 
-	public boolean setUp() throws Exception{
+	public boolean setUp(File configDir) throws Exception{
 		boolean result = true;
 		
+		File buildDir = getBuildDir();
 		if(buildDir.exists()){
 			FileUtils.deleteDirectory(buildDir);
 		}
+		buildDir.mkdirs();
 		
 		getBinTmpDir().mkdirs();
 		getBinDir().mkdirs();
 		getBinTestTmpDir().mkdirs();
 		getBinTestDir().mkdirs();
 		
-		
 		if(isMavenProject()){
 			result = setUpMavenProject();
 		}
+		
+		File libDir = new File(versionDir, "lib");
+		if(libDir.exists()){
+			FileUtils.copyFileToDirectory(new File(configDir, TestCoverageDriver.COVERAGE_JAR), libDir);
+		}
+		
 		return result;
 	}
-
+	
 	private boolean setUpMavenProject() throws IOException {
 		File srcResources = getSrcResourcesDir();
 		File testResources = getTestResourcesDir();

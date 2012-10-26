@@ -1,5 +1,6 @@
 package org.testevol.engine;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -7,7 +8,6 @@ import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -22,18 +22,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import junit.framework.AssertionFailedError;
-import junit.framework.TestSuite;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.Test.None;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
 import org.testevol.engine.TestResult.TestOutcome;
 import org.testevol.engine.util.TrexClassLoader;
 import org.testevol.engine.util.Utils;
@@ -68,54 +57,53 @@ public class TestRunner {
 		Class<?> klass = null;
 
 		Object testObj = null;
+		TrexClassLoader localTrexClsLoader = null;
 		try {
 			if (trexClsLoader != null) {
-				TrexClassLoader localTrexClsLoader = new TrexClassLoader(
-						trexClsLoader.getURLs());
-				Thread.currentThread()
-						.setContextClassLoader(localTrexClsLoader);
+				localTrexClsLoader = new TrexClassLoader(trexClsLoader.getURLs());
+				Thread.currentThread().setContextClassLoader(localTrexClsLoader);
 				klass = localTrexClsLoader.loadClass(className);
 			} else {
-				klass = Class.forName(className);
+				throw new RuntimeException("Classloader cannot be null!");
 			}
-			testObj = createInstance(klass);
+			testObj = createInstance(klass, localTrexClsLoader);
 			if (testObj == null) {
 				return null;
 			}
 			klass.getDeclaredMethods();//force an exception
 			klass.getMethods();//force an exception	
 		} catch (ClassNotFoundException e) {
-			// e.printStackTrace();
+			 e.printStackTrace();
 			// TODO: Check that it can only be a compilation error
 			results = logError(className, e, klass, results);
 			return results;
 		} catch (IllegalAccessException e) {
 			// TODO: Check that it can only be a compilation error
-			// e.printStackTrace();
+			 e.printStackTrace();
 			results = logError(className, e, klass, results);
 			return results;
 		} catch (NoSuchMethodException e) {
-			// e.printStackTrace();
+			 e.printStackTrace();
 			// TODO: Check that it can only be a compilation error
 			results = logError(className, e, klass, results);
 			return results;
 		} catch (InstantiationException e) {
-			// e.printStackTrace();
+			 e.printStackTrace();
 			// TODO: Check that it can only be a compilation error
 			results = logError(className, e, klass, results);
 			return results;
 		} catch (InvocationTargetException e) {
-			// e.printStackTrace();
+			 e.printStackTrace();
 			// TODO: Check that it can only be a compilation error
 			results = logError(className, e, klass, results);
 			return results;
 		} catch (NoClassDefFoundError e) {
-			// e.printStackTrace();
+			 e.printStackTrace();
 			// TODO: Check that it can only be a compilation error
 			results = logError(className, e, klass, results);
 			return results;
 		} catch (Throwable e) {
-			// e.printStackTrace();
+			 e.printStackTrace();
 			// TODO: Check that it can only be a compilation error
 			results = logError(className, e, klass, results);
 			return results;
@@ -123,13 +111,14 @@ public class TestRunner {
 
 		Method beforeClassMethod = null;
 		Method afterClassMethod = null;
-		for (Method m : klass.getMethods()) {
-			if (m.isAnnotationPresent(AfterClass.class)) {
-				afterClassMethod = m;
-			} else if (m.isAnnotationPresent(BeforeClass.class)) {
-				beforeClassMethod = m;
-			}
-		}
+		//HERE444
+//		for (Method m : klass.getMethods()) {
+//			if (m.isAnnotationPresent(AfterClass.class)) {
+//				afterClassMethod = m;
+//			} else if (m.isAnnotationPresent(BeforeClass.class)) {
+//				beforeClassMethod = m;
+//			}
+//		}
 
 		try {
 			// invoke the setup method
@@ -141,7 +130,7 @@ public class TestRunner {
 			List<Method> testMethods = getTestMethods(klass);
 			if (!testMethods.isEmpty()) {
 				for (Method method : testMethods) {
-					TestResult res = execMethod(method, klass, createInstance(klass), results);
+					TestResult res = execMethod(method, klass, createInstance(klass, localTrexClsLoader), results);
 					if (res != null) {
 						results.put(
 								Utils.getCanonicalMethodSignature(method),
@@ -189,32 +178,6 @@ public class TestRunner {
 		}
 		executedTests.add(className);	
 		return results;
-	}
-
-	public static void execTestSuite(TestSuite testSuite, HashMap<String, TestResult> results){
-		Enumeration<junit.framework.Test> tests = testSuite.tests(); 
-		while(tests.hasMoreElements()){
-			junit.framework.Test localTest = tests.nextElement();
-			if(localTest instanceof TestSuite){
-				execTestSuite((TestSuite)localTest, results);
-			}
-			else{
-				String className = localTest.getClass().getName();
-				if(executedTests.contains(className)){
-					continue;
-				}
-				List<Method> testMethods = getTestMethods(localTest.getClass());
-				for(Method method:testMethods){
-					TestResult res = execMethod(method, localTest.getClass(), localTest, results);
-					if (res != null) {
-						results.put(
-								Utils.getCanonicalMethodSignature(method),
-								res);
-					}
-				}
-				executedTests.add(localTest.getClass().getName());
-			}
-		}
 	}
 	
 	private static int column = 0;
@@ -275,13 +238,10 @@ public class TestRunner {
 		List<Method> methods = new ArrayList<Method>();
 		for (Method method : klass.getMethods()) {
 			String fullyQualifidName = klass.getName() + "." + method.getName();
-			if (Utils.isIgnoredMethod(method)) {
+			if (!Utils.isTestMethod(method, trexClsLoader)) {
 				continue;
 			}
-			if (!Utils.isTestMethod(method)) {
-				continue;
-			}
-			
+
 			if(onlyTests != null && !onlyTests.isEmpty() &&
 					!onlyTests.contains(fullyQualifidName)){
 				continue;
@@ -305,10 +265,10 @@ public class TestRunner {
 		if (klass != null) {
 			try {
 				for (Method method : klass.getDeclaredMethods()) {
-					if (Utils.isIgnoredMethod(method)) {
+					if (Utils.isIgnoredMethod(method, trexClsLoader)) {
 						results.put(Utils.getCanonicalMethodSignature(method),
 								new TestResult(TestOutcome.IGNORE, null));
-					} else if (Utils.isTestMethod(method)) {
+					} else if (Utils.isTestMethod(method, trexClsLoader)) {
 						results.put(
 								Utils.getCanonicalMethodSignature(method),
 								new TestResult(TestOutcome.COMPILATION_ERROR, e));
@@ -365,27 +325,28 @@ public class TestRunner {
 	// + " not found in Class " + className);
 	// }
 
-	public static Object createInstance(Class<?> cls)
+	public static Object createInstance(Class<?> cls, TrexClassLoader classLoader)
 			throws ClassNotFoundException, IllegalAccessException,
 			NoSuchMethodException, InstantiationException,
 			InvocationTargetException {
 		// check whether the test class is abstract
-		if (Modifier.isAbstract(cls.getModifiers()) || !Modifier.isPublic(cls.getModifiers()) || isInnerClass(cls) || isIgnoredClass(cls)) {
+		if (Modifier.isAbstract(cls.getModifiers()) || !Modifier.isPublic(cls.getModifiers()) || isInnerClass(cls) || classLoader.isIgnoredClass(cls)) {
 			return null;
 		}
 
 		Object testObj = null;
 		try {
-			if(cls.isAnnotationPresent(RunWith.class)){
-				RunWith runWith = cls.getAnnotation(RunWith.class);
-				Class runner = runWith.value();
-				if(Parameterized.class.isAssignableFrom(runner)){
-					testObj = createFromParameterized(cls);
-					if(testObj != null){
-						return testObj;
-					}
-				}
-			}
+			//HERE444
+//			if(cls.isAnnotationPresent(RunWith.class)){
+//				RunWith runWith = cls.getAnnotation(RunWith.class);
+//				Class runner = runWith.value();
+//				if(Parameterized.class.isAssignableFrom(runner)){
+//					testObj = createFromParameterized(cls);
+//					if(testObj != null){
+//						return testObj;
+//					}
+//				}
+//			}
 
 			testObj = cls.newInstance(); // try the nullary test case
 											// constructor
@@ -408,10 +369,6 @@ public class TestRunner {
 		}
 
 		return testObj;
-	}
-	
-	public static boolean isIgnoredClass(Class cls){
-		return cls.isAnnotationPresent(Ignore.class);
 	}
 	
 	private static Object createFromParameterized(Class<?> cls) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException{
@@ -523,10 +480,11 @@ public class TestRunner {
 						setUpMethod.invoke(testObj);
 					}
 				}
-				if (method.isAnnotationPresent(Test.class)) {
-					Test testAnnotation = method.getAnnotation(Test.class);
-					expectedException = testAnnotation.expected();
-					if (expectedException.equals(None.class)) {
+				
+				if (trexClsLoader.isAnnotationPresent(method, TrexClassLoader.TestAnnotation)) {
+					Annotation testAnnotation = trexClsLoader.getAnnotation(method, TrexClassLoader.TestAnnotation);
+					expectedException = (Class) testAnnotation.getClass().getMethod("expected").invoke(testAnnotation);
+					if (expectedException.getClass().getName().equals(TrexClassLoader.TestNoneAnnotation)) {
 						expectedException = null;
 					}
 				}
@@ -542,28 +500,36 @@ public class TestRunner {
 						&& expectedException.isAssignableFrom(cause.getClass())) {
 					rethrowException = false;
 				}
+				if(method.getName().contains("sumFile")){
+					System.out.println(cause.getClass().getName());
+					System.out.println(cause.getMessage());
+				}
+				
 				if (rethrowException) {
 					throw cause;
 				}
 			}
 		} catch (AssertionFailedError afe) {
-			afe.printStackTrace();
+			//afe.printStackTrace();
 			return new TestResult(TestOutcome.ASSERT_FAILURE, afe);
 		} catch (NoSuchMethodError nme) {
-			nme.printStackTrace();
+			//nme.printStackTrace();
 			return new TestResult(TestOutcome.COMPILATION_ERROR, nme);
 		}catch (NoSuchFieldError nfe) {
-			nfe.printStackTrace();
+			//nfe.printStackTrace();
 			return new TestResult(TestOutcome.COMPILATION_ERROR, nfe);
 		} catch (NoClassDefFoundError ncde) {
-			ncde.printStackTrace();
+			//ncde.printStackTrace();
 			return new TestResult(TestOutcome.COMPILATION_ERROR, ncde);
 		} catch (IllegalAccessError illegalAccessException) {
-			illegalAccessException.printStackTrace();
+			//illegalAccessException.printStackTrace();
 			return new TestResult(TestOutcome.COMPILATION_ERROR, illegalAccessException);
 		}
 		catch (Throwable t) {
-			t.printStackTrace();
+			//t.printStackTrace();
+			if("java.lang.AssertionError".equals(t.getClass().getName())){
+				return new TestResult(TestOutcome.ASSERT_FAILURE, t);	
+			}			
 			return new TestResult(TestOutcome.RUNTIME_ERROR, t);
 		} finally {
 			// invoke the teardown method
@@ -587,19 +553,22 @@ public class TestRunner {
 	
 	public static List<Method> getParameterizedMethods(Class clazz) {
 		List<Method> methods = new ArrayList<Method>();
-		getMethods(clazz, null, Parameters.class, methods);
+		//HERE444
+		//getMethods(clazz, null, Parameters.class, methods);
 		return methods;
 	}
 
 	public static List<Method> getSetUpMethods(Class clazz) {
 		List<Method> methods = new ArrayList<Method>();
-		getMethods(clazz, SET_UP_METHOD, Before.class, methods);
+		//HERE444
+		//getMethods(clazz, SET_UP_METHOD, Before.class, methods);
 		return methods;
 	}
 
 	public static List<Method> getTearDownMethods(Class clazz) {
 		List<Method> methods = new ArrayList<Method>();
-		getMethods(clazz, TEAR_DOWN_METHOD, After.class, methods);
+		//HERE444
+		//getMethods(clazz, TEAR_DOWN_METHOD, After.class, methods);
 		return methods;
 	}
 

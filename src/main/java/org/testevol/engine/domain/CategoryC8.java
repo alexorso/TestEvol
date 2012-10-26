@@ -61,7 +61,7 @@ public class CategoryC8 extends Category {
 		}
 		Utils.println(getTestsOnThisCategory().size()+" tests in category C8, starting coverage analysis.");
 		
-		CoverageUtil.deleteCoverageInfo();
+		CoverageUtil.deleteCoverageInfo(version.getBuildDir());
 		
 		List<String> code = new ArrayList<String>();
 		code.add(version.getCodeJar().getAbsolutePath());
@@ -84,7 +84,7 @@ public class CategoryC8 extends Category {
 																			Arrays.asList(version.getTestsJar().getAbsolutePath()),
 																			null,
 																			testsExcluded,
-																			version.getDirectory().getAbsolutePath(),
+																			version.getBuildDir().getAbsolutePath(),
 																			true);
 		
         for(String test:getTestsOnThisCategory()){

@@ -12,12 +12,14 @@ import org.springframework.stereotype.Repository;
 import org.testevol.domain.Project;
 import org.testevol.domain.ProjectRepository;
 import org.testevol.domain.Version;
+import org.testevol.engine.util.Utils;
 import org.testevol.versioncontrol.UpdateResult;
 import org.testevol.versioncontrol.VersionControlSystem;
 
 @Repository
 public class ProjectRepoFileSystem implements ProjectRepository {
 
+	private static final String REPORTS_DIR_NAME = "reports";
 	private File projectsDir = null;
 
 	@Autowired
@@ -57,11 +59,14 @@ public class ProjectRepoFileSystem implements ProjectRepository {
 		File[] files = f.listFiles();
 		List<Version> versions = new ArrayList<Version>(files.length);
 		Version master = null;
-		for(File dirName:f.listFiles()){
-			Version version = new Version(dirName);
+		for(File dir:f.listFiles()){
+			if(REPORTS_DIR_NAME.equals(dir.getName())){
+				continue;
+			}
+			Version version = new Version(dir);
 			int index = version.getIndex();
 			if(index == -1){//means it is the master
-				master = new Version(dirName);
+				master = new Version(dir);
 			}
 			else{
 				versions.add(index,version);
@@ -115,7 +120,16 @@ public class ProjectRepoFileSystem implements ProjectRepository {
 
 		Version version = new Version(versionDir);
 		return version.updateLocalFilesFromRepository();
-		
 	}
+
+	@Override
+	public File createReportDir(Project project) {
+		File projectDir = new File(projectsDir, project.getName());
+		File reportDir = Utils.getTempDir(new File(projectDir, REPORTS_DIR_NAME));
+		reportDir.mkdirs();
+		return reportDir;
+	}
+	
+	
 
 }

@@ -128,4 +128,15 @@ public abstract class Category {
 		fileName.append(".txt");
 		return fileName.toString();
 	}
+	
+	@Override
+	public String toString() {
+		StringBuffer b= new StringBuffer();
+		b.append("Tests on: "+getClassification().getLabel()).append("\n");
+		for(String test:getTestsOnThisCategory()){
+			b.append(test).append("\n");
+		}
+		return b.toString();
+	}
+	
 }

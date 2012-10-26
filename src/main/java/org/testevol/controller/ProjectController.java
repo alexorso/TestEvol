@@ -1,5 +1,6 @@
 package org.testevol.controller;
 
+import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -64,16 +65,19 @@ public class ProjectController {
 	
 	@RequestMapping(value="{project}/execute",method = RequestMethod.POST)
 	public String execute(@PathVariable("project") String projectName, @ModelAttribute Project projectModel) throws Exception {
-		System.out.println(projectModel.getVersionsToExecute());
+
 		Project project = projectRepo.getProject(projectName);
+		File buildDir = projectRepo.createReportDir(project);
+		
 		List<Version> versionsToExecute = new ArrayList<Version>();
 		for(Version version:project.getVersionsList()){
 			if(projectModel.getVersionsToExecute().contains(version.getName())){
+				version.setBaseBuildDir(buildDir);
 				versionsToExecute.add(version);
 			}
 		}
 		Collections.reverse(versionsToExecute);
-		DataAnalysis dataAnalysis = new DataAnalysis(configDir, project, versionsToExecute);
+		DataAnalysis dataAnalysis = new DataAnalysis(configDir, project, versionsToExecute, buildDir);
 		dataAnalysis.start();
 		
 		return "redirect:/projects/"+projectName;
@@ -99,6 +103,12 @@ public class ProjectController {
 		} catch (Exception e) {
 			return new UpdateResult(false, getStringFromException(e));
 		}
+
+	}
+	
+	@RequestMapping(value="version/script",method = RequestMethod.GET)
+	public @ResponseBody String getReportScript() throws Exception {
+		return "alert('loaded dude');";
 
 	}
 

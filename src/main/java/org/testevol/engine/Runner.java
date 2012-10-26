@@ -111,10 +111,10 @@ public class Runner extends Task {
 
                 PrintStream out = new PrintStream(new File(buildDir,"data-testlog-out." + versions + ".txt"));
                 PrintStream err = new PrintStream(new File(buildDir,"data-testlog-err." + versions + ".txt"));
-                PrintStream origout = System.out;
-                PrintStream origerr = System.err;
-                System.setOut(out);
-                System.setErr(err);
+                //PrintStream origout = System.out;
+                //PrintStream origerr = System.err;
+                //System.setOut(out);
+                //System.setErr(err);
 
                 try {
                     Version versionAux = null;
@@ -171,8 +171,8 @@ public class Runner extends Task {
                         Utils.sortTextFile(new File(buildDir, "data-testout-"+ testOutcome + "-" + versions + ".txt"));
                         out.close();
                         err.close();
-                        System.setOut(origout);
-                        System.setErr(origerr);
+                        //System.setOut(origout);
+                        //System.setErr(origerr);
                     }
                 }
                 

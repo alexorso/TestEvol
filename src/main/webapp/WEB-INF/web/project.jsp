@@ -103,8 +103,10 @@
 	<!--/.fluid-container-->
 	
 	
-
-	<%@include file="includes/scripts.jsp" %>
+<!-- 	<script type="text/javascript" src="<c:url value="/projects/version/script"/>"></script>
+ -->
+ 
+ 	<%@include file="includes/scripts.jsp" %>
 	<script type="text/javascript">
 		//var closeClickEvent
 		

@@ -13,15 +13,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
-import net.sourceforge.cobertura.coveragedata.ProjectData;
+import net.sourceforge.cobertura.instrument.Main;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.sonatype.guice.bean.containers.Main;
 import org.testevol.engine.TestRunner;
 import org.testevol.engine.domain.coverage.Coverage;
 import org.testevol.engine.util.TrexClassLoader;
@@ -41,14 +36,8 @@ import org.testevol.engine.util.Utils;
  */
 public class TestCoverageDriver 
 {	
-	private static ExecutorService executor = Executors.newFixedThreadPool(1);
 	
-	
-	public static void main(String[] args) throws Exception {
-		TestCoverageDriver.generateCoverageReport("cobertura.ser", "teste", "xml", new ArrayList<String>());
-	}
-
-	public static final String TEMP_DIR = "CoberturaTemp";
+	public static String COVERAGE_JAR = "cobertura-1.9.4.1.jar";
 	
 	/**
 	 * Instruments given jar file and executes test cases and outputs the coverage.
@@ -63,41 +52,36 @@ public class TestCoverageDriver
 	 * @param excludeTestCases
 	 */
 	public static Coverage computeCoverage(	List<String> srcJarFiles,
-											String sourceDirs[], 
-											List<String> classPathJars, 
-											List<String> testJarFile, 
-											Set<String> inclTestCases, 
-											Set<String> exclTestCases,
-											String destination,
-											boolean instrument)
+												String sourceDirs[], 
+												List<String> classPathJars, 
+												List<String> testJarFile, 
+												Set<String> inclTestCases, 
+												Set<String> exclTestCases,
+												String destination,
+												boolean instrument)
 	{			
 		try
 		{
 
 			//Instrument the files using cobertura. Don't specify destination. Source files will be overwritten
 			List<String> dirsToInstrument = new ArrayList<String>();
-
-			System.out.print("Caution: source jar files ");
+			//System.out.print("Caution: source jar files ");
 			for (int i = 0; i < srcJarFiles.size(); i++) {
 					File jarFile = new File(srcJarFiles.get(i));
 					FileUtils.copyFile(jarFile, new File(jarFile.getParent(), jarFile.getName()+".NotInstrumented.jar"));
-					System.out.print(srcJarFiles.get(i) + ", ");					
+				//	System.out.print(srcJarFiles.get(i) + ", ");					
 					dirsToInstrument.add(srcJarFiles.get(i));
 			}
-			System.out.println(" will be instrumented!!!");
+			//System.out.println(" will be instrumented!!!");
 
 			if(instrument){
-				TestCoverageDriver.instrument(null, null, null, null, null, null, dirsToInstrument);				
+				TestCoverageDriver.instrument(null, new File(destination, "cobertura.ser"), null, null, null, null, dirsToInstrument);				
 			}
-			
 			//Run tests
 			if(!runTests(srcJarFiles, classPathJars, testJarFile, inclTestCases, exclTestCases))
 			{
 				System.err.println("Some tests not executed, coverage result may not be complete!!!");
 			}
-			//Flush cobertura data
-			ProjectData.saveGlobalProjectData();
-			
 			//Generate report
 			try
 			{
@@ -110,12 +94,8 @@ public class TestCoverageDriver
 				if(coverageXml.exists()){
 					coverageXml.delete();
 				}
-				
-				
-				TestCoverageDriver.generateCoverageReport("cobertura.ser", destination, "xml", srcDirectories);
-				
+				TestCoverageDriver.generateCoverageReport(new File(destination,"cobertura.ser"), destination, "xml", srcDirectories);
 				coverageXml = new File(destination,"coverage.xml");
-								
 				Coverage coverage = Coverage.getInstance(new FileInputStream(new File(destination, "coverage.xml")));
 				return coverage;
 			}
@@ -154,6 +134,8 @@ public class TestCoverageDriver
 									Set<String> inclTestCases, 
 									Set<String> exclTestCases) 
 	{
+		
+		TrexClassLoader clsLoader = null;
 		try
 		{
 			//Loading all URLs including all from class paths as well
@@ -181,12 +163,11 @@ public class TestCoverageDriver
 			URL[] urlsToLoad = new URL[allUrls.size()];
 			
 			allUrls.toArray(urlsToLoad);
-			
 		
 			TestRunner.init(exclTestCases, inclTestCases);
 			TestRunner.initClassLoader(urlsToLoad);
 			
-			TrexClassLoader clsLoader = new TrexClassLoader(urlsToLoad);			
+			clsLoader = new TrexClassLoader(urlsToLoad);			
 			
 			List<String> classList = new ArrayList<String>();
 			
@@ -216,7 +197,7 @@ public class TestCoverageDriver
 			{
 				try
 				{
-					clsLoader = new TrexClassLoader(urlsToLoad);
+					//clsLoader = new TrexClassLoader(urlsToLoad);
 					Thread.currentThread().setContextClassLoader(clsLoader);
 					TestRunner.runTests(className);
 				} catch (Exception e) {
@@ -228,7 +209,20 @@ public class TestCoverageDriver
 		{
 			ex.printStackTrace();
 			return false;
-		} 
+		}
+		finally{
+			if(clsLoader != null){
+				try {
+					Class ProjectData = clsLoader.loadClass("net.sourceforge.cobertura.coveragedata.ProjectData");
+					ProjectData.getMethod("saveGlobalProjectData").invoke(null);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+			}
+
+		}
 		return true;
 	}
 	
@@ -245,9 +239,9 @@ public class TestCoverageDriver
 	 * @throws InvocationTargetException
 	 */
 	public static void runSelectedTests(	TrexClassLoader clsLoader,
-															String className, 
-															Set<String> inclTests,
-															Set<String> exclTests )
+											String className, 
+											Set<String> inclTests,
+											Set<String> exclTests )
 			throws ClassNotFoundException, IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
 		
 		final Class<?> klass = clsLoader.loadClass(className);
@@ -256,13 +250,14 @@ public class TestCoverageDriver
 				
         Method beforeClassMethod = null;
         Method afterClassMethod = null;
-        for (Method m : klass.getMethods()) {
-            if (m.isAnnotationPresent(AfterClass.class)) {
-            	afterClassMethod = m;
-            } else if (m.isAnnotationPresent(BeforeClass.class)) {
-            	beforeClassMethod = m;
-            }
-        }
+//HERE444
+        //        for (Method m : klass.getMethods()) {
+//            if (m.isAnnotationPresent(AfterClass.class)) {
+//            	afterClassMethod = m;
+//            } else if (m.isAnnotationPresent(BeforeClass.class)) {
+//            	beforeClassMethod = m;
+//            }
+//        }
         // invoke the setup method
         if (beforeClassMethod != null) {
         	beforeClassMethod.setAccessible(true);
@@ -270,10 +265,10 @@ public class TestCoverageDriver
         }
         
 		for (final Method method : klass.getDeclaredMethods() ) {			
-			if ( Utils.isIgnoredMethod( method ) ) {
+			if ( Utils.isIgnoredMethod( method, clsLoader) ) {
 				continue;
 			}
-			else if ( !Utils.isTestMethod( method ) ) {
+			else if ( !Utils.isTestMethod( method, clsLoader ) ) {
 				continue;
 			}			
 			
@@ -285,7 +280,7 @@ public class TestCoverageDriver
 
 			if(inclTests == null || inclTests.contains(fullyQualifidName)) {
 				Utils.println("\n**** Running test for coverage:"+fullyQualifidName+ " ****\n");	
-				TestRunner.execMethod(method, klass, TestRunner.createInstance(klass), null);
+				TestRunner.execMethod(method, klass, TestRunner.createInstance(klass, clsLoader), null);
 			}
 		}
 		// invoke the setup method
@@ -323,7 +318,7 @@ public class TestCoverageDriver
 		return true;
 	}
 		
-	public static void instrument(String basedir, String datafile, String destination, List<String> ignore,
+	public static void instrument(String basedir, File datafile, String destination, List<String> ignore,
             List<String> includeClasses, List<String> excludeClasses, List<String> instrument) {
 		
 		List<String> args = new ArrayList<String>();
@@ -342,7 +337,7 @@ public class TestCoverageDriver
         }
         if (datafile != null && !datafile.equals("")) {
             args.add("--datafile");
-            args.add(datafile);
+            args.add(datafile.getAbsolutePath());
         }
         if (destination != null && !destination.equals("")) {
             args.add("--destination");
@@ -372,11 +367,14 @@ public class TestCoverageDriver
 	
 	
 
-    private static void generateCoverageReport(String datafile, String destination, String format,
-            List<String> sourceDirectories) throws Exception {
+    private static void generateCoverageReport(	File datafile, 
+    												String destination,
+    												String format,
+    												List<String> sourceDirectories) throws Exception {
         List<String> args = new ArrayList<String>();
         args.add("--datafile");
-        args.add(datafile);
+        System.out.println(datafile.getAbsolutePath());
+        args.add(datafile.getAbsolutePath());
         args.add("--format");
         args.add(format);
         args.add("--destination");
@@ -400,56 +398,56 @@ public class TestCoverageDriver
         return dir.delete();
     }
     
-    public static void CoberturaMain(String args[]) throws IOException
-	{
-		//Instrumenting
-		List<String> dirsToInstrument = new ArrayList<String>();
-		dirsToInstrument.add("C:\\Suresh\\eclipse-rcp-galileo-SR2-win32\\eclipse\\workspace\\TestNew\\bin");
-		TestCoverageDriver.instrument(null, null, 
-				"C:\\Suresh\\eclipse-rcp-galileo-SR2-win32\\eclipse\\workspace\\TestNew\\instrumented", 
-				null, null, null, dirsToInstrument);
-		
-		//Running
-		try
-		{
-			String line;
-			Process p = Runtime.getRuntime().exec("java -cp " +
-					"C:\\Suresh\\Softwares\\cobertura-1.9.4.1-bin\\cobertura-1.9.4.1\\cobertura.jar;" +
-					"C:\\Suresh\\eclipse-rcp-galileo-SR2-win32\\eclipse\\workspace\\TestNew\\instrumented;" +
-					"C:\\Suresh\\eclipse-rcp-galileo-SR2-win32\\eclipse\\workspace\\TestNew\\bin;" +
-					"C:\\Suresh\\Softwares\\junit\\junit-4.9.jar temp.Main");	
-			 BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
-			 while ((line = input.readLine()) != null) {
-			     System.out.println(line);
-			 }
-			 input.close();
-		}
-		catch(IOException ex)
-		{
-			System.err.println("Failed to execute the program!!!");
-			ex.printStackTrace();
-			return;
-		}
-		
-		//Reporting
-		try
-		{
-			List<String> srcDirectories = new ArrayList<String>();
-			srcDirectories.add("C:\\Suresh\\eclipse-rcp-galileo-SR2-win32\\eclipse\\workspace\\TestNew\\src");
-			TestCoverageDriver.generateCoverageReport("cobertura.ser", 
-					"C:\\Suresh\\eclipse-rcp-galileo-SR2-win32\\eclipse\\workspace\\TestNew\\instrumented\\report\\xml", 
-					"xml", 
-					srcDirectories);
-			
-			TestCoverageDriver.generateCoverageReport("cobertura.ser", 
-					"C:\\Suresh\\eclipse-rcp-galileo-SR2-win32\\eclipse\\workspace\\TestNew\\instrumented\\report\\html", 
-					"html", 
-					srcDirectories);
-		}
-		catch(Exception ex)
-		{
-			System.err.println("Exception occurred while generating report!!!");
-			ex.printStackTrace();
-		}
-	}
+//    public static void CoberturaMain(String args[]) throws IOException
+//	{
+//		//Instrumenting
+//		List<String> dirsToInstrument = new ArrayList<String>();
+//		dirsToInstrument.add("C:\\Suresh\\eclipse-rcp-galileo-SR2-win32\\eclipse\\workspace\\TestNew\\bin");
+//		TestCoverageDriver.instrument(null, null, 
+//				"C:\\Suresh\\eclipse-rcp-galileo-SR2-win32\\eclipse\\workspace\\TestNew\\instrumented", 
+//				null, null, null, dirsToInstrument);
+//		
+//		//Running
+//		try
+//		{
+//			String line;
+//			Process p = Runtime.getRuntime().exec("java -cp " +
+//					"C:\\Suresh\\Softwares\\cobertura-1.9.4.1-bin\\cobertura-1.9.4.1\\cobertura.jar;" +
+//					"C:\\Suresh\\eclipse-rcp-galileo-SR2-win32\\eclipse\\workspace\\TestNew\\instrumented;" +
+//					"C:\\Suresh\\eclipse-rcp-galileo-SR2-win32\\eclipse\\workspace\\TestNew\\bin;" +
+//					"C:\\Suresh\\Softwares\\junit\\junit-4.9.jar temp.Main");	
+//			 BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
+//			 while ((line = input.readLine()) != null) {
+//			     System.out.println(line);
+//			 }
+//			 input.close();
+//		}
+//		catch(IOException ex)
+//		{
+//			System.err.println("Failed to execute the program!!!");
+//			ex.printStackTrace();
+//			return;
+//		}
+//		
+//		//Reporting
+//		try
+//		{
+//			List<String> srcDirectories = new ArrayList<String>();
+//			srcDirectories.add("C:\\Suresh\\eclipse-rcp-galileo-SR2-win32\\eclipse\\workspace\\TestNew\\src");
+//			TestCoverageDriver.generateCoverageReport("cobertura.ser", 
+//					"C:\\Suresh\\eclipse-rcp-galileo-SR2-win32\\eclipse\\workspace\\TestNew\\instrumented\\report\\xml", 
+//					"xml", 
+//					srcDirectories);
+//			
+//			TestCoverageDriver.generateCoverageReport("cobertura.ser", 
+//					"C:\\Suresh\\eclipse-rcp-galileo-SR2-win32\\eclipse\\workspace\\TestNew\\instrumented\\report\\html", 
+//					"html", 
+//					srcDirectories);
+//		}
+//		catch(Exception ex)
+//		{
+//			System.err.println("Exception occurred while generating report!!!");
+//			ex.printStackTrace();
+//		}
+//	}
 }

@@ -19,13 +19,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.StringTokenizer;
+import java.util.UUID;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-
-import org.junit.Ignore;
-import org.junit.Test;
 
 public class Utils {
 	private static boolean diagnosticOn = true;
@@ -62,19 +60,6 @@ public class Utils {
 		}
 		return filesList;
 	}
-
-//	public static File[] getMatchingFilesOrdered(String sourceDirectory,
-//			String regexpVersionNames) {
-//		File[] directories = Utils.getMatchingFiles(sourceDirectory,
-//				regexpVersionNames).toArray(new File[0]);
-//		Arrays.sort(directories, new Comparator<File>() {
-//			@Override
-//			public int compare(File f1, File f2) {
-//				return f1.getPath().compareTo(f2.getPath());
-//			}
-//		});
-//		return directories;
-//	}
 
 	public static HashSet<File> getMatchingFilesRecursively(String dir,
 			String filter) {
@@ -232,24 +217,17 @@ public class Utils {
 		}
 	}
 
-	public static boolean isTestMethod(Method method) {
-		if (method.isAnnotationPresent(Test.class)) {
-			return true;
-		}
+	public static boolean isTestMethod(Method method, TrexClassLoader classLoader) {
+		
 		// Ignore the method that receive parameters
-		else if (method.getName().startsWith("test")
-				&& method.getParameterTypes().length == 0) {
-			return true;
+		if(method.getParameterTypes().length > 0){
+			return false;
 		}
-
-		return false;
+		return classLoader.isTestMethod(method);
 	}
 
-	public static boolean isIgnoredMethod(Method method) {
-		if (method.isAnnotationPresent(Ignore.class)) {
-			return true;
-		}
-		return false;
+	public static boolean isIgnoredMethod(Method method, TrexClassLoader classLoader) {
+		return classLoader.isAnnotationPresent(method, TrexClassLoader.IgnoreAnnotation);
 	}
 
 	public static String getClassPathInDir(File verDir) {
@@ -339,5 +317,25 @@ public class Utils {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static File getTempDir(){
+		return getTempDir(null);
+	}
+	
+	public static File getTempDir(File baseDir){
+		File dir = null;
+		while(dir == null){
+			if(baseDir != null){
+				dir = new File(baseDir, UUID.randomUUID().toString());	
+			}
+			else{
+				dir = new File(UUID.randomUUID().toString());				
+			}
+			if(dir.exists()){
+				dir = null;
+			}			
+		}
+		return dir;
 	}
 }

@@ -3,6 +3,7 @@
  */
 package org.testevol.engine;
 
+import java.io.File;
 import java.util.List;
 
 import org.testevol.domain.Project;
@@ -18,15 +19,18 @@ public class DataAnalysis {
 	private String testevolConfigRoot;
 	private Project project;
 	private List<Version> versions;
+	private File reportFolder;
 	
 	
-	
-	public DataAnalysis(String testevolConfigRoot, Project project,
-			List<Version> versions) {
+	public DataAnalysis(	String testevolConfigRoot, 
+							Project project,
+							List<Version> versions,
+							File reportsFolder) {
 		super();
 		this.testevolConfigRoot = testevolConfigRoot;
 		this.project = project;
 		this.versions = versions;
+		this.reportFolder = reportsFolder;
 	}
 
 	/**
@@ -50,30 +54,15 @@ public class DataAnalysis {
 	public void start() throws Exception {
 		
 		for(Version version:versions){
-			version.setUp();
+			version.setUp(new File(testevolConfigRoot));
 		}
 		
 		Compiler compiler = new Compiler(versions);
-//		Instrumenter instrumenter = new Instrumenter(toolroot, subjroot,
-//				regexpVersionNames);
 		Runner runner = new Runner(versions);
 		Differ differ = new Differ(versions,testevolConfigRoot);
-		//Classifier classifier = new Classifier(versions, differ);
-//		ReportGenerator reportGenerator = new ReportGenerator(classifier,
-//				toolroot, subjroot, regexpVersionNames, projectName);
+		Classifier classifier = new Classifier(versions, differ);
+		ReportGenerator reportGenerator = new ReportGenerator(versions, classifier, project.getName(), reportFolder);
 
-//		if (args[3].equalsIgnoreCase("clean")) {
-//			compiler.clean();
-//			compiler.cleanUp();
-//			instrumenter.clean();
-//			instrumenter.cleanUp();
-//			runner.clean();
-//			runner.cleanUp();
-//			differ.clean();
-//			differ.cleanUp();
-//			System.exit(0);
-//		}
-//		boolean force = Boolean.parseBoolean(args[3]);
 		boolean force = false;
 		try {
 			long init = System.currentTimeMillis();
@@ -81,8 +70,8 @@ public class DataAnalysis {
 			compiler.go(force);
 			runner.go(force);
 			differ.go(force);
-			//classifier.go(force);
-//			reportGenerator.go(force);
+			classifier.go(force);
+			reportGenerator.go(force);
 //
 			long end = System.currentTimeMillis();
 

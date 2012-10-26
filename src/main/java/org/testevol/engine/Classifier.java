@@ -73,7 +73,7 @@ public class Classifier extends Task {
 
 			if (oldVersion == null) {
 				oldVersion = version;
-				Utils.println("\nDiffing: Skipping first version: " + version.getName());
+				Utils.println("\nClassifier: Skipping first version: " + version.getName());
 				continue;
 			}
 

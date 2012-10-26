@@ -14,7 +14,7 @@ public class VersionTest {
 	@Test
 	public void checkConfiguration() throws Exception{
 		Version version = new Version(new File("/home/leandro/Documents/Atlanta/tmp/Versions/math/v1"));
-		version.setUp();
+		version.setUp(null);
 		Assert.assertEquals("1.6", version.getJavaVersion());
 	}
 	

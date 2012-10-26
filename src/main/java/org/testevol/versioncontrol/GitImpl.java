@@ -9,6 +9,7 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.PullResult;
 import org.eclipse.jgit.lib.Ref;
 import org.testevol.domain.Version;
+import org.testevol.engine.util.Utils;
 
 public class GitImpl extends VersionControlSystem {
 
@@ -26,7 +27,7 @@ public class GitImpl extends VersionControlSystem {
 	@Override
 	public List<String> getBranches() throws Exception {
 
-		File dir = getTempDir();
+		File dir = Utils.getTempDir();
 		List<String> branches = new ArrayList<String>();
 
 		try {
@@ -50,7 +51,7 @@ public class GitImpl extends VersionControlSystem {
 		if(!destinationDir.exists()){
 			destinationDir.mkdirs();
 		}
-		File dir = getTempDir();
+		File dir = Utils.getTempDir();
 		try {
 			int branchIndex=0;
 			for(String branch:branchesToClone){

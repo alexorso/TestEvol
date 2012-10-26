@@ -1,6 +1,7 @@
 package org.testevol.engine.util;
 
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.net.JarURLConnection;
@@ -16,11 +17,12 @@ import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import org.junit.Ignore;
-import org.junit.Test;
-
 public class TrexClassLoader extends URLClassLoader {
 
+	public static final String IgnoreAnnotation = "org.junit.Ignore";
+	public static final String TestAnnotation = "org.junit.Test";
+	public static final String TestNoneAnnotation = "org.junit.Test.None";
+	
 	private HashMap<String, Class<?>> loadedClasses;
 	
 	public TrexClassLoader( URL[] jarURLs ) {
@@ -32,46 +34,6 @@ public class TrexClassLoader extends URLClassLoader {
 		addURL( url );
 	}
 
-	public boolean isTestClass( String className ) throws ClassNotFoundException {
-
-		Class<?> cls = findOrLoadClass( className );
-		
-		if(isTestClass("org.junit.runners.JUnit4", className)){
-			return true;
-		}
-		if(isTestClass("org.junit.internal.runners.JUnit38ClassRunner", className)){
-			return true;
-		}
-		return false;
-	}
-
-	private boolean isTestClass(String JUnitRunner, String className){
-		try {
-			Class<?> cls = findOrLoadClass( className );
-			Class<?> clsJUnit = findOrLoadClass(JUnitRunner);
-			Constructor c = clsJUnit.getConstructor(cls.getClass());
-			Object o = c.newInstance(cls);
-			int testCount = (Integer) o.getClass().getMethod("testCount").invoke(o);
-			return testCount > 0;
-		} catch (Exception e) {
-			//e.printStackTrace();
-			//It is not a test case!
-		}
-		return false;
-	}
-	
-	public Collection<String> getAllTestcases( String className ) throws ClassNotFoundException {
-		ArrayList<String> testMethods = new ArrayList<String>();
-		Class<?> cls = findOrLoadClass( className );
-		for ( Method method : cls.getMethods() ) {
-			if ( ( method.getName().startsWith( "test" ) || method.isAnnotationPresent( Test.class ) ) &&
-					!method.isAnnotationPresent( Ignore.class ) ) {
-				testMethods.add( Utils.getCanonicalMethodSignature( method ) );
-			}
-		}
-		return testMethods;
-	}
-	
 	private Class<?> findOrLoadClass( String className ) throws ClassNotFoundException {
 		Class<?> cls = loadedClasses.get( className );
 		if ( cls == null ) {
@@ -80,7 +42,7 @@ public class TrexClassLoader extends URLClassLoader {
 		}
 		return cls;
 	}
-	
+
 	/**
 	 * Helps to retrive all the class names
 	 * @param url
@@ -111,5 +73,84 @@ public class TrexClassLoader extends URLClassLoader {
 		}
 		
 		return classNamesSet;
+	}
+	
+	public Collection<String> getAllTestcases( String className ) throws ClassNotFoundException {
+		ArrayList<String> testMethods = new ArrayList<String>();
+		
+		Class<?> cls = findOrLoadClass( className );
+		
+		for ( Method method : cls.getMethods() ) {
+			if (isTestMethod(method)) {
+				testMethods.add( Utils.getCanonicalMethodSignature( method ) );
+			}
+		}
+		return testMethods;
+	}
+	
+	public boolean isAnnotationPresent(Annotation[] annotations, String annotationName){
+		for(Annotation annotation:annotations){
+			if(annotation.annotationType().getName().equals(annotationName)){
+				return true;
+			}		
+		}
+		return false;
+	}
+	
+	public boolean isAnnotationPresent(Class clazz, String annotationName){
+		return isAnnotationPresent(clazz.getAnnotations(), annotationName);
+	}
+	
+	public boolean isAnnotationPresent(Method method, String annotationName){
+		return isAnnotationPresent(method.getAnnotations(), annotationName);
+	}
+	
+	public boolean isIgnoredClass(Class<?> cls) throws ClassNotFoundException {
+		return isAnnotationPresent(cls,IgnoreAnnotation);
+	}
+	
+	
+	
+	public boolean isTestClass( String className ) throws ClassNotFoundException {
+
+		Class<?> cls = findOrLoadClass( className );
+		
+		if(isTestClass("org.junit.runners.JUnit4", className)){
+			return true;
+		}
+		if(isTestClass("org.junit.internal.runners.JUnit38ClassRunner", className)){
+			return true;
+		}
+		return false;
+	}
+	
+	private boolean isTestClass(String JUnitRunner, String className){
+		try {
+			Class<?> cls = findOrLoadClass( className );
+			Class<?> clsJUnit = findOrLoadClass(JUnitRunner);
+			Constructor c = clsJUnit.getConstructor(cls.getClass());
+			Object o = c.newInstance(cls);
+			int testCount = (Integer) o.getClass().getMethod("testCount").invoke(o);
+			return testCount > 0;
+		} catch (Exception e) {
+			//e.printStackTrace();
+			//It is not a test case!
+		}
+		return false;
+	}
+
+	public boolean isTestMethod(Method method) {
+		return (method.getName().startsWith("test") || isAnnotationPresent(
+				method, TestAnnotation))
+				&& !isAnnotationPresent(method, IgnoreAnnotation);
+	}
+
+	public Annotation getAnnotation(Method method, String annotationName) {
+		for(Annotation annotation:method.getAnnotations()){
+			if(annotation.annotationType().getName().equals(annotationName)){
+				return annotation;
+			}
+		}
+		return null;
 	}
 }
