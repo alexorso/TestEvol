@@ -29,44 +29,42 @@ import org.testevol.engine.util.Utils;
 
 public class TestRunner {
 	
-	private static Set<String> executedTests = null;
-	private static Set<String> testsToIgnore = null;
-	private static Set<String> onlyTests = null;
+	private Set<String> executedTests = null;
+	private Set<String> testsToIgnore = null;
+	private Set<String> onlyTests = null;
 	
 	private static final String SET_UP_METHOD = "setUp";
 	private static final String TEAR_DOWN_METHOD = "tearDown";
 
-	private static TrexClassLoader trexClsLoader;
+	private TrexClassLoader trexClsLoader;
 
-	private static ExecutorService executor = Executors.newFixedThreadPool(1);
-
-	public static void init(Set<String> ignoredTests, Set<String> onlyTests){
+	private ExecutorService executor = Executors.newFixedThreadPool(1);
+	
+	public TestRunner(TrexClassLoader trexClsLoader, Set<String> ignoredTests, Set<String> onlyTests){
+		if (trexClsLoader == null) {
+			throw new IllegalArgumentException("Classloader cannot be null!");
+		}
+		this.trexClsLoader = trexClsLoader;
 		executedTests = new HashSet<String>();
-		TestRunner.testsToIgnore = ignoredTests;
-		TestRunner.onlyTests = onlyTests;
+		this.testsToIgnore = ignoredTests;
+		this.onlyTests = onlyTests;
 	}
 	
-	public static boolean alreadyExecuted(String className){
+	public boolean alreadyExecuted(String className){
 		return executedTests.contains(className);
 	}
 	
 	// Returns an empty map in case of a "compilation error"
 	// Returns null in the case of abstract classes
-	public static Map<String, TestResult> runTests(String className) {
-		HashMap<String, TestResult> results = new HashMap<String, TestResult>();
+	public Map<String, TestResult> runTests(String className) {
+		
+		Map<String, TestResult> results = new HashMap<String, TestResult>();
 		Class<?> klass = null;
 
 		Object testObj = null;
-		TrexClassLoader localTrexClsLoader = null;
 		try {
-			if (trexClsLoader != null) {
-				localTrexClsLoader = new TrexClassLoader(trexClsLoader.getURLs());
-				Thread.currentThread().setContextClassLoader(localTrexClsLoader);
-				klass = localTrexClsLoader.loadClass(className);
-			} else {
-				throw new RuntimeException("Classloader cannot be null!");
-			}
-			testObj = createInstance(klass, localTrexClsLoader);
+			klass = trexClsLoader.findOrLoadClass(className);
+			testObj = createInstance(klass, trexClsLoader);
 			if (testObj == null) {
 				return null;
 			}
@@ -130,7 +128,7 @@ public class TestRunner {
 			List<Method> testMethods = getTestMethods(klass);
 			if (!testMethods.isEmpty()) {
 				for (Method method : testMethods) {
-					TestResult res = execMethod(method, klass, createInstance(klass, localTrexClsLoader), results);
+					TestResult res = execMethod(method, klass, createInstance(klass, trexClsLoader), results);
 					if (res != null) {
 						results.put(
 								Utils.getCanonicalMethodSignature(method),
@@ -140,22 +138,6 @@ public class TestRunner {
 			}
 			else{
 				return null;
-//				if(testObj instanceof TestCase){
-//					try {
-//						Method suite = testObj.getClass().getDeclaredMethod("suite");
-//						junit.framework.Test test = (junit.framework.Test) suite.invoke(testObj);
-//						if(test instanceof TestSuite){
-//							execTestSuite((TestSuite)test, results);
-//						}
-//						if(results.isEmpty()){
-//							return null;
-//						}
-//					} catch (Exception e) {
-//						e.printStackTrace();
-//						//IGNORE
-//					}
-//				}
-
 			}
 					
 		} catch (InvocationTargetException e) {
@@ -180,8 +162,8 @@ public class TestRunner {
 		return results;
 	}
 	
-	private static int column = 0;
-	private static void feedback(Method m) {
+	private int column = 0;
+	private void feedback(Method m) {
 		Utils.print(".");
 		if(column == 80){
 			Utils.println("");
@@ -194,7 +176,7 @@ public class TestRunner {
 	}
 	
 	
-	public static TestResult execMethod(final Method method,final Class<?> clazz, final Object obj, HashMap<String, TestResult> results){		
+	public TestResult execMethod(final Method method,final Class<?> clazz, final Object obj, Map<String, TestResult> results){		
 		feedback(method);
 		TestResult res= null;
 		try {
@@ -234,7 +216,7 @@ public class TestRunner {
 		return res;
 	}
 	
-	public static List<Method> getTestMethods(Class klass) {
+	public List<Method> getTestMethods(Class klass) {
 		List<Method> methods = new ArrayList<Method>();
 		for (Method method : klass.getMethods()) {
 			String fullyQualifidName = klass.getName() + "." + method.getName();
@@ -255,8 +237,8 @@ public class TestRunner {
 		return methods;
 	}
 
-	public static HashMap<String, TestResult> logError(String className,
-			Throwable e, Class<?> klass, HashMap<String, TestResult> results) {
+	public Map<String, TestResult> logError(String className,
+			Throwable e, Class<?> klass, Map<String, TestResult> results) {
 		System.err.println("====== test class <" + className + " beg> ======");
 		System.err.println("");
 		System.err.println("[treated as a compilation error]");
@@ -294,8 +276,8 @@ public class TestRunner {
 		return results;
 	}
 
-	public static HashMap<String, TestResult> logError(Method method,
-			Throwable e, HashMap<String, TestResult> results) {
+	public Map<String, TestResult> logError(Method method,
+			Throwable e, Map<String, TestResult> results) {
 		System.err.println("====== test case <" + method + " beg>======");
 		System.err.println("");
 		System.err.println("[treated as a compilation error]");
@@ -325,7 +307,7 @@ public class TestRunner {
 	// + " not found in Class " + className);
 	// }
 
-	public static Object createInstance(Class<?> cls, TrexClassLoader classLoader)
+	public Object createInstance(Class<?> cls, TrexClassLoader classLoader)
 			throws ClassNotFoundException, IllegalAccessException,
 			NoSuchMethodException, InstantiationException,
 			InvocationTargetException {
@@ -371,7 +353,7 @@ public class TestRunner {
 		return testObj;
 	}
 	
-	private static Object createFromParameterized(Class<?> cls) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException{
+	private Object createFromParameterized(Class<?> cls) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException{
 		List<Method> methods = getParameterizedMethods(cls);
 		if(methods.isEmpty()){
 			return null;
@@ -397,7 +379,7 @@ public class TestRunner {
 		
 	}
 	
-	private static Constructor getConstructor(Class cls, Class[] types){
+	private Constructor getConstructor(Class cls, Class[] types){
 		for(Constructor c:cls.getConstructors()){
 			if(c.getParameterTypes().length == types.length){
 				for (int i = 0; i < types.length; i++) {
@@ -411,28 +393,8 @@ public class TestRunner {
 		return null;
 	}
 
-	private static boolean isInnerClass(Class clazz) {
+	private boolean isInnerClass(Class clazz) {
 		return clazz.getEnclosingClass() != null;
-	}
-
-	/**
-	 * Initializes the class loader to be used for loading test and application
-	 * classes
-	 * 
-	 * @param urls
-	 */
-	public static void initClassLoader(URL[] urls) {
-		trexClsLoader = new TrexClassLoader(urls);
-	}
-
-	/**
-	 * Adds a jar to the current class loader
-	 * 
-	 * @param url
-	 * @throws Exception
-	 */
-	public static void addJarToClassLoader(URL url) throws Exception {
-		trexClsLoader.addJar(url);
 	}
 
 	/**
@@ -464,7 +426,7 @@ public class TestRunner {
 	 * Thread.currentThread().setContextClassLoader(
 	 * currThreadParentClsLoader.getParent() ); } }
 	 */
-	public static TestResult runTest(Class<?> klass, Method method, Object testObj)
+	public TestResult runTest(Class<?> klass, Method method, Object testObj)
 			throws IllegalAccessException, InvocationTargetException {
 		// check whether setup and teardown methods exist
 
@@ -499,10 +461,6 @@ public class TestRunner {
 				if (expectedException != null
 						&& expectedException.isAssignableFrom(cause.getClass())) {
 					rethrowException = false;
-				}
-				if(method.getName().contains("sumFile")){
-					System.out.println(cause.getClass().getName());
-					System.out.println(cause.getMessage());
 				}
 				
 				if (rethrowException) {
@@ -551,28 +509,28 @@ public class TestRunner {
 		return new TestResult(TestOutcome.PASS, null);
 	}
 	
-	public static List<Method> getParameterizedMethods(Class clazz) {
+	public List<Method> getParameterizedMethods(Class clazz) {
 		List<Method> methods = new ArrayList<Method>();
 		//HERE444
 		//getMethods(clazz, null, Parameters.class, methods);
 		return methods;
 	}
 
-	public static List<Method> getSetUpMethods(Class clazz) {
+	public List<Method> getSetUpMethods(Class clazz) {
 		List<Method> methods = new ArrayList<Method>();
 		//HERE444
 		//getMethods(clazz, SET_UP_METHOD, Before.class, methods);
 		return methods;
 	}
 
-	public static List<Method> getTearDownMethods(Class clazz) {
+	public List<Method> getTearDownMethods(Class clazz) {
 		List<Method> methods = new ArrayList<Method>();
 		//HERE444
 		//getMethods(clazz, TEAR_DOWN_METHOD, After.class, methods);
 		return methods;
 	}
 
-	private static void getMethods(Class clazz, String methodName,
+	private void getMethods(Class clazz, String methodName,
 			Class<? extends java.lang.annotation.Annotation> annotation,
 			List<Method> methods) {
 		if (clazz.getSuperclass() != null
@@ -607,7 +565,7 @@ public class TestRunner {
 
 	}
 	
-	private static boolean contains(List<Method> methods, Method method){
+	private boolean contains(List<Method> methods, Method method){
 		for(Method m:methods){
 			if(m.getName().equals(method.getName())){
 				return true;
@@ -639,7 +597,7 @@ public class TestRunner {
 	// return methods;
 	// }
 
-	public static boolean isTimeoutEnabled() {
+	public boolean isTimeoutEnabled() {
 		String timeout = System.getProperty("timeout");
 		return timeout != null && Boolean.valueOf(timeout);
 	}

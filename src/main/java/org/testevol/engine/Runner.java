@@ -98,8 +98,8 @@ public class Runner extends Task {
                 // + versionToClasspathMap.get(versions));
             	
                 HashSet<URL> cpurls = Utils.getClassPathFromString(versionToClasspathMap.get(versions));
-                TestRunner.initClassLoader(cpurls.toArray(new URL[0]));
-                TrexClassLoader c = new TrexClassLoader(cpurls.toArray(new URL[0]));
+                TrexClassLoader classLoader = new TrexClassLoader(cpurls.toArray(new URL[0]));
+                TestRunner testRunner = new TestRunner(classLoader, null, null);
                 
                 HashMap<TestOutcome, FileWriter> outcomeToWritersMap = new HashMap<TestOutcome, FileWriter>();
                 for (TestOutcome testOutcome : TestOutcome.values()) {
@@ -130,7 +130,6 @@ public class Runner extends Task {
                         assert false;
                     }
                     
-                    TestRunner.init(null, null);
                     List<String> classList = new ArrayList<String>();
 
                     String classPath = versionAux.getBinTestDir().getCanonicalPath();
@@ -145,10 +144,10 @@ public class Runner extends Task {
                 	}
                     
                     for (String testClassName:classList) {                       
-                        if(TestRunner.alreadyExecuted(testClassName)){
+                        if(testRunner.alreadyExecuted(testClassName)){
                         	continue;
                         }
-                        Map<String, TestResult> testResults = TestRunner.runTests(testClassName);
+                        Map<String, TestResult> testResults = testRunner.runTests(testClassName);
 
                         if (testResults == null) {
                             System.out.println("\nSkipping class: "+ testClassName);

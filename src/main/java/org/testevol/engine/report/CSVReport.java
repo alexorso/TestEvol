@@ -17,8 +17,6 @@ public class CSVReport {
 		
 		File csvResults = new File(reportsDir, "results.txt");
 		
-		System.out.println(csvResults.getAbsolutePath());
-
 		//File c1Results = new File(version.getDirectory().getParent(), "c1.txt");
 		boolean fileAlreadyExists = csvResults.exists();
 

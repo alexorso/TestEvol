@@ -119,7 +119,6 @@ public class CategoryC8 extends Category {
 		boolean hasImprovedCoverage = false;
 		for (String coveredLine : testCoverage.getCoveredLines()) {
 			if (!linesCoveredByTestSuite.contains(coveredLine)) {
-				System.out.println(coveredLine);
 				hasImprovedCoverage = true;
 				break;
 			}

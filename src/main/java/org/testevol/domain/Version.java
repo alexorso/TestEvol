@@ -295,7 +295,7 @@ public class Version {
 		
 		File libDir = new File(versionDir, "lib");
 		if(libDir.exists()){
-			FileUtils.copyFileToDirectory(new File(configDir, TestCoverageDriver.COVERAGE_JAR), libDir);
+			FileUtils.copyDirectory(new File(configDir, TestCoverageDriver.COVERAGE_JARS), libDir);
 		}
 		
 		return result;

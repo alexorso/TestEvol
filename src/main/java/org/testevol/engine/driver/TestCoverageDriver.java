@@ -7,20 +7,16 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import net.sourceforge.cobertura.instrument.Main;
-
 import org.apache.commons.io.FileUtils;
 import org.testevol.engine.TestRunner;
 import org.testevol.engine.domain.coverage.Coverage;
 import org.testevol.engine.util.TrexClassLoader;
-import org.testevol.engine.util.Utils;
 
 /**
  * Computes test coverage based using cobertura open source tool
@@ -37,7 +33,7 @@ import org.testevol.engine.util.Utils;
 public class TestCoverageDriver 
 {	
 	
-	public static String COVERAGE_JAR = "cobertura-1.9.4.1.jar";
+	public static String COVERAGE_JARS = "cobertura";
 	
 	/**
 	 * Instruments given jar file and executes test cases and outputs the coverage.
@@ -54,7 +50,7 @@ public class TestCoverageDriver
 	public static Coverage computeCoverage(	List<String> srcJarFiles,
 												String sourceDirs[], 
 												List<String> classPathJars, 
-												List<String> testJarFile, 
+												List<String> testJarFiles, 
 												Set<String> inclTestCases, 
 												Set<String> exclTestCases,
 												String destination,
@@ -65,46 +61,68 @@ public class TestCoverageDriver
 
 			//Instrument the files using cobertura. Don't specify destination. Source files will be overwritten
 			List<String> dirsToInstrument = new ArrayList<String>();
-			//System.out.print("Caution: source jar files ");
 			for (int i = 0; i < srcJarFiles.size(); i++) {
 					File jarFile = new File(srcJarFiles.get(i));
 					FileUtils.copyFile(jarFile, new File(jarFile.getParent(), jarFile.getName()+".NotInstrumented.jar"));
-				//	System.out.print(srcJarFiles.get(i) + ", ");					
 					dirsToInstrument.add(srcJarFiles.get(i));
+			}			
+			
+			//Loading all URLs including all from class paths as well
+			List<URL> allUrls = new ArrayList<URL>();
+			if(classPathJars != null)
+			{
+				for(String classPathJar : classPathJars)
+				{
+					URL url = new URL( "jar:file:"+ classPathJar +"!/" );
+					allUrls.add(url);
+				}
 			}
-			//System.out.println(" will be instrumented!!!");
+			
+			for(String testJarFile:testJarFiles){
+				URL testJarURL = new URL("jar:file:"+ testJarFile +"!/");
+				allUrls.add(testJarURL);				
+			}
+				
+			URL[] urlsToLoad = new URL[allUrls.size()];
+			allUrls.toArray(urlsToLoad);
+			
+			TrexClassLoader clsLoader = new TrexClassLoader(urlsToLoad);
 
+			File cobertura_ser = new File(destination, "cobertura.ser");
+			
 			if(instrument){
-				TestCoverageDriver.instrument(null, new File(destination, "cobertura.ser"), null, null, null, null, dirsToInstrument);				
+				TestCoverageDriver.instrument(null, cobertura_ser, null, null, null, null, dirsToInstrument, clsLoader);				
 			}
+
+			for(String srcJarFile : srcJarFiles)
+			{
+				URL url = new URL( "jar:file:"+ srcJarFile +"!/" );
+				clsLoader.addJar(url);
+			}
+			
 			//Run tests
-			if(!runTests(srcJarFiles, classPathJars, testJarFile, inclTestCases, exclTestCases))
+			if(!runTests(testJarFiles, inclTestCases, exclTestCases, clsLoader))
 			{
 				System.err.println("Some tests not executed, coverage result may not be complete!!!");
 			}
-			//Generate report
-			try
-			{
-				List<String> srcDirectories = new ArrayList<String>();
-				for(String sourceDir : sourceDirs){
-					srcDirectories.add(sourceDir);
-				}
-				
-				File coverageXml = new File(destination,"coverage.xml");
-				if(coverageXml.exists()){
-					coverageXml.delete();
-				}
-				TestCoverageDriver.generateCoverageReport(new File(destination,"cobertura.ser"), destination, "xml", srcDirectories);
-				coverageXml = new File(destination,"coverage.xml");
-				Coverage coverage = Coverage.getInstance(new FileInputStream(new File(destination, "coverage.xml")));
-				return coverage;
+
+			Class ProjectData = clsLoader.findOrLoadClass("net.sourceforge.cobertura.coveragedata.ProjectData");
+			ProjectData.getMethod("saveGlobalProjectDataFromFile", File.class).invoke(null,cobertura_ser);
+
+			List<String> srcDirectories = new ArrayList<String>();
+			for(String sourceDir : sourceDirs){
+				srcDirectories.add(sourceDir);
 			}
-			catch(Exception ex)
-			{
-				System.err.println("Exception occurred while generating report!!!");
-				ex.printStackTrace();
-				return null;
+			
+			File coverageXml = new File(destination,"coverage.xml");
+			if(coverageXml.exists()){
+				coverageXml.delete();
 			}
+			TestCoverageDriver.generateCoverageReport(cobertura_ser, destination, "xml", srcDirectories, clsLoader);
+			coverageXml = new File(destination,"coverage.xml");
+			Coverage coverage = Coverage.getInstance(new FileInputStream(new File(destination, "coverage.xml")));
+			return coverage;
+			
 		}
 		catch(Exception ex)
 		{
@@ -128,47 +146,15 @@ public class TestCoverageDriver
 		return null;
 	}
 	
-	private static boolean runTests(List<String> srcJarFiles, 
-									List<String> classPathJars, 
+	private static boolean runTests( 
 									List<String> testJarFiles, 
 									Set<String> inclTestCases, 
-									Set<String> exclTestCases) 
+									Set<String> exclTestCases,
+									TrexClassLoader clsLoader) 
 	{
-		
-		TrexClassLoader clsLoader = null;
 		try
 		{
-			//Loading all URLs including all from class paths as well
-			List<URL> allUrls = new ArrayList<URL>();
-			for(String srcJarFile : srcJarFiles)
-			{
-				URL url = new URL( "jar:file:"+ srcJarFile +"!/" );
-				allUrls.add(url);
-			}
-			
-			if(classPathJars != null)
-			{
-				for(String classPathJar : classPathJars)
-				{
-					URL url = new URL( "jar:file:"+ classPathJar +"!/" );
-					allUrls.add(url);
-				}
-			}
-			
-			for(String testJarFile:testJarFiles){
-				URL testJarURL = new URL("jar:file:"+ testJarFile +"!/");
-				allUrls.add(testJarURL);				
-			}
-				
-			URL[] urlsToLoad = new URL[allUrls.size()];
-			
-			allUrls.toArray(urlsToLoad);
-		
-			TestRunner.init(exclTestCases, inclTestCases);
-			TestRunner.initClassLoader(urlsToLoad);
-			
-			clsLoader = new TrexClassLoader(urlsToLoad);			
-			
+			TestRunner testRunner = new TestRunner(clsLoader, exclTestCases, inclTestCases);
 			List<String> classList = new ArrayList<String>();
 			
 			//If inclTestCases is defined we only need to put the classes
@@ -197,9 +183,7 @@ public class TestCoverageDriver
 			{
 				try
 				{
-					//clsLoader = new TrexClassLoader(urlsToLoad);
-					Thread.currentThread().setContextClassLoader(clsLoader);
-					TestRunner.runTests(className);
+					testRunner.runTests(className);
 				} catch (Exception e) {
 					System.err.println("Failed to run tests of class: " + className);
 				} 
@@ -210,84 +194,8 @@ public class TestCoverageDriver
 			ex.printStackTrace();
 			return false;
 		}
-		finally{
-			if(clsLoader != null){
-				try {
-					Class ProjectData = clsLoader.loadClass("net.sourceforge.cobertura.coveragedata.ProjectData");
-					ProjectData.getMethod("saveGlobalProjectData").invoke(null);
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-
-			}
-
-		}
-		return true;
-	}
-	
-
-	/**
-	 * Runs selected tests
-	 * @param className
-	 * @param inclTests
-	 * @param exclTests
-	 * @return
-	 * @throws ClassNotFoundException
-	 * @throws IllegalAccessException
-	 * @throws InstantiationException
-	 * @throws InvocationTargetException
-	 */
-	public static void runSelectedTests(	TrexClassLoader clsLoader,
-											String className, 
-											Set<String> inclTests,
-											Set<String> exclTests )
-			throws ClassNotFoundException, IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
 		
-		final Class<?> klass = clsLoader.loadClass(className);
-		if(klass.isInterface() || Modifier.isAbstract( klass.getModifiers() ))
-			return;
-				
-        Method beforeClassMethod = null;
-        Method afterClassMethod = null;
-//HERE444
-        //        for (Method m : klass.getMethods()) {
-//            if (m.isAnnotationPresent(AfterClass.class)) {
-//            	afterClassMethod = m;
-//            } else if (m.isAnnotationPresent(BeforeClass.class)) {
-//            	beforeClassMethod = m;
-//            }
-//        }
-        // invoke the setup method
-        if (beforeClassMethod != null) {
-        	beforeClassMethod.setAccessible(true);
-        	beforeClassMethod.invoke(null);
-        }
-        
-		for (final Method method : klass.getDeclaredMethods() ) {			
-			if ( Utils.isIgnoredMethod( method, clsLoader) ) {
-				continue;
-			}
-			else if ( !Utils.isTestMethod( method, clsLoader ) ) {
-				continue;
-			}			
-			
-			String methodName = method.getName();
-			String fullyQualifidName = klass.getName() + "." + methodName;
-			
-			if(exclTests != null && exclTests.contains(fullyQualifidName))
-				continue;
-
-			if(inclTests == null || inclTests.contains(fullyQualifidName)) {
-				Utils.println("\n**** Running test for coverage:"+fullyQualifidName+ " ****\n");	
-				TestRunner.execMethod(method, klass, TestRunner.createInstance(klass, clsLoader), null);
-			}
-		}
-		// invoke the setup method
-        if (afterClassMethod != null) {
-        	afterClassMethod.setAccessible(true);
-        	afterClassMethod.invoke(null);
-        }
+		return true;
 	}
 	
 	/**
@@ -319,7 +227,7 @@ public class TestCoverageDriver
 	}
 		
 	public static void instrument(String basedir, File datafile, String destination, List<String> ignore,
-            List<String> includeClasses, List<String> excludeClasses, List<String> instrument) {
+            List<String> includeClasses, List<String> excludeClasses, List<String> instrument, TrexClassLoader classLoader) throws ClassNotFoundException, IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		
 		List<String> args = new ArrayList<String>();
         /*
@@ -362,25 +270,33 @@ public class TestCoverageDriver
             }
         }
         args.addAll(instrument);
-        Main.main(args.toArray(new String[args.size()]));
+        String[] argsArray = args.toArray(new String[args.size()]);
+        main(classLoader, "net.sourceforge.cobertura.instrument.Main", argsArray);
     }
 	
+	private static void main(TrexClassLoader clsLoader, String className, String[] params) throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException{
+        Class<?> cls = clsLoader.loadClass(className);
+        Method meth = cls.getMethod("main", String[].class);
+        meth.invoke(null, (Object) params);
+	}
 	
 
     private static void generateCoverageReport(	File datafile, 
     												String destination,
     												String format,
-    												List<String> sourceDirectories) throws Exception {
+    												List<String> sourceDirectories,
+    												TrexClassLoader classLoader) throws Exception {
         List<String> args = new ArrayList<String>();
         args.add("--datafile");
-        System.out.println(datafile.getAbsolutePath());
         args.add(datafile.getAbsolutePath());
         args.add("--format");
         args.add(format);
         args.add("--destination");
         args.add(destination);
         args.addAll(sourceDirectories);
-        net.sourceforge.cobertura.reporting.Main.main(args.toArray(new String[args.size()]));
+        
+        String[] argsArray = args.toArray(new String[args.size()]);
+        main(classLoader, "net.sourceforge.cobertura.reporting.Main", argsArray);
     }
     
     public static boolean deleteDir(File dir) {

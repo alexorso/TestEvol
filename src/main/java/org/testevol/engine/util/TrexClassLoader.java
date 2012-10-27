@@ -34,7 +34,7 @@ public class TrexClassLoader extends URLClassLoader {
 		addURL( url );
 	}
 
-	private Class<?> findOrLoadClass( String className ) throws ClassNotFoundException {
+	public Class<?> findOrLoadClass( String className ) throws ClassNotFoundException {
 		Class<?> cls = loadedClasses.get( className );
 		if ( cls == null ) {
 			cls = loadClass( className );

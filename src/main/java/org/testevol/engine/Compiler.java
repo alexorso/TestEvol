@@ -111,7 +111,6 @@ public class Compiler extends Task {
             for (File fentry : Utils.getMatchingFilesRecursively(binTmpDir, ".*class$")) {
                 assert fentry.isFile();                
                 String absolutePath = fentry.getCanonicalPath();
-                System.out.println(absolutePath);
                 //Cut from the entry path the the aprt related to the bin tmp dir
                 String relativePath = absolutePath.substring(binTmpDirCanonicalPathLength + 1);
                 
