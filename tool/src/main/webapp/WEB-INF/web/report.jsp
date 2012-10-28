@@ -62,6 +62,7 @@
 	<!--/.fluid-container-->
 	
 	<%@include file="includes/scripts.jsp" %>
+	
 
 	</body>
 </html>
