@@ -18,6 +18,7 @@ import java.util.jar.Manifest;
 
 import org.apache.commons.io.FileUtils;
 import org.testevol.domain.Version;
+import org.testevol.engine.domain.TestEvolLog;
 import org.testevol.engine.util.TrexClassLoader;
 import org.testevol.engine.util.Utils;
 
@@ -32,39 +33,22 @@ public class Compiler extends Task {
 	/**
 	 * List expected to be ordered
 	 */
-    public Compiler(List<Version> versions) {
-        super(versions);
+    public Compiler(List<Version> versions, TestEvolLog log) {
+        super(versions, log);
     }
 
-    @Override
-    protected String[] getGeneratedFiles() {
-        String files[] = { "bintmp", "bin", "bintest", "code.jar", "tests.jar", "data-testslist.txt" };
-        return files;
-    }
 
     @Override
-    public boolean go(boolean force) throws Exception {
-        if (!super.go(force)) {
-            return false;
-        }
-        cleanUp();
-
-//        File[] directories = Utils.getMatchingFiles(sourceDirectory,
-//                regexpVersionNames).toArray(new File[0]);
-//
-//        Arrays.sort(directories, new Comparator<File>() {
-//            @Override
-//            public int compare(File f1, File f2) {
-//                return f1.getPath().compareTo(f2.getPath());
-//            }
-//        });
-
-        for (Version version : versions) {
+    public boolean go() throws Exception {
+    	log.logStrong("Starting Compiler...");
+    	for (Version version : versions) {
         	
         	if (!version.getSourceDir().exists()) {
-                throw new CompilerException("Source directory \""+version.getSourceDir()+"\" not found in " + version.getName());
+        		log.logError("Source directory \""+version.getSourceDir()+"\" not found for version " + version.getName());
+                throw new RuntimeException("Source directory \""+version.getSourceDir()+"\" not found for version " + version.getName());
             }            
                         
+        	log.log("Compiling version "+version.getName());
             compileSrc(version);
             if(version.getTestsSourceDir().exists()){
                 compileTests(version);            	
@@ -182,9 +166,9 @@ public class Compiler extends Task {
             codejar.close();
             testsjar.close();
             testslist.close();
+            
             Utils.sortTextFile(version.getTestslistFile());
         }
-        markAsRun();
         return true;
     }
     
@@ -233,33 +217,27 @@ public class Compiler extends Task {
         }
         
         Process process = new ProcessBuilder(args).start();
-        InputStream is = process.getInputStream();
-        InputStreamReader isr = new InputStreamReader(is);
-        BufferedReader br = new BufferedReader(isr);
         process.waitFor();
         
         String line;        
-        System.out.printf("Output of running %s is:", 
-        		args);
-        while ((line = br.readLine()) != null) {
-          System.out.println(line);
-        }
         
         if(process.exitValue() != 0){
+        	log.logError("Error while compiling version "+version.getName());
         	InputStreamReader isr2 = new InputStreamReader(process.getErrorStream());
             BufferedReader br2 = new BufferedReader(isr2);
             while ((line = br2.readLine()) != null) {
-                System.out.println(line);
-              }
+                log.logError(line);
+            }
         	throw new RuntimeException("Error compiling "+version.getName());
         }
-        
-//        //Compile
-//        Process proc = Runtime.getRuntime().exec("javac " + compileCommand);
-//        proc.waitFor();
-//        if(proc.exitValue() != 0){
-//        	throw new RuntimeException("Error compiling "+version.getName());
-//        }
+        else{
+            InputStream is = process.getInputStream();
+            InputStreamReader isr = new InputStreamReader(is);
+            BufferedReader br = new BufferedReader(isr);
+        	while ((line = br.readLine()) != null) {
+            	log.log(line);
+            }
+        }
 
     }
     

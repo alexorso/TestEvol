@@ -1,6 +1,5 @@
 package org.testevol.controller;
 
-import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -23,6 +22,8 @@ import org.testevol.domain.Project;
 import org.testevol.domain.ProjectRepository;
 import org.testevol.domain.Version;
 import org.testevol.engine.DataAnalysis;
+import org.testevol.engine.domain.Execution;
+import org.testevol.engine.report.ExecutionStatus;
 import org.testevol.versioncontrol.UpdateResult;
 import org.testevol.versioncontrol.VersionControlSystem;
 
@@ -64,23 +65,39 @@ public class ProjectController {
 	}
 	
 	@RequestMapping(value="{project}/execute",method = RequestMethod.POST)
-	public String execute(@PathVariable("project") String projectName, @ModelAttribute Project projectModel) throws Exception {
+	public String execute(@PathVariable("project") final String projectName, @ModelAttribute Project projectModel) throws Exception {
 
-		Project project = projectRepo.getProject(projectName);
-		File buildDir = projectRepo.createReportDir(project);
+		final Execution execution = projectRepo.createExecution(projectName, projectModel.getVersionsToExecute());
+		final Project project = execution.getProject();
 		
-		List<Version> versionsToExecute = new ArrayList<Version>();
+		final List<Version> versionsToExecute = new ArrayList<Version>();
 		for(Version version:project.getVersionsList()){
 			if(projectModel.getVersionsToExecute().contains(version.getName())){
-				version.setBaseBuildDir(buildDir);
+				version.setBaseBuildDir(execution.getExecutionDir());
 				versionsToExecute.add(version);
 			}
 		}
-		Collections.reverse(versionsToExecute);
-		DataAnalysis dataAnalysis = new DataAnalysis(configDir, project, versionsToExecute, buildDir);
-		dataAnalysis.start();
+		Collections.reverse(versionsToExecute);		
+
+		new Thread(){
+			@Override
+			public synchronized void run() {
+				DataAnalysis dataAnalysis = new DataAnalysis(configDir, project, versionsToExecute, execution.getExecutionDir());
+				try {
+					projectRepo.saveExecution(projectName, execution.getId(), execution.getName(), ExecutionStatus.RUNNING);
+					dataAnalysis.start();
+					projectRepo.saveExecution(projectName, execution.getId(), execution.getName(), ExecutionStatus.SUCCESS);
+				} catch (Exception e) {
+					e.printStackTrace();
+					try {
+						projectRepo.saveExecution(projectName, execution.getId(), execution.getName(), ExecutionStatus.ERROR);
+					} catch (Exception e1) {}
+				}
+			}
+		}.start();
+
 		
-		return "redirect:/projects/"+projectName;
+		return "redirect:/projects/"+projectName+"/execution/"+execution.getId();
 	}
 	
 	@RequestMapping(value="{project}/delete",method = RequestMethod.GET)
@@ -103,11 +120,91 @@ public class ProjectController {
 		} catch (Exception e) {
 			return new UpdateResult(false, getStringFromException(e));
 		}
+	}
+
+	@RequestMapping(value="{project}/executions",method = RequestMethod.GET)
+	public ModelAndView getExecutions(@PathVariable("project") String projectName) throws Exception {
+		Project project = projectRepo.getProject(projectName);
+		List<Execution> executions = projectRepo.getExecutions(project);
+		ModelAndView mav = new ModelAndView();
+		mav.addObject("project", project);
+		mav.addObject("executions", executions);
+		mav.setViewName("executions");
+		return mav;
+	}
+	
+	@RequestMapping(value="{project}/execution/{id}",method = RequestMethod.GET)
+	public ModelAndView getExecution(@PathVariable("project") String projectName, @PathVariable("id") String id) throws Exception {
+		Execution execution = projectRepo.getExecution(projectName, id);
+		ModelAndView mav = new ModelAndView();
+		mav.addObject("execution", execution);
+		mav.setViewName("execution");
+		return mav;
+	}
+	
+	@RequestMapping(value="{project}/execution/{id}/report",method = RequestMethod.GET)
+	public ModelAndView getExecutionReport(@PathVariable("project") String projectName, @PathVariable("id") String id) throws Exception {
+		Execution execution = projectRepo.getExecution(projectName, id);
+		ModelAndView mav = new ModelAndView();
+		mav.addObject("execution", execution);
+		mav.setViewName("report");
+		return mav;
+	}
+	
+	
+	
+	@RequestMapping(value="{project}/execution/{id}/delete",method = RequestMethod.GET)
+	public String deleteExecution(@PathVariable("project") String projectName, @PathVariable("id") String id) throws Exception {
+		
+		try {
+			projectRepo.deleteExecution(projectName, id);
+			return "redirect:/projects/"+projectName+"/executions?success=true";
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return "redirect:/projects/"+projectName+"/executions?success=false";
 
 	}
 	
+	@RequestMapping(value="{project}/execution/{id}/save",method = RequestMethod.GET)
+	public @ResponseBody Map saveExecution(	@PathVariable("project") String projectName, 
+										@PathVariable("id") String id, 
+										@RequestParam("name") String name){
+		
+		Map<String, Object> result = new HashMap<String, Object>(); 
+		try {
+			projectRepo.saveExecution(projectName, id, name, null);
+			result.put("success", Boolean.TRUE);
+		} catch (Exception e) {
+			result.put("success", Boolean.FALSE);
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
+		return result;
+	}
+	
+	@RequestMapping(value="{project}/execution/{id}/status",method = RequestMethod.GET, produces="application/json")
+	public @ResponseBody Map getExecutionStatus(@PathVariable("project") String projectName, @PathVariable("id") String id){
+		
+		Execution execution;
+		Map<String, Object> executionMap = new HashMap<String, Object>();
+		try {
+			execution = projectRepo.getExecution(projectName, id);
+			ExecutionStatus status = execution.getStatus();			
+			executionMap.put("code", status.getCode());
+			executionMap.put("label", status.getLabel());
+			executionMap.put("style", status.getStyle());
+			executionMap.put("req_success", Boolean.TRUE);
+			executionMap.put("log", execution.getExecutionLog());
+			
+		} catch (Exception e) {
+			executionMap.put("req_success", Boolean.FALSE);
+		}
+		return executionMap;
+	}
+	
 	@RequestMapping(value="version/script",method = RequestMethod.GET)
-	public @ResponseBody String getReportScript() throws Exception {
+	public @ResponseBody String getSummReportScript() throws Exception {
 		return "alert('loaded dude');";
 
 	}

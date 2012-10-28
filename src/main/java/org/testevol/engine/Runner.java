@@ -12,53 +12,32 @@ import java.util.Map;
 
 import org.testevol.domain.Version;
 import org.testevol.engine.TestResult.TestOutcome;
+import org.testevol.engine.domain.TestEvolLog;
 import org.testevol.engine.util.TrexClassLoader;
 import org.testevol.engine.util.Utils;
 
 public class Runner extends Task {
 
-
-
-    public Runner(List<org.testevol.domain.Version> versions) {
-		super(versions);
-		// TODO Auto-generated constructor stub
-	}
-
-	@Override
-    protected String[] getGeneratedFiles() {
-        String files[] = { "emptytrace.txt", "data-testslist-skipped-1.txt",
-                "data-testslist-skipped-2.txt", "data-testout-*.txt",
-                "data-trace-curr-*.txt" };
-        return files;
+	public Runner(List<Version> versions, TestEvolLog log) {
+        super(versions, log);
     }
 
     @Override
-    public boolean go(boolean force) throws Exception {
-        if (!super.go(force)) {
-            return false;
-        }
-        cleanUp();
-
+    public boolean go() throws Exception {
         Version oldVersion = null;
 
+        log.logStrong("Starting testing execution...");
         nextVersion: for (Version version : versions) {
-        	//Version version = new Version(verDir);
-        	
             if (oldVersion == null) {
-                Utils.println("Running first version: " + version.getName());
+                log.log("Running first version: " + version.getName());
             } else {
-                Utils.println("\nRunning pair " + oldVersion.getName() + "-" + version.getName());
+            	log.log("Running pair " + oldVersion.getName() + " - " + version.getName());
             }
 
             List<String> versionList = new ArrayList<String>();
             HashMap<String, String> versionToClasspathMap = new HashMap<String, String>();
 
             String classpath = null;
-            
-            //File binT1P1 = version.getFile("binT1P1");
-            //Utils.removeAndCreate(binT1P1);
-            //FileUtils.copyDirectory(version.getBinTestDir(), binT1P1);
-            //FileUtils.copyDirectory(version.getBinDir(), binT1P1);
             
             // T1P1
             classpath = version.getClassPath();
@@ -170,8 +149,6 @@ public class Runner extends Task {
                         Utils.sortTextFile(new File(buildDir, "data-testout-"+ testOutcome + "-" + versions + ".txt"));
                         out.close();
                         err.close();
-                        //System.setOut(origout);
-                        //System.setErr(origerr);
                     }
                 }
                 
@@ -181,7 +158,7 @@ public class Runner extends Task {
                 	File runtimeError = new File(buildDir, "data-testout-"+ TestOutcome.RUNTIME_ERROR + "-" + versions + ".txt");
                 	
                 	if(assertError.length() > 0 || compilationError.length() > 0 || runtimeError.length() > 0 ){
-                		Utils.println("\nTests from version "+version.getName()+" CONTAIN ERRORS!!");
+                		log.logError("Tests from version "+version.getName()+" contain errors!");
                 		//continue nextVersion;
                 		//return false;
                 	}
@@ -189,8 +166,7 @@ public class Runner extends Task {
             }
             oldVersion = version;
         }
-        
-        markAsRun();
+
         return oldVersion != null;
     }
 }

@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.testevol.domain.Version;
+import org.testevol.engine.domain.TestEvolLog;
 import org.testevol.engine.domain.VersionPair;
 import org.testevol.engine.util.Utils;
 
@@ -16,8 +17,10 @@ public class Differ extends Task {
 	private HashMap<VersionPair, JavaDifferencer> codeDifferencers;
 	private String configDirectory;
 	
-	public Differ(List<Version> versions, String configDirectory) {
-		super(versions);
+	
+	
+	public Differ(List<Version> versions, String configDirectory, TestEvolLog log) {
+		super(versions, log);
 		testDifferencers = new HashMap<VersionPair, JavaDifferencer>();
 		codeDifferencers = new HashMap<VersionPair, JavaDifferencer>();
 		if(!configDirectory.endsWith(File.separator)){
@@ -27,32 +30,19 @@ public class Differ extends Task {
 	}
 
     @Override
-    protected String[] getGeneratedFiles() {
-        // TODO: update list of files
-        String files[] = { "emptytrace.txt", "data-testslist-skipped-1.txt",
-                "data-testslist-skipped-2.txt", "data-testout-*.txt",
-                "data-trace-curr-*.txt", "wala-*.config" };
-        return files;
-    }
-
-    @Override
-    public boolean go(boolean force) throws Exception {
-        if (!super.go(force)) {
-            return false;
-        }
-        cleanUp();
-
+    public boolean go() throws Exception {
         Version oldVersion = null;
+        log.logStrong("Starting diffing...");
         
         for (Version version:versions) {
             
             if (oldVersion == null) {
             	oldVersion = version;
-                Utils.println("\nDiffing: Skipping first version: " + version.getName());
+            	log.log("Diffing: Skipping first version: " + version.getName());
                 continue;
             }            
             
-            Utils.println("\nDiffing pair " + oldVersion.getName() + "-" + version.getName());
+            log.log("Diffing pair " + oldVersion.getName() + " - " + version.getName());
 
             String[] configFilesCode = new String[2];
             String[] configFilesTests = new String[2];
@@ -88,8 +78,6 @@ public class Differ extends Task {
             
             oldVersion = version;
         }
-        
-        markAsRun();
         return true;
     }
     

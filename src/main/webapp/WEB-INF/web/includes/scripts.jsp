@@ -72,3 +72,36 @@
 	<script src="<c:url value="/js/jquery.history.js"/>"></script>
 	<!-- application script for Charisma demo -->
 	<script src="<c:url value="/js/charisma.js"/>"></script>
+	
+	
+	<script>
+		function addFeedbackMessage(){
+			var buttonMessage =$('<button class="btn btn-primary noty" style="display:none" id="feedbackMessage" data-noty-options=\'{"text":"This is a success information","layout":"top","type":"information"}\'><i class="icon-bell icon-white"></i> Top Full Width</button>');
+			$('body').append(buttonMessage);
+		}
+		
+		function showFeedbackMessage(message, type){
+			if(!type){
+				type=getFeedbackMessageType();
+			}
+			$('#feedbackMessage').attr( 'data-noty-options',  '{"text":"'+message+'","layout":"top","type":"'+type+'"}');
+			$('#feedbackMessage').trigger('click');
+		}
+		
+		function mustShowFeedbackMessage(){
+			return window.location.search.indexOf("success=true") >= 0 ||
+					window.location.search.indexOf("success=false") >= 0;
+		}
+		
+		function successExecution(){
+			return window.location.search.indexOf("success=true") >= 0;
+		}
+		
+		function getFeedbackMessageType(){
+			if(!successExecution()){
+				return 'error';
+			}
+			return 'information';
+		}
+		
+	</script>

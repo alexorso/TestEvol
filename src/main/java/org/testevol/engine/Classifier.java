@@ -25,6 +25,7 @@ import org.testevol.engine.domain.CategoryC7;
 import org.testevol.engine.domain.CategoryC8;
 import org.testevol.engine.domain.CloneAnalyser;
 import org.testevol.engine.domain.Results;
+import org.testevol.engine.domain.TestEvolLog;
 import org.testevol.engine.domain.VersionPair;
 import org.testevol.engine.driver.CopyAndPasteDetectorDriver;
 import org.testevol.engine.util.Utils;
@@ -35,8 +36,8 @@ import com.ibm.wala.ipa.cha.ClassHierarchyException;
 
 public class Classifier extends Task {
 
-	public Classifier(List<Version> versions, Differ differ) {
-		super(versions);
+	public Classifier(List<Version> versions, Differ differ, TestEvolLog log) {
+		super(versions, log);
 		this.differ = differ;
 		this.results = new HashMap<VersionPair, Results>();
 
@@ -46,36 +47,21 @@ public class Classifier extends Task {
 	private Differ differ;
 	private Map<VersionPair, Results> results;
 	
-	
-	
-//	public Classifier(String toolDirectory, String sourceDirectory,
-//			String regexpVersionNames) {
-//		super(toolDirectory, sourceDirectory, regexpVersionNames);
-//	}
-//	
-//	public Classifier(Differ differ, String toolDirectory, String sourceDirectory,
-//			String regexpVersionNames) {
-//		super(toolDirectory, sourceDirectory, regexpVersionNames);
-//		this.differ = differ;
-//		this.results = new HashMap<VersionPair, Results>();
-//	}
-
-
 	@Override
-	public boolean go(boolean force) throws Exception {
-		if (!super.go(force)) {
-			return false;
-		}
-		cleanUp();
-
+	public boolean go() throws Exception {
 		Version oldVersion = null;
+		
+		log.logStrong("Starting classifier...");
+		
 		for (Version version:versions) {
 
 			if (oldVersion == null) {
 				oldVersion = version;
-				Utils.println("\nClassifier: Skipping first version: " + version.getName());
+				log.log("Skipping first version: " + version.getName());
 				continue;
 			}
+            log.log("Classifing tests from pair " + oldVersion.getName() + " - " + version.getName());
+			
 
 			VersionPair versionPair = new VersionPair(oldVersion, version);
 			JavaDifferencer javaDiffTests = differ.getTestDifferencers().get(versionPair);
@@ -257,11 +243,4 @@ public class Classifier extends Task {
         return copyAndPasteDetectorDriver.getClonesInFile1();
 	
 	}
-
-	
-	@Override
-	protected String[] getGeneratedFiles() {
-		return new String[0];
-	}
-
 }

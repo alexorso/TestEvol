@@ -1,4 +1,6 @@
-<%@ taglib uri="http://java.sun.com/jstl/core" prefix="c" %>
+<%@ page session="false"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -121,17 +123,6 @@
 		<!--/fluid-row-->
 
 		<hr>
-
-		<footer>
-			<p class="pull-left">
-				&copy; <a href="http://usman.it" target="_blank">Muhammad Usman</a>
-				2012
-			</p>
-			<p class="pull-right">
-				Powered by: <a href="http://usman.it/free-responsive-admin-template">Charisma</a>
-			</p>
-		</footer>
-
 	</div>
 	<!--/.fluid-container-->
 
@@ -142,7 +133,6 @@
 			$('#git_get_info').click(function() {
 				getAvailableBranches();
 			});
-			
 		});
 
 		function getAvailableBranches() {

@@ -109,12 +109,7 @@
  	<%@include file="includes/scripts.jsp" %>
 	<script type="text/javascript">
 		//var closeClickEvent
-		
-		function playSong(){
-			document.getElementById('audioTestEvol').play();
-			$('#audioDiv').show();
-		}
-	
+
 		function deleteVersion(projectName, version){
 						
 			$("#titleModal").html("Delete Version "+version);

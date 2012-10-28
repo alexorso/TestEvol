@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.testevol.domain.Project;
 import org.testevol.domain.Version;
+import org.testevol.engine.domain.TestEvolLog;
 
 /**
  * @author orso
@@ -19,18 +20,15 @@ public class DataAnalysis {
 	private String testevolConfigRoot;
 	private Project project;
 	private List<Version> versions;
-	private File reportFolder;
-	
-	
-	public DataAnalysis(	String testevolConfigRoot, 
-							Project project,
-							List<Version> versions,
-							File reportsFolder) {
+	private File executionFolder;
+
+	public DataAnalysis(String testevolConfigRoot, Project project,
+			List<Version> versions, File executionFolder) {
 		super();
 		this.testevolConfigRoot = testevolConfigRoot;
 		this.project = project;
 		this.versions = versions;
-		this.reportFolder = reportsFolder;
+		this.executionFolder = executionFolder;
 	}
 
 	/**
@@ -52,34 +50,41 @@ public class DataAnalysis {
 	}
 
 	public void start() throws Exception {
-		
-		for(Version version:versions){
-			version.setUp(new File(testevolConfigRoot));
-		}
-		
-		Compiler compiler = new Compiler(versions);
-		Runner runner = new Runner(versions);
-		Differ differ = new Differ(versions,testevolConfigRoot);
-		Classifier classifier = new Classifier(versions, differ);
-		ReportGenerator reportGenerator = new ReportGenerator(versions, classifier, project.getName(), reportFolder);
 
-		boolean force = false;
+		long init = System.currentTimeMillis();
+		TestEvolLog log = null;
 		try {
-			long init = System.currentTimeMillis();
+			log = new TestEvolLog(new File(executionFolder, "log.txt"));
 
-			compiler.go(force);
-			runner.go(force);
-			differ.go(force);
-			classifier.go(force);
-			reportGenerator.go(force);
-//
-			long end = System.currentTimeMillis();
+			log.logStrong("Starting Execution...");			
+			for (Version version : versions) {
+				log.log("Setting up version " + version.getName());
+				version.setUp(new File(testevolConfigRoot));
+			}
+			Compiler compiler = new Compiler(versions, log);
+			Runner runner = new Runner(versions, log);
+			Differ differ = new Differ(versions, testevolConfigRoot, log);
+			Classifier classifier = new Classifier(versions, differ, log);
+			ReportGenerator reportGenerator = new ReportGenerator(versions,
+					classifier, project.getName(), executionFolder, log);
 
-			System.out.println("\n\n TOTAL EXECUTION TIME:"
-					+ ((end - init) / 1000) + "\n\n");
+			compiler.go();
+			runner.go();
+			differ.go();
+			classifier.go();
+			reportGenerator.go();
 
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			long end = System.currentTimeMillis();
+			if(log != null){
+				log.addLine();
+				log.addLineSeparator(25);
+				log.logStrong("Total execution time: " + ((end - init) / 1000) + " seconds");
+				log.addLineSeparator(25);
+			}
+
 		}
 	}
 }

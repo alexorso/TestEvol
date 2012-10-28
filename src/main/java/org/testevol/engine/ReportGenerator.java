@@ -11,6 +11,7 @@ import org.testevol.engine.domain.AddedTestMethods;
 import org.testevol.engine.domain.CategoryC5;
 import org.testevol.engine.domain.CategoryC8;
 import org.testevol.engine.domain.Results;
+import org.testevol.engine.domain.TestEvolLog;
 import org.testevol.engine.domain.VersionPair;
 import org.testevol.engine.report.CSVReport;
 import org.testevol.engine.report.HtmlReport;
@@ -22,8 +23,8 @@ public class ReportGenerator extends Task {
 	private String projectName;
 	private File reportsFolder;
 	
-	public ReportGenerator(List<Version> versions, Classifier classifier, String projectName, File reportsFolder) {
-		super(versions);
+	public ReportGenerator(List<Version> versions, Classifier classifier, String projectName, File reportsFolder, TestEvolLog log) {
+		super(versions, log);
 		this.classifier = classifier;
 		this.projectName = projectName;
 		this.reportsFolder = reportsFolder;
@@ -31,18 +32,14 @@ public class ReportGenerator extends Task {
 
 
 	@Override
-	public boolean go(boolean force) throws Exception {
-		if (!super.go(force)) {
-			return false;
-		}
-		cleanUp();
-
+	public boolean go() throws Exception {
 		Version oldVersion = null;
 
 		Map<VersionPair, Results> resultsMap = classifier.getResults();
         List<VersionPair> versionPairs = new ArrayList<VersionPair>();
 
-		
+        log.logStrong("Generating report...");
+        
 		for (Version version:versions) {
 			
 			if (oldVersion == null) {
@@ -51,10 +48,13 @@ public class ReportGenerator extends Task {
 				continue;
 			}
 
+			log.log("Generation report for pair " + oldVersion.getName() + " - " + version.getName());
+			
 			VersionPair versionPair = new VersionPair(oldVersion, version);
 			versionPairs.add(versionPair);
 			Results results = resultsMap.get(versionPair);
 			
+			log.log("Analysing coverage");
 			CategoryC5 categoryC5 = results.getCategoryC5();
 			categoryC5.analyseCoverage();
 			
@@ -94,10 +94,4 @@ public class ReportGenerator extends Task {
 	
 		return true;
 	}
-	
-	@Override
-	protected String[] getGeneratedFiles() {
-		return new String[0];
-	}
-
 }

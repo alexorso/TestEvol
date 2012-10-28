@@ -70,9 +70,12 @@
 						  <c:forEach var="project" items="${projects}">
 							<tr>
 								<td><strong>${project.name}</strong></td>
-								<td style="width:80px;text-align: center" class="center">
-									<a class="btn btn-info" href="<c:url value="/projects/${project.name}"/>" title="Edit">
-										<i class="icon-edit icon-white"></i>                                            
+								<td style="width:120px;text-align: center" class="center">
+									<a class="btn btn-success" href="<c:url value="/projects/${project.name}"/>" title="Execute TestEvol for this project">
+										<i class="icon-play icon-white"></i>                                            
+									</a>
+									<a class="btn btn-info" href="<c:url value="/projects/${project.name}/executions"/>" title="Show TestEvol executions for project ${project.name}">
+										<i class="icon-tasks icon-white"></i>                                            
 									</a>
 									<a class="btn btn-danger btn-setting" onclick="deleteProject('${project.name}')" title="Delete">
 										<i class="icon-trash icon-white"></i>

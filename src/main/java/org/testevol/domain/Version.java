@@ -343,4 +343,9 @@ public class Version {
 		return vcs.update();
 
 	}
+	
+	@Override
+	public String toString() {
+		return getName();
+	}
 }
