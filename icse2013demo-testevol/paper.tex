@@ -1,0 +1,146 @@
+\documentclass[conference]{IEEEtran}
+\synctex=1
+
+\usepackage[linesnumbered,boxed,ruled,nofillcomment]{algorithm2e} % add vlined,
+\usepackage{amsmath}
+%\usepackage{amsthm}
+\usepackage[usenames]{color}
+\usepackage[light,first]{draftcopy}
+% \usepackage{draftwatermark}
+% \usepackage[firstpage]{draftwatermark}
+\usepackage{epsfig}
+%\usepackage{fullpage}
+%\usepackage[pdftex]{graphicx}
+\usepackage{graphicx}
+%\usepackage{latex8}
+\usepackage{listings}
+\lstloadlanguages{Java}
+\usepackage{multirow}
+%\usepackage{palatino}
+\usepackage{alltt}
+\usepackage{times}
+% \usepackage{url}
+\usepackage{hyperref}
+\usepackage{cite}
+\usepackage{xspace}
+\usepackage[linesnumbered,boxed,ruled,nofillcomment]{algorithm2e} % add vlined,
+% \usepackage[small,compact]{titlesec}
+
+\newcommand{\subparagraph}{}
+%\usepackage[compact]{titlesec}
+%\titlespacing{\section}{0pt}{1ex}{1ex}
+%\titlespacing{\subsection}{0pt}{1ex}{0ex}
+%\titlespacing{\subsubsection}{0pt}{0.5ex}{0ex}
+
+% Use the following to make modification
+% \SetWatermarkAngle{45}
+% \SetWatermarkLightness{0.8}
+% \SetWatermarkFontSize{5cm}
+% \SetWatermarkScale{1}
+% \SetWatermarkText{DRAFT -- Do not redistribute}
+
+%\renewcommand{\topfraction}{0.85}
+%\renewcommand{\textfraction}{0.1}
+%\renewcommand{\floatpagefraction}{0.75}
+%\addtolength{\textfloatsep}{-0.3in}
+
+\input{mymacros}
+\newcommand{\tool}{\textsc{TestEvol}\xspace}
+
+%\linespread{0.97}
+%\columnsep 0.11in
+\clubpenalty = 10000
+\widowpenalty = 10000
+\displaywidowpenalty = 10000
+
+\let\oldthebibliography=\thebibliography
+\let\endoldthebibliography=\endthebibliography
+\renewenvironment{thebibliography}[1]{%
+  \begin{oldthebibliography}{#1}%
+    \setlength{\parskip}{0ex}%
+    \setlength{\itemsep}{0ex}%
+  }%
+  {%
+  \end{oldthebibliography}%
+}
+
+%\toappear{}
+
+\begin{document}
+
+\title{TestEvol: A Tool for Analyzing\\Test-Suite Evolution}
+
+\author{\IEEEauthorblockN{XXX}
+\IEEEauthorblockA{
+College of Computing\\
+Georgia Institute of Technology\\
+Atlanta, USA\\
+\{orso\}@cc.gatech.edu}
+}
+
+\maketitle
+
+\pagestyle{empty}
+
+\begin{abstract}
+  Test suites, once created, rarely remain static. Just like the
+  application they are testing, they evolve throughout their lifetime.
+  Test obsolescence is probably the most known reason for test-suite
+  evolution---test cases cease to work because of changes in the code
+  and must be suitably repaired. Repairing existing test cases
+  manually, however, can be extremely time consuming, especially for
+  large test suites, which has motivated the recent development of
+  automated test-repair techniques. We believe that, for developing
+  effective repair techniques that are applicable in real-world
+  scenarios, a fundamental prerequisite is a thorough understanding of
+  how test cases evolve in practice. Without such knowledge, we risk
+  to develop techniques that may work well for only a small number of
+  tests or, worse, that may not work at all in most realistic cases.
+  Unfortunately, to date there are no studies in the literature that
+  investigate how test suites evolve. To tackle this problem, in this
+  paper we present a technique for studying test-suite evolution, a
+  tool that implements the technique, and an extensive empirical study
+  in which we used our technique to study many versions of six
+  real-world programs and their unit test suites. This is the first
+  study of this kind, and our results reveal several interesting
+  aspects of test-suite evolution. In particular, our findings show
+  that test repair is just one possible reason for test-suite
+  evolution, whereas most changes involve refactorings, deletions, and
+  additions of test cases.  Our results also show that test
+  modifications tend to involve complex, and hard-to-automate, changes
+  to test cases, and that existing test-repair techniques that focus
+  exclusively on assertions may have limited practical applicability.
+  More generally, our findings provide initial insight on how test
+  cases are added, removed, and modified in practice, and can guide
+  future research efforts in the area of test-suite evolution.
+\end{abstract}
+
+% A category with the (minimum) three required fields
+%\category{H.4}{Information Systems Applications}{Miscellaneous}
+%A category including the fourth, optional field follows...
+%\category{D.2.8}{Software Engineering}{Metrics}[complexity measures, performance measures]
+
+%\terms{Theory}
+
+%\keywords{ACM proceedings, \LaTeX, text tagging}
+
+\section{Introduction}
+
+\vspace{4pt}
+The rest of the paper is organized as follows.  
+
+\section{Conclusion and future work}
+\label{sec:concl-future-work}
+
+
+\section*{Acknowledgments}
+
+This work was supported in part by NSF awards CCF-0916605 and
+CCF-0964647 to Georgia Tech, and by funding from IBM Research and
+Microsoft Research.
+
+\bibliographystyle{abbrv}
+\bibliography{paper}
+
+\end{document}
+
