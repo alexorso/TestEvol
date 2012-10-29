@@ -1,0 +1,135 @@
+%\setpapersize{USletter}
+%\setmarginsrb{2.54cm}{2.54cm}{2.54cm}{1.5cm}{0pt}{0mm}{0pt}{8mm}
+%\setcounter{secnumdepth}{3}
+
+\newcommand{\ie}{\textit{i.e.,} }
+\newcommand{\eg}{\textit{e.g.,} }
+
+\newcommand\opt[1]{}
+\newcommand\find[1]{}
+
+\newcommand{\xxx}[1]{{\color{red}\bf #1}}
+
+\def\denseitems{
+  \itemsep1pt plus1pt minus1pt
+  \parsep0pt plus0pt
+  \parskip0pt
+  \topsep0pt
+}
+\leftmargini 1em
+%  \leftmarginii-1em
+%  \leftmarginiii-1em
+%  \leftmarginvi-1em
+
+\newenvironment{myquote}
+  {\baselineskip=\SingleLine \begin{quote}
+    {\setlength{\leftmargin}{2\parindent}}}
+  {\end{quote} \baselineskip=\DoubleLine \vspace*{-\SingleLine}}
+
+\def\bfcaption#1{\caption[#1]{\bf #1}}
+
+\def\argmax{\mathop{\rm arg\,max}}
+
+\def\denseitems{
+  \itemsep1pt plus1pt minus1pt
+  \parsep0pt plus0pt
+  \parskip0pt\topsep0pt}
+
+\newcommand{\ls}[1]
+   {\dimen0=\fontdimen6\the\font 
+    \lineskip=#1\dimen0
+    \advance\lineskip.5\fontdimen5\the\font
+    \advance\lineskip-\dimen0
+    \lineskiplimit=.9\lineskip
+    \baselineskip=\lineskip
+    \advance\baselineskip\dimen0
+    \normallineskip\lineskip
+    \normallineskiplimit\lineskiplimit
+    \normalbaselineskip\baselineskip
+    \ignorespaces
+   }
+
+\newcommand{\crunchlist}{
+        \setlength{\itemsep}{-0.05in}
+        \setlength{\partopsep}{0in}
+        \setlength{\topsep}{0in}}
+
+\def\sqzhuge{\vspace{-14pt}}
+\def\sqztiny{\vspace{-6pt}}
+
+\def\definition#1#2{
+\begin{smalldescription}
+\item[Definition:] \underline{#1}\\
+#2\hfill~$\Box$
+\end{smalldescription}
+%\vspace*{-5mm}
+}
+
+\def\definition#1{
+\begin{smalldescription}
+\item[Definition:]
+#1\hfill~$\Box$
+\end{smalldescription}
+}
+
+\def\ind#1{{\it #1}\index{#1}}
+
+%% Alternative to itemize
+\newenvironment{smallitemize}{
+   \setlength{\topsep}{0pt}
+   \setlength{\partopsep}{0pt}
+   \setlength{\parskip}{0pt}
+   \begin{itemize}
+   \setlength{\leftmargin}{.2in}
+   \setlength{\parsep}{0pt}
+   \setlength{\parskip}{0pt}
+   \setlength{\itemsep}{0pt}}{\end{itemize}}
+
+%% Alternative to enumerate
+\newenvironment{smallenumerate}{
+   \setlength{\topsep}{0pt}
+   \setlength{\partopsep}{0pt}
+   \setlength{\parskip}{0pt}
+   \begin{enumerate}
+   \setlength{\leftmargin}{.2in}
+   \setlength{\parsep}{0pt}
+   \setlength{\parskip}{0pt}
+   \setlength{\itemsep}{0pt}}{\end{enumerate}}
+
+%% Alternative to description
+\newenvironment{smalldescription}{
+   \setlength{\topsep}{0pt}
+   \setlength{\partopsep}{0pt}
+   \setlength{\parskip}{0pt}
+   \begin{description}
+   \setlength{\leftmargin}{.2in}
+   \setlength{\parsep}{0pt}
+   \setlength{\parskip}{0pt}
+   \setlength{\itemsep}{0pt}}{\end{description}}
+
+%\long\gdef\TabPerf#1#2{%
+%  #1 & #2 \\ \hline
+%}
+
+%% The [gray]{0} gives rise to the black color. For other shades of
+%% gray, increase the number.
+%\long\gdef\TabHead#1#2{%
+%\multicolumn{1}{|>{\columncolor[gray]{0}}c|}{\textcolor{white}{\bf #1}} &
+%\multicolumn{1}{>{\columncolor[gray]{0}}c|}{\textcolor{white}{\bf #2}} \\ \hline 
+%}
+
+%\long\gdef\TabPerf#1#2{%
+%  #1 & #2 \\ \hline
+%}
+
+%% The [gray]{0} gives rise to the black color. For other shades of
+%% gray, increase the number.
+%\long\gdef\TabHead#1#2{%
+%\multicolumn{1}{|>{\columncolor[gray]{0}}c|}{\textcolor{white}{\bf #1}} &
+%\multicolumn{1}{>{\columncolor[gray]{0}}c|}{\textcolor{white}{\bf #2}} \\ \hline 
+%}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "paper"
+%%% End: 

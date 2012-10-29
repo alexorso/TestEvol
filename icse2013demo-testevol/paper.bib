@@ -1,0 +1,652 @@
+-- Predefined (standard) journal abbreviations:
+acmcs    ACM Computing Surveys
+acta     Acta Informatica
+cacm     Communications of the ACM
+ibmjrd   IBM Journal of Research and Development
+ibmsj    IBM Systems Journal
+ieeese   IEEE Transactions on Softw. Engineering
+ieeetc   IEEE Transactions on Computers
+ieeetcad IEEE Transactions on Computer-Aided Design of Integrated Circuits
+ipl      Information Processing Letters
+jacm     Journal of the ACM
+jcss     Journal of Computer and System Sciences
+scp      Science of Computer Programming
+sicomp   SIAM Journal on Computing
+tocs     ACM Transactions on Computer Systems
+tods     ACM Transactions on Database Systems
+tog      ACM Transactions on Graphics
+toms     ACM Transactions on Mathematical Softw.
+toois    ACM Transactions on Office Information Systems
+toplas   ACM Transactions on Programming Languages and Systems
+tcs      Theoretical Computer Science
+
+-- Non-standard abbreviations (journals):
+@STRING{ieeesoft = "IEEE Softw."}
+@STRING{ieeecomp = "IEEE Computer"}
+@STRING{jsm      = "Journal of Softw. Maintenance: Research and Practice"}
+@STRING{jss      = "The Journal of Systems and Softw."}
+@STRING{lncs     = "Lecture Notes in Computer Science"}
+@STRING{loplas   = "ACM Letters on Programming Languages and Systems"}
+@STRING{sen      = "ACM SIGSOFT Softw. Engineering Notes"}
+@STRING{sigplan  = "ACM SIGPLAN Notices"}
+@STRING{spe      = "Softw.---Practice and Experience"}
+@STRING{tosem    = "ACM Transactions on Softw. Engineering and Methodology"}
+@STRING{stvr     = "Softw. Testing, Verification and Reliability"}
+@STRING{mam      = "Microprocessing and Microprogramming"}
+
+
+-- Non-standard abbreviations (conferences):
+
+@STRING{ase03 = "Proceedings of the 18th International Conference on
+                Automated Software Engineering"}
+@STRING{ase05 = "Proceedings of the 20th International Conference on
+                Automated Software Engineering"}
+@STRING{ase07 = "Proceedings of the 22nd International Conference on
+                Automated Software Engineering"}
+@STRING{ase08 = "Proceedings of the 23rd International Conference on
+                Automated Software Engineering"}
+@STRING{ase10 = "Proceedings of the 25th International Conference on
+                Automated Software Engineering"}
+
+@STRING{ecoop10 = "Proceedings of the 24th European Conference on
+                  Object-Oriented Programming"}
+
+@STRING{fse99 = "Proceedings of the 7th European Software 
+                Engineering Conference and the 7th ACM SIGSOFT
+                Symposium on the Foundations of Software
+                Engineering"}
+@STRING{fse06 = "Proceedings of the 14th  ACM SIGSOFT Symposium
+                on the Foundations of Software Engineering"}
+@STRING{fse07 = "Proceedings of the 6th joint meeting of the European
+                Software Engineering Conference and the ACM SIGSOFT
+                Symposium on the Foundations of Software
+                Engineering"}
+@STRING{fse09 = "Proceedings of the 7th joint meeting of the European
+                Software Engineering Conference and the ACM SIGSOFT
+                Symposium on the Foundations of Software
+                Engineering"}
+
+@STRING{icse02 = "Proceedings of the 24th International Conference on
+                  Software Engineering"}
+@STRING{icse03 = "Proceedings of the 25th International Conference on
+                  Software Engineering"}
+@STRING{icse06 = "Proceedings of the 28th International Conference on
+                  Software Engineering"}
+@STRING{icse07 = "Proceedings of the 29th International Conference on
+                  Software Engineering"}
+@STRING{icse08 = "Proceedings of the 30th International Conference on
+                  Software Engineering"}
+
+@STRING{issre95 = "Proceedings of the 6th International Symposium on
+                  Software Reliability Engineering"}
+@STRING{issre03 = "Proceedings of the 14th International Symposium on
+                  Software Reliability Engineering"}
+@STRING{issre04 = "Proceedings of the 15th International Symposium on
+                  Software Reliability Engineering"}
+@STRING{issre06 = "Proceedings of the 17th International Symposium on
+                  Software Reliability Engineering"}
+
+@STRING{issta = "Proceedings of the International Symposium on
+                Software Testing and Analysis"}
+
+@STRING{paste05 = "Proceedings of 6th ACM SIGPLAN-SIGSOFT Workshop on
+                  Program Analysis for Software Tools and
+                  Engineering"}
+@STRING{paste07 = "Proceedings of 7th ACM SIGPLAN-SIGSOFT Workshop on
+                  Program Analysis for Software Tools and Engineering"}
+
+@STRING{pldi90 = "Proceedings of the ACM SIGPLAN Conference on
+                 Programming Languages Design and Implementation"}
+@STRING{pldi07 = "Proceedings of the ACM SIGPLAN Conference on
+                 Programming Languages Design and Implementation"}
+
+@STRING{oopsla03 = "Proceedings of the 18th ACM SIGPLAN Conference on
+                   Object-Oriented Programming, Systems, Languages, and
+                   Applications"}
+@STRING{oopsla05 = "Proceedings of the 20th ACM SIGPLAN Conference on
+                   Object-Oriented Programming, Systems, Languages, and
+                   Applications"}
+@STRING{oopsla09 = "Proceedings of the 24th ACM SIGPLAN Conference on
+                   Object-Oriented Programming, Systems, Languages, and
+                   Applications"}
+
+
+@article{king76jul,
+author = {King, J. C.},
+title = {Symbolic execution and program testing},
+journal = cacm,
+volume = {19},
+number = {7},
+year = {1976},
+month = jul,
+pages = {385--394}
+}
+
+@article{weiser84jul,
+author = {Weiser, M.},
+title = {Program slicing},
+journal = ieeese,
+volume = {10},
+number = {4},
+month = jul,
+year = {1984},
+pages = {352--357}
+}
+
+@article{horwitz90jan,
+author = {S. Horwitz and  T. Reps and D. Binkley},
+title = {Interprocedural slicing using dependence graphs},
+journal = toplas,
+volume = {12},
+number = {1},
+month = jan,
+year = {1990},
+pages = {26--60}
+}
+
+@inproceedings{ko08may,
+author = {Ko, A. J. and Myers, B. A.},
+title = {Debugging reinvented: {A}sking and answering why and why not questions about program behavior},
+booktitle = icse08,
+year = {2008},
+month = may,
+pages = {301--310}
+}
+
+@inproceedings{clause09jul,
+author = {Clause, J. and Orso, A.},
+title = {Penumbra: {A}utomatically identifying failure-relevant inputs using dynamic tainting},
+booktitle = issta,
+year = {2009},
+month = jul,
+pages = {249--259}
+}
+
+@inproceedings{agrawal95oct,
+author = {H. Agrawal and J. R. Horgan and S. London and W. E. Wong},
+title = {Fault localization using execution slices and dataflow tests},
+booktitle = issre95,
+year = {1995},
+month = oct,
+pages = {143--151}
+}
+
+@inproceedings{gupta05nov,
+author = {Gupta, N. and He, H. and Zhang, X. and Gupta, R.},
+title = {Locating faulty code using failure-inducing chops},
+booktitle = ase05,
+year = {2005},
+month = nov,
+pages = {263--272}
+}
+
+@article{zhang07jul,
+author = {Zhang, X. and Gupta, N. and Gupta, R.},
+title = {Locating faulty code by multiple points slicing},
+journal = spe,
+volume = {37},
+number = {9},
+year = {2007},
+month = jul,
+pages = {935--961}
+}
+
+@inproceedings{korel97may,
+author = {Korel, B. and Rilling, J.},
+title = {Application of dynamic slicing in program debugging},
+booktitle = {Proceedings of the 3rd International Workshop on Automatic Debugging},
+year = {1997},
+month = may,
+}pages = {43--58}
+}
+
+@inproceedings{gyimothy99nov,
+author = {Gyim\'{o}thy, T. and Besz\'{e}des, \'{A}. and Forg\'{a}cs, I.},
+title = {An efficient relevant slicing method for debugging},
+booktitle = fse99,
+year = {1999},
+month = nov,
+pages = {303--321}
+}
+
+@inproceedings{demillo96jan,
+author = {DeMillo, R. A. and Pan, H. and Spafford, E. H.},
+title = {Critical slicing for software fault localization},
+booktitle = issta,
+year = {1996},
+month = jan,
+pages = {121--134}
+}
+
+@article{zeller02feb,
+author = {Zeller, A. and Hildebrandt, R.},
+title = {Simplifying and isolating failure-inducing input},
+journal = ieeese,
+volume = {28},
+number = {2},
+year = {2002},
+month = feb,
+pages = {183--200}
+}
+
+@inproceedings{jones02may,
+author = {Jones, J. A. and Harrold, M. J. and Stasko, J.},
+title = {Visualization of Test Information to Assist Fault Localization},
+booktitle = icse02,
+year = {2002},
+month = may,
+pages = {467--477}
+}
+
+@inproceedings{renieres03oct,
+author = {Renieres, M. and Reiss, S. P.},
+title = {Fault localization with nearest neighbor queries},
+booktitle = ase03,
+year = {2003},
+month = oct,
+pages = {30--39}
+}
+
+@article{harrold00sep,
+author = {M. J. Harrold and G. Rothermel and K. Sayre and R. Wu and L. Yi},
+title = {An empirical investigation of the relationship between spectra differences and regression faults},
+journal = stvr,
+volume = {10},
+number = {3},
+year = {2000},
+month = sep,
+pages = {171--194}
+}
+
+@inproceedings{clause07jul,
+author = {J. Clause and W. Li and A. Orso},
+title = {{Dytan: A generic dynamic taint analysis framework}},
+booktitle = issta,
+month = jul,
+year = {2007},
+pages = {196--206}
+}
+
+@inproceedings{misherghi06may,
+author = {G. Misherghi and Z. Su},
+title = {{HDD: Hierarchical delta debugging}},
+booktitle = icse06,
+year = {2006},
+month = may,
+pages = {142--151}
+}
+
+@article{ferrante87jul,
+author = {J. Ferrante and  K. J. Ottenstein and J. D. Warren},
+title = {The program dependence graph and its use in optimization},
+journal = toplas,
+volume = {9},
+number = {3},
+month = jul,
+year = {1987},
+pages = {319--349}
+}
+
+@techreport{xie02dec,
+author = {T. Xie and D. Notkin},
+title = {Checking inside the black box: Regression fault exposure and localization
+based on value spectra differences},
+institution = {University of Washington},
+number = {UW-CSE-02-12-04},
+month = dec,
+year = {2002}
+}
+
+@conference{hangal02may,
+author = {S. Hangal and M. S. Lam},
+title = {Tracking down software bugs using automatic anomaly detection},
+booktitle = icse02,
+year = {2002},
+month = {May},
+pages = {291--301}
+}
+
+@article{korel88oct,
+author = {Korel, B. and Laski, J.},
+title = {Dynamic program slicing},
+journal = {Information Processing Letters},
+volume = {29},
+number = {3},
+month = oct,
+year = {1988},
+pages = {155--163}
+}
+
+@inproceedings{agrawal90jun,
+author = {Agrawal, H. and Horgan, J. R.},
+title = {Dynamic program slicing},
+booktitle = pldi90,
+-series = sigplan,
+-volume = {25},
+-number = {6},
+month = jun,
+year = {1990},
+pages = {246--256}
+}
+
+@article{agrawal93jun,
+author = {Agrawal, H. and DeMillo, R. A. and Spafford, E. H.},
+title = {Debugging with dynamic slicing and backtracking},
+journal = spe,
+volume = {23},
+number = {6},
+month = jun,
+year = {1993},
+pages = {589--616}
+}
+
+@inproceedings{zhang06may,
+author = {Zhang, X. and Gupta, N. and Gupta, R.},
+title = {Locating faults through automated predicate switching},
+booktitle = icse06,
+year = {2006},
+month = may,
+pages = {272--281}
+}
+
+@inproceedings{zhang07jun,
+author = {Zhang, X. and Tallam, S. and Gupta, N. and Gupta, R.},
+title = {Towards locating execution omission errors},
+booktitle = pldi07,
+year = {2007},
+month = jun,
+pages = {415--424}
+}
+
+@inproceedings{sen05,
+author = {K. Sen and D. Marinov and G. Agha},
+title = {{CUTE: A concolic unit testing engine for C}},
+booktitle = {Proceedings of the 10th European Software Engineering Conference / 13th ACM SIGSOFT International Symposium on Foundations of Software Engineering},
+year = {2005},
+pages = {263--272},
+}
+
+@article{visser04,
+author = {W. Visser and C. S. P\v{a}s\v{a}reanu and S. Khurshid},
+title = {{Test input generation with Java PathFinder}},
+journal = {ACM SIGSOFT Software Engineering Notes},
+volume = {29},
+number = {4},
+year = {2004},
+pages = {97--107},
+}
+
+@inproceedings{xie05,
+author = {T. Xie and D. Marinov and W. Schulte and D. Notkin},
+title = {Symstra: A framework for generating object-oriented unit tests using symbolic execution},
+booktitle = {Proceedings of the 11th International Conference on Tools and Algorithms for the Construction and Analysis of Systems},
+year = {2005},
+pages = {365--381},
+}
+
+@inproceedings{cadar08,
+author    = {C. Cadar and D. Dunbar and D. R. Engler},
+title     = {{KLEE: Unassisted and automatic generation of high-coverage
+             tests for complex systems programs}},
+booktitle = {Proceedings of the 8th USENIX Symposium on Operating Systems Design and Implementation},
+year      = {2008},
+pages     = {209-224},
+}
+
+@inproceedings{godefroid05,
+author = {P. Godefroid and N. Klarlund and K. Sen},
+title = {{DART: Directed automated random testing}},
+booktitle = {Proceedings of the ACM SIGPLAN Conference on Programming Language Design and Implementation},
+year = {2005},
+pages = {213--223},
+}
+
+@article{korel90aug,
+author = {Korel, B.},
+title = {Automated software test data generation},
+journal = ieeese,
+volume = {16},
+number = {8},
+month = aug,
+year = {1990},
+pages = {870--879}
+}
+
+@inproceedings{Daniel:2009,
+ author = {Daniel, B. and Jagannath, V. and Dig, D. and Marinov, D.},
+ title = {{ReAssert: Suggesting repairs for broken unit tests}},
+ booktitle = {Proceedings of the International Conference on Automated Software Engineering},
+ year = {2009},
+ pages = {433--444}
+} 
+
+@inproceedings{Daniel:2010,
+ author = {Daniel, B. and Gvero, T. and Marinov, D.},
+ title = {On test repair using symbolic execution},
+ booktitle = {Proceedings of the 19th International Symposium on Software Testing and Analysis},
+ year = {2010},
+ pages = {207--218}
+} 
+
+@inproceedings{Grechanik:2009,
+ author = {Grechanik, M. and Xie, Q. and Fu, C.},
+ title = {Maintaining and evolving GUI-directed test scripts},
+ booktitle = {Proceedings of the 31st International Conference on Software Engineering},
+ year = {2009},
+ pages = {408--418}
+} 
+
+@inproceedings{Memon:2003,
+ author = {Memon, A. M. and Soffa, M. L.},
+ title = {{Regression testing of GUIs}},
+ booktitle = {Proceedings of the 9th European Software Engineering Conference and the 11th ACM SIGSOFT International Symposium on Foundations of Software Engineering},
+ year = {2003},
+ pages = {118--127}
+} 
+
+@article{Memon:2008,
+ author = {Memon, A. M.},
+ title = {{Automatically repairing event sequence-based GUI test suites for regression testing}},
+ journal = {ACM Trans. Softw. Eng. Methodol.},
+ volume = {18},
+ issue = {2},
+ month = {November},
+ year = {2008},
+ pages = {1--36}
+} 
+
+@inproceedings{Chandra:2011,
+ author = {Chandra, S. and Torlak, E. and Barman, S. and Bodik, R.},
+ title = {Angelic debugging},
+ booktitle = {Proceeding of the 33rd International Conference on Software Engineering},
+ year = {2011},
+ pages = {121--130}
+}
+
+@inproceedings{Gopinath:2011,
+ author = {Gopinath, D. and Malik, M. Z. and Khurshid, S.},
+ title = {{Specification-based program repair using SAT}},
+ booktitle = {Proceedings of the 17th International Conference on Tools and Algorithms for the Construction and Analysis of Systems},
+ year = {2011},
+ pages = {173--188}
+} 
+
+@inproceedings{Alshahwan:2008,
+ author = {Alshahwan, N. and Harman, M.},
+ title = {Automated Session Data Repair for Web Application Regression Testing},
+ booktitle = {Proceedings of the International Conference on Software Testing, Verification, and Validation},
+ year = {2008},
+ pages = {298--307}
+} 
+
+@inproceedings{Weimer:2009,
+ author = {Weimer, W. and Nguyen, T. and Le Goues, C. and Forrest, S.},
+ title = {Automatically finding patches using genetic programming},
+ booktitle = {Proceedings of the 31st International Conference on Software Engineering},
+ year = {2009},
+ pages = {364--374}
+} 
+
+@inproceedings{Wei:2010,
+ author = {Wei, Y. and Pei, Y. and Furia, C. A. and Silva, L. S. and Buchholz, S. and Meyer, B. and Zeller, A.},
+ title = {Automated fixing of programs with contracts},
+ booktitle = {Proceedings of the 19th International Symposium on Software Testing and Analysis},
+ year = {2010},
+ pages = {61--72}
+} 
+
+@inproceedings{Malik:2011,
+ author = {Malik, M. Z. and Siddiqi, J. H. and Khurshid, S.},
+ title = {Constraint-Based Program Debugging Using Data Structure Repair},
+ booktitle = {Proceedings of the International Conference on Software Testing, Verification and Validation},
+ year = {2011},
+ pages = {190--199}
+}
+
+@inproceedings{Demsky:2003,
+ author = {Demsky, B. and Rinard, M.},
+ title = {Automatic detection and repair of errors in data structures},
+ booktitle = {Proceedings of the 18th annual ACM SIGPLAN Conference on Object-oriented Programing, Systems, Languages, and Applications},
+ year = {2003},
+ pages = {78--95}
+} 
+
+@inproceedings{Demsky:2005,
+ author = {Demsky, B. and Rinard, M.},
+ title = {Data structure repair using goal-directed reasoning},
+ booktitle = {Proceedings of the 27th International Conference on Software Engineering},
+ year = {2005},
+ pages = {176--185}
+} 
+
+@inproceedings{Zaeem:2010,
+ author = {Zaeem, R. N. and Khurshid, S.},
+ title = {Contract-based data structure repair using alloy},
+ booktitle = {Proceedings of the 24th European Conference on Object-oriented Programming},
+ year = {2010},
+ pages = {577--598}
+} 
+
+@INPROCEEDINGS{thummalapenta:2011,
+ author = {S. Thummalapenta and T. Xie and N. Tillmann and J. de Halleux and Z. Su},
+ title = {Synthesizing Method Sequences for High-Coverage Testing},
+ booktitle = {Proceedings ACM SIGPLAN International Conference on Object-Oriented Programming, Systems, Languages, and Applications},
+ year = {2011},
+ pages = {189--206}
+}
+
+@inproceedings{Dagenais:2008,
+ author = {Dagenais, B. and Robillard, M. P.},
+ title = {Recommending adaptive changes for framework evolution},
+ booktitle = {Proceedings of the 30th International Conference on Software Engineering},
+ year = {2008},
+ pages = {481--490}
+} 
+
+@inproceedings{Chow:1996,
+ author = {Chow, K. and Notkin, D.},
+ title = {Semi-automatic update of applications in response to library changes},
+ booktitle = {Proceedings of the International Conference on Software Maintenance},
+ year = {1996},
+ pages = {359--369}
+} 
+
+@article{Dig:2006,
+ author = {Dig, D. and Johnson, R.},
+ title = {{How do APIs evolve? A story of refactoring}},
+ journal = {J. Softw. Maint. Evol.},
+ volume = {18},
+ issue = {2},
+ month = {March},
+ year = {2006},
+ pages = {83--107}
+} 
+
+@inproceedings{Dig:2006:ecoop,
+  author    = {D. Dig and C. Comertoglu and D. Marinov and R. E. Johnson},
+  title     = {Automated detection of refactorings in evolving components},
+  booktitle = {Proceedings of the European Conference on Object-Oriented Programming},
+  year      = {2006},
+  pages     = {404-428}
+}
+
+@inproceedings{Henkel:2005,
+ author = {Henkel, J. and Diwan, A.},
+ title = {{CatchUp!: Capturing and replaying refactorings to support API evolution}},
+ booktitle = {Proceedings of the 27th International Conference on Software Engineering},
+ year = {2005},
+ pages = {274--283}
+} 
+
+@inproceedings{Meng:2011,
+ author = {Meng, N. and Kim, M. and McKinley, K. S.},
+ title = {{Systematic editing: Generating program transformations from an example}},
+ booktitle = {Proceedings of the 32nd ACM SIGPLAN Conference on Programming Language Design and Implementation},
+ year = {2011},
+ pages = {329--342}
+} 
+
+@inproceedings{Nguyen:2010,
+ author = {Nguyen, H. A. and Nguyen, T. T. and Wilson,Jr., G. and Nguyen, A. T. and Kim, M. and Nguyen, T. N.},
+ title = {{A graph-based approach to API usage adaptation}},
+ booktitle = {Proceedings of the ACM International Conference on Object Oriented Programming Systems Languages and Applications},
+ year = {2010},
+ pages = {302--321}
+} 
+
+@inproceedings{Choudhary:2011,
+ author = {Choudhary, S. R. and Zhao, D. and Versee, H. and Orso, A.},
+ title = {{WATER: Web Application TEst Repair}},
+ booktitle = {Proceedings of the First International Workshop on End-to-End Test Script Engineering},
+ year = {2011},
+ pages = {24--29}
+} 
+
+@inproceedings{bevan05sep,
+author = {Bevan, J. and Whitehead, E. J. and Sunghun, K. and Godfrey, M.},
+title = {Facilitating software evolution research with {K}enyon},
+booktitle = {Proceedings of the 10th European Software Engineering Conference / 13th ACM SIGSOFT International Symposium on Foundations of Software Engineering},
+month = sep,
+year = {2005},
+pages = {177--186}
+}
+
+@inproceedings{santelices08ase,
+  author    = {R. A. Santelices and
+               P. K. Chittimalli and
+               T. Apiwattanapong and
+               A. Orso and
+               M. J. Harrold},
+  title     = {Test-suite augmentation for evolving software},
+  booktitle = {Proceedings of the IEEE and ACM International Conference on Automated Software Engineering},
+  year      = {2008},
+  pages     = {218-227}
+}
+
+@inproceedings{Mirzaaghaei:2012,
+ author = {Mirzaaghaei, M. and Pastore, F. and Pezz{\'e}, M.},
+ title = {Supporting test suite evolution through test case adaptation},
+ booktitle = {Proceedings of the 5th IEEE International Conference on Software Testing, Verification and Validation},
+ year = {2012},
+ pages = {231--240}
+}
+
+@inproceedings{Huang:2010,
+ author = {Huang, S. and Cohen, M. B. and Memon, A. M.},
+ title = {Repairing {GUI} test suites using a genetic algorithm},
+ booktitle = {Proceedings of the 3rd International Conference on Software Testing, Verification and Validation},
+ year = {2010},
+ pages = {245--254}
+} 
+
+@Misc{sourceforge,
+  key = 	 {sourceforge},
+  OPTauthor = 	 {},
+  title = 	 {SourceForge},
+  howpublished = {\url{www.sourceforge.net}},
+  OPTmonth = 	 {},
+  year = 	 {2012},
+  OPTnote = 	 {},
+  OPTannote = 	 {}
+}
+
