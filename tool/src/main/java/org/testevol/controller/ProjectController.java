@@ -1,5 +1,6 @@
 package org.testevol.controller;
 
+import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -8,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -51,6 +53,11 @@ public class ProjectController {
 		mav.addObject("projects", projects);
 		mav.setViewName("projectList");
 		return mav;
+	}
+
+	@RequestMapping(value="names",method = RequestMethod.GET, produces="application/json")
+	public @ResponseBody List<String> getProjectNames() throws Exception {
+		return projectRepo.getProjectsNames();
 	}
 
 	
@@ -203,10 +210,14 @@ public class ProjectController {
 		return executionMap;
 	}
 	
-	@RequestMapping(value="version/script",method = RequestMethod.GET)
-	public @ResponseBody String getSummReportScript() throws Exception {
-		return "alert('loaded dude');";
-
+	@RequestMapping(value = "{project}/execution/{id}/report/script/{name}", method = RequestMethod.GET, produces="application/javascript")
+	public @ResponseBody
+	String getReportScript(@PathVariable("project") String projectName,
+			@PathVariable("id") String id,
+			@PathVariable("name") String scriptName) throws Exception {
+		
+		Execution execution = projectRepo.getExecution(projectName, id);
+		return FileUtils.readFileToString(new File(execution.getExecutionDir(),scriptName+".js"));
 	}
 
 	@RequestMapping(method = RequestMethod.POST)
@@ -218,7 +229,7 @@ public class ProjectController {
 	@RequestMapping(value = "getBranches", method = RequestMethod.GET, produces = "application/json")
 	public @ResponseBody
 	Map getBranches(@RequestParam("vcs") String versionControlSystem,
-			@RequestParam("url") String url) {
+					@RequestParam("url") String url) {
 
 		VersionControlSystem versionControlSystemInstance = VersionControlSystem
 				.getInstance(versionControlSystem, url);

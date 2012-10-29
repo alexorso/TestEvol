@@ -7,11 +7,8 @@
 
 <%@include file="includes/header.jsp" %>
 
-<style type="text/css">
+<link href="<c:url value="/css/summary.css"/>" rel="stylesheet">
 
-
-</style>
-</head>
 
 <body>
 
@@ -35,16 +32,40 @@
 						<li><a href="<c:url value="/projects/list"/>">Projects</a><span class="divider">/</span></li>
 						<li><a href="<c:url value="/projects/${execution.project.name}"/>">Project ${execution.project.name}</a><span class="divider">/</span></li>
 						<li><a href="<c:url value="/projects/${execution.project.name}/executions"/>">Executions</a><span class="divider">/</span></li>
-						<li><a href="<c:url value="/projects/${execution.project.name}/executions/${execution.id}"/>">${execution.name}</a><span class="divider">/</span></li>												
+						<li><a href="<c:url value="/projects/${execution.project.name}/execution/${execution.id}"/>">${execution.name}</a><span class="divider">/</span></li>												
 						<li id="titleName">TestEvol Report</li>
 					</ul>
 				</div>
 
 				<div class="row-fluid sortable">
 					<div class="box span12">
-						<div class="box-content">
-							Aiiiiiii
-						</div>
+						<div class="box-header well" data-original-title>
+						<h2><i class="icon-inbox"></i> Summary for Project ${execution.project.name} - Execution "${execution.name}"</h2>
+					</div>
+					<div class="box-content">
+						<table class="table table-striped table-bordered bootstrap-datatable" id="summary_table">
+						 <thead>
+                    <tr>
+                        <th></th>
+                        <th>TESTREP</th>
+                        <th>TESTMODNOTREP</th>
+                        <th colspan="3" class="testDelLeft testDelRight">TESTDEL</th>
+                        <th colspan="3" style="text-align: center">TESTADD</th>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th class="testDelLeft">(AE|RE)</th>
+                        <th>(CE)</th>
+                        <th class="testDelRight">(P)</th>
+                        <th>(AE|RE)</th>
+                        <th>(CE)</th>
+                        <th>(P)</th>
+                    </tr>
+                </thead>
+					  </table>            
+					</div>
 					</div>
 					<!--/span-->
 				</div>
@@ -62,7 +83,32 @@
 	<!--/.fluid-container-->
 	
 	<%@include file="includes/scripts.jsp" %>
-	
+	<script type="text/javascript" src="<c:url value="/projects/${execution.project.name}/execution/${execution.id}/report/script/summary.js"/>"></script>
+	<script type="text/javascript">
+	var versions = getVersions();
+	var olData = "";
+	var summaryInfo = new Array(0, 0, 0, 0, 0, 0, 0, 0);
+
+	for(var i = 1; i < versions.length; i++) {
+		var version = versions[i];
+		document.write('<script type="text/javascript" src=<c:url value="/projects/${execution.project.name}/execution/${execution.id}/report/script/"/>' + version + '.js"><\/script>');
+		//olData += "<li> Pair <a href='" + version + "/report.html' target='_blank'>" + versions[i - 1] + " - " + versions[i] + "</a></li>";
+	}
+
+	$(function() {
+		for(var i = 1; i < versions.length; i++) {
+			var version = versions[i];
+			for(var j = 0; j < 8; j++) {
+				summaryInfo[j] += versionsSummary[version][j];
+			}
+		}
+		$("#versions").html(olData);
+		versionsSummary["total"] = summaryInfo;
+		populateTotals(versionsSummary);
+		createSummaryTable($("#summary_table"), versions, versionsSummary);
+
+	});
+</script>
 
 	</body>
 </html>

@@ -1,0 +1,319 @@
+.allValues {
+	font-size: 15px;
+	font-weight: bold;
+}
+
+.bootstrap-datatable tr:nth-child(1){
+	font-size: 15px;
+	background-color: red;
+	background-color: #CCCCCC;
+}
+
+.bootstrap-datatable tr:nth-child(2){
+font-size: 15px;
+	background-color: #CCCCCC;
+}
+
+
+.bootstrap-datatable tr td:nth-child(n+1), .bootstrap-datatable tr th:nth-child(n+1){
+	text-align: center;
+}
+
+/* 
+
+html {
+	margin: 0px;
+	padding: 0px;
+}
+body {
+	margin: 0px;
+	background-color: #FEFEFE;
+	font-family: 'Inder';
+}
+
+a:visited {
+	color: black;
+}
+
+a:link {
+	text-decoration: none;
+	color: black;
+}
+a:hover {
+	text-decoration: underline;
+	color: black;
+}
+
+.bad {
+	color: red;
+}
+
+.good {
+	color: green;
+}
+
+#summary {
+	border-collapse: collapse;
+}
+
+#summary thead tr th, #summary tbody tr td {
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+#summary thead th:nth-child(odd) {
+	text-align: left;
+	padding-left: 5px;
+}
+
+#summary thead th:nth-child(even) {
+	text-align: right;
+	padding-right: 5px;
+}
+
+#summary tbody tr:nth-child(even) {
+	background: #F1F1F1;
+}
+
+#summary tbody tr:nth-child(odd) {
+	background: #FFFFFF;
+}
+
+#summary tbody td:nth-child(odd) {
+	padding-left: 5px;
+	width: 140px;
+}
+
+#summary tbody td:nth-child(even) {
+	text-align: right;
+	padding-right: 5px;
+}
+
+#summary tfoot {
+	font-weight: bold;
+	background-color: #000;
+	color: #FFF;
+}
+
+#summary tfoot td:nth-child(odd) {
+	text-align: right;
+}
+
+#summary tfoot td:nth-child(even) {
+	padding-right: 67px;
+	text-align: right;
+}
+
+.percent {
+	min-width: 60px;
+	float: right;
+}
+
+pre {
+	font-family: 'Droid Sans Mono', 'Courier New', monospace;
+	font-size: 12px;
+	line-height: 18px;
+	color: black;
+	background: white;
+	border: 1px solid rgb(224, 224, 224);
+	min-width: 400px;
+	width: 100%;
+	max-width: 100%;
+	overflow-x: scroll;
+}
+
+.linenums {
+	padding-left: 32px;
+}
+
+.prettyprint .str, string content
+.prettyprint .atv { a markup attribute value
+	color: rgb(0, 138, 53);
+}
+.prettyprint .kwd, a keyword
+.prettyprint .tag { a markup tag name
+	color: rgb(0, 102, 204);
+}
+.prettyprint .com { a comment
+	color: rgb(127, 127, 127);
+	font-style: italic;
+}
+.prettyprint .lit { a literal value
+	color: rgb(127, 0, 0);
+}
+.prettyprint .pun, punctuation, lisp open bracket, lisp close bracket
+.prettyprint .opn, .prettyprint .clo {
+	color: rgb(127, 127, 127);
+}
+.prettyprint .typ, a type name
+.prettyprint .atn, a markup attribute name
+.prettyprint .dec, .prettyprint .var { a declaration; a variable name
+	color: rgb(127, 0, 127);
+}
+
+#old {
+	margin-right: 20px;
+}
+
+header {
+	font-size: 18px;
+	margin: 0px;
+	padding: 5px 0 5px 8px;
+	background-color: blue;
+	border-bottom: 1px solid #CCCCCC;
+	background: #FFF url(pattern_35.gif) repeat;
+	color: white;
+	text-shadow: 2px 2px 2px #000;
+}
+
+header span {
+	font-size: 12px;
+}
+
+.leftbar {
+	float: left;
+	background-color: rgb(40, 122, 122);
+	height: 100%;
+	padding-top:5px;
+	border-top-right-radius: 5px;
+	border-bottom-right-radius: 5px;
+}
+
+#left{
+	padding: 5px;
+}
+
+#left_hidden{
+}
+
+
+#summary {
+	font-size: 14px;
+}
+
+#summary tr:first-child td:first-child {
+    border-top-left-radius:5px
+}
+
+#summary tr:first-child td:last-child {
+    border-top-right-radius:5px
+}
+
+#summary tr:last-child td:first-child {
+    border-bottom-left-radius:5px
+}
+
+#summary tr:last-child td:last-child {
+    border-bottom-right-radius:5px
+}
+
+#accordion {
+	float: left;
+	height:auto;
+	font-size: 18px;
+	border-left:1px dashed black;
+	padding-left: 5px;
+	background-color: #F1F1F1;
+	border-radius: 5px;
+	min-height:100%;
+}
+
+#headerAccordion{
+	margin-top:10px;
+	font-weight: bold;	
+}
+
+#accordion table{
+	width: 100%;
+	font-size: 13px;
+}
+#accordion table tr td{
+	padding-left: 10px;
+}
+
+#labelTotalOfTests {
+	margin-bottom: 10px;
+}
+
+#totalOfTests {
+	font-weight: bold;
+}
+
+#versions {
+	padding-top: 10px;
+}
+
+#versions div {
+	font-weight: bold;
+	padding-bottom: 10px;
+}
+
+#versions_list {
+	margin: 0px;
+}
+----------------NEW STYLE-----------------
+.numbers {
+	text-align: right;
+}
+
+
+.packageAndClass{
+	font-size: 16px;
+	background-color: rgb(13, 71, 71);
+	color: white;
+}
+
+#content {
+	margin: 0 5px 0 5px;
+}
+
+#content h1 {
+	margin: 0px;
+	margin-bottom: 5px;
+	font-size: 24px;
+}
+
+#summary_table {
+	border-collapse: collapse;
+	width: 100%;
+	border: 1px solid black;
+}
+
+#summary_table td {
+	padding: 5px;
+}
+
+#summary_table thead {
+	letter-spacing: 2px;
+	background-color: rgb(40, 122, 122);
+	padding-top: 30px;
+}
+
+#summary_table thead tr:nth-child(1) th {
+	padding-top: 10px;
+	padding-bottom: 3px;
+}
+#summary_table thead tr:nth-child(2) th {
+	padding-bottom: 10px;
+}
+.testDelLeft {
+	background-color: rgb(19, 95, 95);
+	border-left: 1px dashed black;
+}
+.testDelRight {
+	border-right: 1px dashed black;
+}
+.testDelColumn {
+	background-color: rgb(25, 100, 100);
+}
+
+#summary_table tbody:nth-child(3) tr:nth-child(even){
+	background-color: #CCCCCC;
+}
+
+
+.ui-widget{
+	font-family: 'Inder';
+}
+
+ */

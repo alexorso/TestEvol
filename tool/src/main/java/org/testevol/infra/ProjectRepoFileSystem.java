@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
@@ -228,6 +229,12 @@ public class ProjectRepoFileSystem implements ProjectRepository {
 		File executionDir = new File(executionsDir,id);
 		
 		FileUtils.deleteDirectory(executionDir);		
+	}
+
+	@Override
+	public List<String> getProjectsNames() {
+		return Arrays.asList(projectsDir.list());
+	
 	}
 	
 	

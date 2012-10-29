@@ -1,5 +1,6 @@
 target/
 projects/
+tmp/
 *.class
 
 # Package Files #

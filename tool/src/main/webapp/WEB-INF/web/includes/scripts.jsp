@@ -72,6 +72,7 @@
 	<script src="<c:url value="/js/jquery.history.js"/>"></script>
 	<!-- application script for Charisma demo -->
 	<script src="<c:url value="/js/charisma.js"/>"></script>
+	<script src="<c:url value="/js/testevol.js"/>"></script>
 	
 	
 	<script>
@@ -104,4 +105,12 @@
 			return 'information';
 		}
 		
+		$.get('<c:url value="/projects/names"/>', function(data){loadProjects(data);});
+		
+		function loadProjects(data){
+			for(var i = 0;i<data.length;i++){
+				$(".main-menu").append($('<li style="padding-left:20px;"><a class="ajax-link" href="<c:url value="/projects/'+data[i]+'"/>"><span class="hidden-tablet"> '+data[i]+' </span></a></li>'));
+			}
+		}
+				
 	</script>

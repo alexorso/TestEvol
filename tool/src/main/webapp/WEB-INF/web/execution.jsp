@@ -125,8 +125,6 @@
 	<script type="text/javascript">
 	
 		function openReport(project, executionId){
-			alert(project);
-			alert(executionId);
 			window.location = '<c:url value="/projects/${execution.project.name}/execution/${execution.id}/report"/>';
 		}
 	

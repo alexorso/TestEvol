@@ -13,6 +13,7 @@ public interface ProjectRepository {
 	public boolean exists(String projectName);
 	public Project getProject(String projectName) throws Exception;
 	public List<Project> getProjects();
+	public List<String> getProjectsNames();
 	public void deleteProject(String projectName) throws IOException;
 	public void deleteVersion(String projectName, String version) throws Exception;
 	public UpdateResult updateRepo(String projectName, String version) throws Exception;
