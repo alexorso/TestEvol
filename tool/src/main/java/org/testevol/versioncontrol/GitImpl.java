@@ -2,10 +2,14 @@ package org.testevol.versioncontrol;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.ListBranchCommand.ListMode;
 import org.eclipse.jgit.api.PullResult;
 import org.eclipse.jgit.lib.Ref;
 import org.testevol.domain.Version;
@@ -29,14 +33,36 @@ public class GitImpl extends VersionControlSystem {
 
 		File dir = Utils.getTempDir();
 		List<String> branches = new ArrayList<String>();
-
 		try {
 			Git git = Git.cloneRepository().setURI(url).setDirectory(dir)
 					.setNoCheckout(true).call();
 
+			Set<String> availableRefs = new HashSet<String>();
 			for (Ref ref : git.lsRemote().setHeads(true).call()) {
-				branches.add(ref.getName());
+				availableRefs.add(ref.getName());
 			}
+			
+			boolean hasMaster = false;
+			for(Ref ref : git.branchList().setListMode(ListMode.REMOTE).call()){
+				//System.out.println(ref.getName());
+				String name = ref.getName();
+				if(name.contains("/")){
+					name = name.substring(name.lastIndexOf("/")+1);
+				}
+				String headRef = "refs/heads/"+name;
+				if(availableRefs.contains(headRef)){
+					if(!hasMaster && "master".equals(name)){
+						hasMaster = true;
+					}
+					else{
+						branches.add(headRef);						
+					}					
+				}
+			}
+			if(hasMaster){
+				branches.add("refs/heads/master");
+			}
+			Collections.reverse(branches);
 		} finally {
 			if (dir != null) {
 				FileUtils.deleteDirectory(dir);

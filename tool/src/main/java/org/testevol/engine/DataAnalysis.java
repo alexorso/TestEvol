@@ -21,14 +21,17 @@ public class DataAnalysis {
 	private Project project;
 	private List<Version> versions;
 	private File executionFolder;
+	private boolean skipCoverageAnalysis;
 
 	public DataAnalysis(String testevolConfigRoot, Project project,
-			List<Version> versions, File executionFolder) {
+			List<Version> versions, File executionFolder,
+			boolean skipCoverageAnalysis) {
 		super();
 		this.testevolConfigRoot = testevolConfigRoot;
 		this.project = project;
 		this.versions = versions;
 		this.executionFolder = executionFolder;
+		this.skipCoverageAnalysis = skipCoverageAnalysis;
 	}
 
 	/**
@@ -59,14 +62,17 @@ public class DataAnalysis {
 			log.logStrong("Starting Execution...");			
 			for (Version version : versions) {
 				log.log("Setting up version " + version.getName());
-				version.setUp(new File(testevolConfigRoot));
+				if(!version.setUp(new File(testevolConfigRoot))){
+					log.logError("Error while setting up version "+version.getName());
+					throw new RuntimeException();
+				}
 			}
 			Compiler compiler = new Compiler(versions, log);
 			Runner runner = new Runner(versions, log);
 			Differ differ = new Differ(versions, testevolConfigRoot, log);
 			Classifier classifier = new Classifier(versions, differ, log);
 			ReportGenerator reportGenerator = new ReportGenerator(versions,
-					classifier, project.getName(), executionFolder, log);
+					classifier, project.getName(), executionFolder, log, skipCoverageAnalysis);
 
 			compiler.go();
 			runner.go();
@@ -74,9 +80,7 @@ public class DataAnalysis {
 			classifier.go();
 			reportGenerator.go();
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
+		}finally {
 			long end = System.currentTimeMillis();
 			if(log != null){
 				log.addLine();

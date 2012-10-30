@@ -14,9 +14,17 @@ public class Project {
 	private List<Version> versionsList;
 	private List<String> versionsToExecute;
 	private List<String> branchesToCheckout;
+	private boolean includeCoverageAnalysis;
 	
+	public boolean isIncludeCoverageAnalysis() {
+		return includeCoverageAnalysis;
+	}
+
+	public void setIncludeCoverageAnalysis(boolean includeCoverageAnalysis) {
+		this.includeCoverageAnalysis = includeCoverageAnalysis;
+	}
+
 	public Project() {
-		// TODO Auto-generated constructor stub
 	}
 	
 	public Project(String name) {

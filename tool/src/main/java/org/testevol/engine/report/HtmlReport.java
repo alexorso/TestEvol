@@ -74,6 +74,10 @@ public class HtmlReport {
 		objectMapper.writeValue(coverageLoss, results.getCategoryC5().getNotCoveredLines());
 		
 		resultJS.append(createJSFunction("getCoverageLost", "return " + coverageLoss+ ";"));
+		
+		StringWriter coverageImprovement = new StringWriter();
+		objectMapper.writeValue(coverageImprovement, results.getCategoryC8().getNewCoveredLines());
+		resultJS.append(createJSFunction("getCoverageImprovement", "return " + coverageImprovement+ ";"));
 
 
 //		fileWriter.write(resultJS.toString());

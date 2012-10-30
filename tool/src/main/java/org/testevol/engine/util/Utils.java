@@ -25,6 +25,8 @@ import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import org.testevol.engine.TestRunner;
+
 public class Utils {
 	private static boolean diagnosticOn = true;
 
@@ -227,27 +229,7 @@ public class Utils {
 	}
 
 	public static boolean isIgnoredMethod(Method method, TrexClassLoader classLoader) {
-		return classLoader.isAnnotationPresent(method, TrexClassLoader.IgnoreAnnotation);
-	}
-
-	public static String getClassPathInDir(File verDir) {
-		String classpath = ".";
-		File cpfile = new File(verDir, "classpath.txt");
-		File libDir = new File(verDir, "lib");
-
-		if (!cpfile.exists()) {
-			// No classpath.txt file in verDir
-			// Using all jar files under "lib"
-			for (File jar : Utils.getMatchingFiles(libDir, ".*jar$")) {
-				classpath = classpath + File.pathSeparator
-						+ jar.getAbsolutePath();
-			}
-		} else {
-			classpath = Utils.makePathsAbsolute(
-					Utils.getFileContentAsString(cpfile),
-					verDir.getAbsolutePath());
-		}
-		return classpath;
+		return classLoader.isAnnotationPresent(method, TestRunner.IgnoreAnnotation);
 	}
 
 	public static HashSet<URL> getClassPathFromString(String classpath) {

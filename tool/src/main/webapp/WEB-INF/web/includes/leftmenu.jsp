@@ -1,9 +1,10 @@
 <div class="span2 main-menu-span">
 	<div class="well nav-collapse sidebar-nav">
-		<ul class="nav nav-tabs nav-stacked main-menu">
+		<ul class="nav nav-tabs nav-stacked main-menu" id="main_menu">
 			<li class="nav-header hidden-tablet">Menu</li>
-			<li><a class="ajax-link" href="<c:url value="/projects"/>"><i class="icon-edit"></i><span class="hidden-tablet"> New Project</span></a></li>			
-			<li><a class="ajax-link" href="<c:url value="/projects/list"/>"><i class="icon-list-alt"></i><span class="hidden-tablet"> All Projects</span></a></li>
+			<li><a class="ajax-link" href="<c:url value="/projects"/>"><i class="icon-edit"></i><span class="hidden-tablet"> New Project</span></a></li>
+			<li><a class="ajax-link" href="<c:url value="/projects/list"/>"><i class="icon-list-alt"></i><span class="hidden-tablet"> Project list</span></a></li>
+			<li class="nav-header hidden-tablet">Projects</li>
 		</ul>
 	</div>
 	<!--/.well -->

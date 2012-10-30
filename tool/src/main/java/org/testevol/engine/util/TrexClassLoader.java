@@ -17,11 +17,9 @@ import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-public class TrexClassLoader extends URLClassLoader {
+import org.testevol.engine.TestRunner;
 
-	public static final String IgnoreAnnotation = "org.junit.Ignore";
-	public static final String TestAnnotation = "org.junit.Test";
-	public static final String TestNoneAnnotation = "org.junit.Test.None";
+public class TrexClassLoader extends URLClassLoader {
 	
 	private HashMap<String, Class<?>> loadedClasses;
 	
@@ -106,7 +104,7 @@ public class TrexClassLoader extends URLClassLoader {
 	}
 	
 	public boolean isIgnoredClass(Class<?> cls) throws ClassNotFoundException {
-		return isAnnotationPresent(cls,IgnoreAnnotation);
+		return isAnnotationPresent(cls, TestRunner.IgnoreAnnotation);
 	}
 	
 	
@@ -120,6 +118,11 @@ public class TrexClassLoader extends URLClassLoader {
 		}
 		if(isTestClass("org.junit.internal.runners.JUnit38ClassRunner", className)){
 			return true;
+		}
+		for(Method m:cls.getMethods()){
+			if(isTestMethod(m)){
+				return true;
+			}
 		}
 		return false;
 	}
@@ -141,12 +144,22 @@ public class TrexClassLoader extends URLClassLoader {
 
 	public boolean isTestMethod(Method method) {
 		return (method.getName().startsWith("test") || isAnnotationPresent(
-				method, TestAnnotation))
-				&& !isAnnotationPresent(method, IgnoreAnnotation);
+				method, TestRunner.TestAnnotation))
+				&& !isAnnotationPresent(method, TestRunner.IgnoreAnnotation);
 	}
 
 	public Annotation getAnnotation(Method method, String annotationName) {
-		for(Annotation annotation:method.getAnnotations()){
+		
+		return getAnnotation(method.getAnnotations(), annotationName);
+	}
+	
+	public Annotation getAnnotation(Class clazz, String annotationName) {
+		
+		return getAnnotation(clazz.getAnnotations(), annotationName);
+	}
+	
+	public Annotation getAnnotation(Annotation[] annotations, String annotationName){
+		for(Annotation annotation:annotations){
 			if(annotation.annotationType().getName().equals(annotationName)){
 				return annotation;
 			}

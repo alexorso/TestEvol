@@ -62,16 +62,18 @@
 										<label class="control-label" for="projectName">Name</label>
 										<div class="controls">
 											<input class="input-xlarge focused" id="projectName" name="name"
-												type="text" placeholder="Project Name" title="Project Name" required="required">
+												type="text" placeholder="Project Name" title="Project Name (must only include letters and numbers)" required="required" pattern="([a-z]+|[A-Z]+|[0-9]+)*">
 										</div>
 									</div>
 									<div class="control-group">
 										<label class="control-label" for="vcs">Repository
 											Type:</label>
 										<div class="controls">
-											<select onchange="onSelectRepositoryType(this)" id="vcs" name ="vcs" title="Repository type">
+											<select onchange="onSelectRepositoryType(this)" id="vcs" name ="vcs" title="Repository type" required="required">
 												<option value="">Select...</option>
 												<option value="git">Git</option>
+												<option value="svn">SVN</option>
+												<option value="cvs">CVS</option>												
 											</select>
 										</div>
 									</div>
@@ -191,6 +193,11 @@
 				$("#git_r").show();
 			} else {
 				$("#git_r").hide();
+				if(element.value != ''){
+					element.value = '';
+					alert('Support for the selected reporitory type is not yet available.');
+				}
+
 			}
 		}
 		

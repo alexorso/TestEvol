@@ -72,7 +72,7 @@ public class ProjectController {
 	}
 	
 	@RequestMapping(value="{project}/execute",method = RequestMethod.POST)
-	public String execute(@PathVariable("project") final String projectName, @ModelAttribute Project projectModel) throws Exception {
+	public String execute(@PathVariable("project") final String projectName, final @ModelAttribute Project projectModel) throws Exception {
 
 		final Execution execution = projectRepo.createExecution(projectName, projectModel.getVersionsToExecute());
 		final Project project = execution.getProject();
@@ -84,12 +84,11 @@ public class ProjectController {
 				versionsToExecute.add(version);
 			}
 		}
-		Collections.reverse(versionsToExecute);		
-
+		Collections.reverse(versionsToExecute);
 		new Thread(){
 			@Override
 			public synchronized void run() {
-				DataAnalysis dataAnalysis = new DataAnalysis(configDir, project, versionsToExecute, execution.getExecutionDir());
+				DataAnalysis dataAnalysis = new DataAnalysis(configDir, project, versionsToExecute, execution.getExecutionDir(), !projectModel.isIncludeCoverageAnalysis());
 				try {
 					projectRepo.saveExecution(projectName, execution.getId(), execution.getName(), ExecutionStatus.RUNNING);
 					dataAnalysis.start();
@@ -158,7 +157,17 @@ public class ProjectController {
 		return mav;
 	}
 	
-	
+	@RequestMapping(value="{project}/execution/{id}/report/version",method = RequestMethod.GET)
+	public ModelAndView getDetailedExecutionReport(@PathVariable("project") String projectName, 
+													@PathVariable("id") String id,
+													@RequestParam("name") String version) throws Exception {
+		Execution execution = projectRepo.getExecution(projectName, id);
+		ModelAndView mav = new ModelAndView();
+		mav.addObject("execution", execution);
+		mav.addObject("version", version);
+		mav.setViewName("detailed_report");
+		return mav;
+	}	
 	
 	@RequestMapping(value="{project}/execution/{id}/delete",method = RequestMethod.GET)
 	public String deleteExecution(@PathVariable("project") String projectName, @PathVariable("id") String id) throws Exception {

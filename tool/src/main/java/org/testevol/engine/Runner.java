@@ -52,7 +52,7 @@ public class Runner extends Task {
             // first version
             if (oldVersion != null) {
                 // T0P1
-                classpath = Utils.getClassPathInDir(version.getDirectory());
+                classpath = version.getClassPath();
                 classpath += File.pathSeparator + oldVersion.getBinTestDir();
                 classpath += File.pathSeparator + version.getBinDir();
                 versionToClasspathMap.put("T0P1", classpath);
@@ -60,7 +60,7 @@ public class Runner extends Task {
                 // alternateClasspath = this.buildAlternateClasspath(classpath,
                 // verDir, oldDir);
                 // T1P0
-                classpath = Utils.getClassPathInDir(oldVersion.getDirectory());
+                classpath = oldVersion.getClassPath();
                 classpath += File.pathSeparator + version.getBinTestDir();
                 classpath += File.pathSeparator + oldVersion.getBinDir();
                 versionToClasspathMap.put("T1P0", classpath);

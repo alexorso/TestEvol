@@ -78,9 +78,17 @@ public class ProjectRepoFileSystem implements ProjectRepository {
 				master = new Version(dir);
 			}
 			else{
-				versions.add(index,version);
+				versions.add(version);
 			}
 		}
+		Collections.sort(versions, new Comparator<Version>() {
+			@Override
+			public int compare(Version version1, Version version2) {
+				return new Integer(version1.getIndex()).compareTo(version2.getIndex());
+
+			}
+		});
+		
 		if(master!= null){
 			versions.add(0, master);
 		}

@@ -132,7 +132,6 @@ public class CategoryC5 extends Category {
 	public List<String> hasDecreasedCoverage(Coverage testSuiteCoverage,
 			Coverage testCoverage) {
 		Set<String> linesCoveredByTestSuite = testSuiteCoverage.getCoveredLines();
-		boolean hasDecreasedCoverage = false;
 		List<String> notCoveredLines = new ArrayList<String>();
 		for (String coveredLine : testCoverage.getCoveredLines()) {
 			if (!linesCoveredByTestSuite.contains(coveredLine)) {

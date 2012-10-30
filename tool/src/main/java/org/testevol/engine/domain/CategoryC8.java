@@ -22,10 +22,12 @@ import org.testevol.engine.util.Utils;
 public class CategoryC8 extends Category {
 
 	public Map<String, Boolean> coverageHasImproved;
+	private HashMap<String, List<String>> newCoveredLines;
 	
 	public CategoryC8(Version oldVersion, Version version) {
 		super(CategoryClassification.TESTADD_P, oldVersion, version);
 		coverageHasImproved = new HashMap<String, Boolean>();
+		newCoveredLines = new HashMap<String, List<String>>();
 	}
 
 	public void init() {
@@ -96,7 +98,18 @@ public class CategoryC8 extends Category {
 			if(testCoverage == null){
 				throw new RuntimeException("Did you executed coverage analysis for added test methods?");
 			}
-			coverageHasImproved.put(test, hasImprovedCoverage(testSuiteCoverage, testCoverage));
+			
+			List<String> coveredLines = hasImprovedCoverage(testSuiteCoverage, testCoverage);
+			coverageHasImproved.put(test, !coveredLines.isEmpty());
+			this.newCoveredLines.put(test,coveredLines);
+			
+			//	coverageHasImproved.put(test, hasImprovedCoverage(testSuiteCoverage, testCoverage));
+
+//			List<String> notCoveredLines = hasDecreasedCoverage(testSuiteCoverage, testCoverage);
+//			coverageHasDecreased.put(test, 	notCoveredLines.isEmpty());
+//			this.notCoveredLines.put(test, notCoveredLines);
+
+			
 			
 			System.out.println("Coverage:"+testCoverage.toString());
 						
@@ -114,20 +127,23 @@ public class CategoryC8 extends Category {
 		return testsSameCoverage;
 	}
 	
-	public boolean hasImprovedCoverage(Coverage testSuiteCoverage, Coverage testCoverage) {
+	public List<String> hasImprovedCoverage(Coverage testSuiteCoverage, Coverage testCoverage) {
 		Set<String> linesCoveredByTestSuite = testSuiteCoverage.getCoveredLines();
-		boolean hasImprovedCoverage = false;
+		List<String> newCoveredLines = new ArrayList<String>();
 		for (String coveredLine : testCoverage.getCoveredLines()) {
 			if (!linesCoveredByTestSuite.contains(coveredLine)) {
-				hasImprovedCoverage = true;
+				newCoveredLines.add(coveredLine);
 				break;
 			}
 		}
-
-		return hasImprovedCoverage;
+		return newCoveredLines;
 	}
 	
 	public boolean coverageHasIncreasedWhenIncludedTest(String test){
 		return coverageHasImproved.get(test) != null && coverageHasImproved.get(test);
+	}
+	
+	public HashMap<String, List<String>> getNewCoveredLines() {
+		return newCoveredLines;
 	}
 }

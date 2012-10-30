@@ -28,7 +28,6 @@ import org.testevol.engine.domain.Results;
 import org.testevol.engine.domain.TestEvolLog;
 import org.testevol.engine.domain.VersionPair;
 import org.testevol.engine.driver.CopyAndPasteDetectorDriver;
-import org.testevol.engine.util.Utils;
 
 import com.ibm.wala.classLoader.IClass;
 import com.ibm.wala.classLoader.IMethod;
@@ -178,6 +177,8 @@ public class Classifier extends Task {
 	}
 
     private void searchClones(Version oldVersion, Version version, Results results) throws ParseException, IOException{
+    	
+    	log.log("Running clone detection for pair "+oldVersion.getName()+ " - "+version.getName());
         List<Category> categoriesToSearch = new ArrayList<Category>();
         
         categoriesToSearch.add(results.getCategoryC1());
@@ -206,6 +207,16 @@ public class Classifier extends Task {
         List<String> clonesOnCategory7 = performaCloneAnalysisCategory(version, oldVersion, results.getCategoryC7(), categoriesToSearch);            
         List<String> clonesOnCategory8 = performaCloneAnalysisCategory(version, oldVersion, results.getCategoryC8(), categoriesToSearch);
 
+        int totalNumberOfClonesFound = 	clonesOnCategory1.size()+clonesOnCategory2.size()+clonesOnCategory3.size()+
+        								clonesOnCategory4.size()+clonesOnCategory5.size()+clonesOnCategory6.size()+
+        								clonesOnCategory7.size()+clonesOnCategory8.size();
+        		
+        if(totalNumberOfClonesFound == 0){
+        	log.log("No clones found");
+        }
+        else{
+        	log.log(totalNumberOfClonesFound+ " clones found");
+        }
         
         results.getCategoryC1().removeTestsFromThisCategory(clonesOnCategory1);
         results.getCategoryC2().removeTestsFromThisCategory(clonesOnCategory2);

@@ -39,13 +39,14 @@
 					<div class="box-header well" data-original-title>
 						<h2><i class="icon-tags"></i> Versions</h2>
 					</div>
-					<form action="${project.name}/execute" method="POST">
+					<form action="${project.name}/execute" method="POST" id="executionForm">
+					<input type="hidden" name="includeCoverageAnalysis" id="includeCoverageAnalysis" value="false"/>
 					<div class="box-content">
 						<table class="table table-striped table-bordered bootstrap-datatable">
 						  <thead>
 							  <tr>
 							  	  <th style="100px;text-align: center;">
-							  	  	<button type="submit" class="btn btn-success" id="execute" title="Execute TestEvol for the selected versions"><i class="icon-play icon-white"></i> Execute</button>
+							  	  	<button type="button" class="btn btn-success btn-setting" onclick="executeTestEvol('${project.name}');" id="execute" title="Execute TestEvol for the selected versions"><i class="icon-play icon-white"></i> Execute</button>
 							  	  </th>
 								  <th>Name</th>
 								  <th style="width:50px;text-align: center">Config</th>
@@ -110,6 +111,23 @@
 	<script type="text/javascript">
 		//var closeClickEvent
 
+		function executeTestEvol(project){
+			$("#titleModal").html("Execute TestEvol for Project "+project);
+			$("#bodyModal").html("Confirm execution?<br/><input type='checkbox' id='coverageAux'/> Include coverage analysis");
+			$("#modalButton").removeClass();
+			$("#modalButton").addClass("btn");
+			$("#modalButton").addClass("btn-success");
+			$("#modalButton").html("Execute");
+			
+			document.getElementById("modalButton").href='javascript:submitExecution()';
+		}
+		
+		function submitExecution(){
+			var checked = $("#coverageAux:checked").val() != undefined;
+			$("#includeCoverageAnalysis").val(checked);
+			$("#executionForm").submit();
+		}
+		
 		function deleteVersion(projectName, version){
 						
 			$("#titleModal").html("Delete Version "+version);

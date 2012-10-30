@@ -5,7 +5,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -35,6 +34,17 @@ public class TestRunner {
 	
 	private static final String SET_UP_METHOD = "setUp";
 	private static final String TEAR_DOWN_METHOD = "tearDown";
+	
+	public static final String IgnoreAnnotation = "org.junit.Ignore";
+	public static final String BeforeAnnotation = "org.junit.Before";
+	public static final String BeforeClassAnnotation = "org.junit.BeforeClass";
+	public static final String AfterAnnotation = "org.junit.After";
+	public static final String AfterClassAnnotation = "org.junit.AfterClass";
+	public static final String TestAnnotation = "org.junit.Test";
+	public static final String TestNoneAnnotation = "org.junit.Test$None";
+	public static final String RunWith = "org.junit.runner.RunWith";
+	public static final String Parameterized = "org.junit.runners.Parameterized";
+	public static final String Parameters = "org.junit.runners.Parameterized$Parameters";
 
 	private TrexClassLoader trexClsLoader;
 
@@ -109,14 +119,13 @@ public class TestRunner {
 
 		Method beforeClassMethod = null;
 		Method afterClassMethod = null;
-		//HERE444
-//		for (Method m : klass.getMethods()) {
-//			if (m.isAnnotationPresent(AfterClass.class)) {
-//				afterClassMethod = m;
-//			} else if (m.isAnnotationPresent(BeforeClass.class)) {
-//				beforeClassMethod = m;
-//			}
-//		}
+		for (Method m : klass.getMethods()) {
+			if(trexClsLoader.isAnnotationPresent(m, AfterClassAnnotation)){
+				afterClassMethod = m;
+			} else if (trexClsLoader.isAnnotationPresent(m, AfterClassAnnotation)){
+				beforeClassMethod = m;
+			}
+		}
 
 		try {
 			// invoke the setup method
@@ -318,21 +327,21 @@ public class TestRunner {
 
 		Object testObj = null;
 		try {
-			//HERE444
-//			if(cls.isAnnotationPresent(RunWith.class)){
-//				RunWith runWith = cls.getAnnotation(RunWith.class);
-//				Class runner = runWith.value();
-//				if(Parameterized.class.isAssignableFrom(runner)){
-//					testObj = createFromParameterized(cls);
-//					if(testObj != null){
-//						return testObj;
-//					}
-//				}
-//			}
+			if(trexClsLoader.isAnnotationPresent(cls, RunWith)){
+				Annotation runWith = trexClsLoader.getAnnotation(cls, RunWith);
+				Class runner= (Class) runWith.getClass().getMethod("value").invoke(runWith);
+				if(runner.getName().equals(Parameterized)){
+					testObj = createFromParameterized(cls);
+					if(testObj != null){
+						return testObj;
+					}
+				}
+			}
 
 			testObj = cls.newInstance(); // try the nullary test case
 											// constructor
 		} catch (Exception ie) {
+			//ie.printStackTrace();
 			// nullary constructor does not exist
 			// try the constructor with the string parameter
 			Class<?>[] strArgTypes = new Class[] { Class
@@ -356,6 +365,7 @@ public class TestRunner {
 	private Object createFromParameterized(Class<?> cls) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException{
 		List<Method> methods = getParameterizedMethods(cls);
 		if(methods.isEmpty()){
+			System.out.println("VAZIO!!!");
 			return null;
 		}	
 		
@@ -443,12 +453,12 @@ public class TestRunner {
 					}
 				}
 				
-				if (trexClsLoader.isAnnotationPresent(method, TrexClassLoader.TestAnnotation)) {
-					Annotation testAnnotation = trexClsLoader.getAnnotation(method, TrexClassLoader.TestAnnotation);
+				if (trexClsLoader.isAnnotationPresent(method, TestAnnotation)) {
+					Annotation testAnnotation = trexClsLoader.getAnnotation(method, TestAnnotation);
 					expectedException = (Class) testAnnotation.getClass().getMethod("expected").invoke(testAnnotation);
-					if (expectedException.getClass().getName().equals(TrexClassLoader.TestNoneAnnotation)) {
+					if (expectedException != null && expectedException.getName().equals(TestNoneAnnotation)) {
 						expectedException = null;
-					}
+					}				
 				}
 
 				method.setAccessible(true);
@@ -511,33 +521,29 @@ public class TestRunner {
 	
 	public List<Method> getParameterizedMethods(Class clazz) {
 		List<Method> methods = new ArrayList<Method>();
-		//HERE444
-		//getMethods(clazz, null, Parameters.class, methods);
+		getMethods(clazz, null, Parameters, methods);
 		return methods;
 	}
 
 	public List<Method> getSetUpMethods(Class clazz) {
 		List<Method> methods = new ArrayList<Method>();
-		//HERE444
-		//getMethods(clazz, SET_UP_METHOD, Before.class, methods);
+		getMethods(clazz, SET_UP_METHOD, BeforeAnnotation, methods);
 		return methods;
 	}
 
 	public List<Method> getTearDownMethods(Class clazz) {
 		List<Method> methods = new ArrayList<Method>();
-		//HERE444
-		//getMethods(clazz, TEAR_DOWN_METHOD, After.class, methods);
+		getMethods(clazz, TEAR_DOWN_METHOD, AfterAnnotation, methods);
 		return methods;
 	}
 
 	private void getMethods(Class clazz, String methodName,
-			Class<? extends java.lang.annotation.Annotation> annotation,
+			String annotation,
 			List<Method> methods) {
 		if (clazz.getSuperclass() != null
 				&& !clazz.getSuperclass().equals(Object.class)) {
 			getMethods(clazz.getSuperclass(), methodName, annotation, methods);
 		}
-
 		try {
 			if(methodName != null){
 				Method method = clazz.getDeclaredMethod(methodName, new Class[0]);
@@ -550,16 +556,17 @@ public class TestRunner {
 		} catch (Throwable e1) {
 			//
 		}
-		
 		try {
-			for (Method m : clazz.getMethods()) {
-				if (m.isAnnotationPresent(annotation) && !contains(methods,m)) {
+			for (Method m : clazz.getMethods()) {			
+				if (trexClsLoader.isAnnotationPresent(m, annotation) && !contains(methods,m)) {
 					methods.add(m);
 				}
 			}
 		} catch (Exception e1) {
+			e1.printStackTrace();
 			// do nothing
 		} catch (Throwable e1) {
+			e1.printStackTrace();
 			// do nothing
 		}
 

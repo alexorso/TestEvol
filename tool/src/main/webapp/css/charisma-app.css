@@ -1,4 +1,4 @@
-@import url(http://fonts.googleapis.com/css?family=Shojumaru);
+@import url(http://fonts.googleapis.com/css?family=Shojumaru|Inder|Ropa+Sans);
 
 select{
 background-color:#fff;
@@ -343,7 +343,7 @@ margin-right:-2px;
 margin-left:-2px;
 }
 .brand{
-font-family: 'Shojumaru', cursive, Arial, serif; 
+font-family: 'Ropa Sans', cursive, Arial, serif; 
 letter-spacing:2px;
 text-shadow:1px 1px 5px rgba(0, 0, 0, 0.5);
 width:166px;

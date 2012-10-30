@@ -5,7 +5,7 @@
 				data-target=".top-nav.nav-collapse,.sidebar-nav.nav-collapse"> <span
 				class="icon-bar"></span> <span class="icon-bar"></span> <span
 				class="icon-bar"></span>
-			</a> <a class="brand" href="index.html"> <span>TestEvol</span></a>
+			</a> <a class="brand" href="<c:url value="/projects/list"/>"> <span>TestEvol</span></a>
 
 			<!-- theme selector starts 
 				<div class="btn-group pull-right theme-container">
@@ -42,22 +42,16 @@
 			<!-- user dropdown starts -->
 			<div class="btn-group pull-right">
 				<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-					<i class="icon-user"></i><span class="hidden-phone"> leandro</span>
+					<i class="icon-user"></i><span class="hidden-phone"> guest </span>
 					<span class="caret"></span>
 				</a>
 				<ul class="dropdown-menu">
 					<li><a href="#">Profile</a></li>
 					<li class="divider"></li>
-					<li><a href="login.html">Logout</a></li>
+					<li><a href="<c:url value="/"/>">Logout</a></li>
 				</ul>
 			</div>
 			<!-- user dropdown ends -->
-
-			<div class="btn-group pull-right" style="display:none" id="audioDiv">
-				<audio id="audioTestEvol" controls="controls">
-					<source src="<c:url value="/css/girlfriend.mp3"/>" type="audio/mpeg">
-				</audio>
-			</div>
 			<!--/.nav-collapse -->
 		</div>
 	</div>

@@ -1,23 +1,41 @@
 var NUMBER_OF_CATEGORIES = 8;
 var versionsSummary = {};
 
-function getCategoryLabel(index) {
+function getCategoryLabel(index, escape) {
 	switch(index) {
 		case 0:
 			return 'TESTREP';
 		case 1:
 			return 'TESTMODNOTREP';
 		case 2:
+			if(escape){
+				return 'TESTDEL_AE_RE';
+			}
 			return 'TESTDEL (AE|RE)';
 		case 3:
+			if(escape){
+				return 'TESTDEL_CE';
+			}
 			return 'TESTDEL (CE)';
 		case 4:
+			if(escape){
+				return 'TESTDEL_P';
+			}
 			return 'TESTDEL (P)';
 		case 5:
+			if(escape){
+				return 'TESTADD_AE_RE_';
+			}
 			return 'TESTADD (AE|RE)';
 		case 6:
+			if(escape){
+				return 'TESTADD_CE';
+			}
 			return 'TESTADD (CE)';
 		case 7:
+			if(escape){
+				return 'TESTADD_P';
+			}
 			return 'TESTADD (P)';
 	}
 }
@@ -31,10 +49,8 @@ function isCoverageAwareCategory(category) {
 
 }
 
-function createSummaryTable(summaryTable, versions, summary_data) {
+function createSummaryTable(summaryTable, versions, summary_data, url) {
 	//add header
-	var firstLine = document.createElement("tr");
-
 	var line = document.createElement("tr");
 	var leftMostColumn = document.createElement("td");
 	leftMostColumn.innerHTML = "All Versions";
@@ -50,7 +66,7 @@ function createSummaryTable(summaryTable, versions, summary_data) {
 		line = document.createElement("tr");
 		var versionsColumn = document.createElement("td");
 		var link = document.createElement("a");
-		link.href = version + "/report.html";
+		link.href = url+'?name='+version;
 		link.innerText = previousVersion + ' - ' + version;
 		versionsColumn.appendChild(link);
 		line.appendChild(versionsColumn);
@@ -127,10 +143,10 @@ function toggleLeftBar(op) {
 
 function createTable(category) {
 	$("#dataTable").empty();
-	$("#headerAccordion").html("Tests on category " + category);
+	$("#headerCateogry").html("Tests on category " + category);
 	var packages = getCategories()[category];
 	if(packages.length == 0) {
-		$("#dataTable").html("<tr><td>No tests found in this category.</td></tr>")
+		$("#dataTable").html("<tr><td>No tests found on this category.</td></tr>")
 		return;
 	}
 	for(var i = 0; i < packages.length; i++) {
@@ -166,7 +182,7 @@ function createTable(category) {
 					}
 				} else if(category == 'TESTADD (P)') {
 					if(tests[w]['good_coverage']) {
-						col1.innerHTML = "<span style='float:left;padding-right:10px;'>" + tests[w]['name'] + "</span><span class='ui-state-highlight' style='border:none;cursor:pointer;'><span class='ui-icon ui-icon-star' title='This test has helped to increase the coverage of the test suite.' style='background-color:transparent;'></span></span>";
+						col1.innerHTML = "<span style='float:left;padding-right:10px;'>" + tests[w]['name'] + "</span><span class='ui-state-highlight' style='border:none;cursor:pointer;' onclick='showCoverageImprovement(\"" + completeTestName + "\")'><span class='ui-icon ui-icon-star' title='This test has helped to increase the coverage of the test suite.<br><br>Click for more details.' style='background-color:transparent;'></span></span>";
 					} else {
 						col1.innerHTML = tests[w]['name'];
 					}
@@ -186,25 +202,50 @@ function createTable(category) {
 
 function populateSummaryBody() {
 	populateTotals(versionsSummary);
+	//<li><a class="ajax-link" href="<c:url value="/projects"/>"><i class="icon-edit"></i><span class="hidden-tablet"> New Project</span></a></li>
+	$("#leftmenu_det_report").append('<li class="nav-header hidden-tablet">'+getTotalOfTests()+' differences found</li>');
+	
 	var summaryInfo = versionsSummary[getVersionName()];
 	var total = summaryInfo[NUMBER_OF_CATEGORIES];
 	for(var i = 0; i < NUMBER_OF_CATEGORIES; i++) {
-		//<tr onclick="openAccordion(this)"><td>TESTREP</td><td>2&nbsp;<div id="percent">(13.33%)</div></td></tr>
-		var line = document.createElement("tr");
-		var col1 = document.createElement("td");
 		var categoryLabel = getCategoryLabel(i);
-		col1.innerText = categoryLabel;
-		col1.onclick = (function(curLabel) {
-			return function() {
-				createTable(curLabel);
-			}
-		})(categoryLabel);
-		var col2 = document.createElement("td");
+		
+		var li_cat = document.createElement("li");
+		li_cat.id = "li_" + getCategoryLabel(i,true);
+		var a_cat = document.createElement("a");
 		var value = summaryInfo[i];
-		col2.innerHTML = summaryInfo[i] + "&nbsp;<div class='percent'>(" + getPercent(value, total) + ")</div>";
-		line.appendChild(col1);
-		line.appendChild(col2);
-		$("#summaryBody").append(line);
+		a_cat.innerHTML = categoryLabel + " <div style='margin-left:10px;'>" +value+" ("+getPercent(value, total) + ")</div>";
+		li_cat.onclick = (function(curLabel) {
+			return function() {
+				for(var j = 0; j < NUMBER_OF_CATEGORIES; j++) {
+					$("#li_"+getCategoryLabel(j,true)).removeClass("active");
+					var lblAux = getCategoryLabel(j);
+					if(lblAux == curLabel){
+						$("#li_"+getCategoryLabel(j,true)).addClass("active");
+					}	
+				}
+				createTable(curLabel);
+			};
+		})(categoryLabel);
+		li_cat.style.cursor='pointer';
+		
+		li_cat.appendChild(a_cat);
+		
+		//var line = document.createElement("tr");
+		//var col1 = document.createElement("td");
+		
+//		col1.innerText = categoryLabel;
+//		col1.onclick = (function(curLabel) {
+//			return function() {
+//				createTable(curLabel);
+//			}
+//		})(categoryLabel);
+//		var col2 = document.createElement("td");
+//		var value = summaryInfo[i];
+//		col2.innerHTML = summaryInfo[i] + "&nbsp;<div class='percent'>(" + getPercent(value, total) + ")</div>";
+//		line.appendChild(col1);
+//		line.appendChild(col2);
+		$("#leftmenu_det_report").append(li_cat);
 	}
 }
 
@@ -225,7 +266,7 @@ function showCoverageLost(testName) {
 		uncoveredLine = new Number(info[1]);
 		if(currentClassName != className) {
 			currentUncoveredLines.sort();
-			coverageData += currentClassName+" - Line(s): "+createRanges(currentUncoveredLines) + "<br/>"
+			coverageData += currentClassName+" - Line(s): "+createRanges(currentUncoveredLines) + "<br/>";
 			
 			currentUncoveredLines = new Array();
 			currentClassName = className;
@@ -235,7 +276,40 @@ function showCoverageLost(testName) {
 
 	}
 	currentUncoveredLines.sort();
-	coverageData += currentClassName+" - Line(s): "+createRanges(currentUncoveredLines) + "<br/>"
+	coverageData += currentClassName+" - Line(s): "+createRanges(currentUncoveredLines) + "<br/>";
+	
+	$("#coverage_data").html(coverageData);
+	$("#dialog_coverage").dialog('open');
+}
+
+function showCoverageImprovement(testName) {
+	var coverage = getCoverageImprovement()[testName];
+
+	var info = coverage[0].split(',');
+	var className = info[0];
+	var coveredLine = new Number(info[1]);
+	var currentClassName = className;
+	var currentNewCoveredLines = new Array(coveredLine);
+
+	var coverageData = '';
+
+	for(var i = 1; i < coverage.length; i++) {
+		info = coverage[i].split(',');
+		className = info[0];
+		coveredLine = new Number(info[1]);
+		if(currentClassName != className) {
+			currentNewCoveredLines.sort();
+			coverageData += currentClassName+" - Line(s): "+createRanges(currentNewCoveredLines) + "<br/>";
+			
+			currentNewCoveredLines = new Array();
+			currentClassName = className;
+		}
+
+		currentNewCoveredLines.push(coveredLine);
+
+	}
+	currentNewCoveredLines.sort();
+	coverageData += currentClassName+" - Line(s): "+createRanges(currentNewCoveredLines) + "<br/>";
 	
 	$("#coverage_data").html(coverageData);
 	$("#dialog_coverage").dialog('open');

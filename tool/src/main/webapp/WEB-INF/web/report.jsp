@@ -33,7 +33,7 @@
 						<li><a href="<c:url value="/projects/${execution.project.name}"/>">Project ${execution.project.name}</a><span class="divider">/</span></li>
 						<li><a href="<c:url value="/projects/${execution.project.name}/executions"/>">Executions</a><span class="divider">/</span></li>
 						<li><a href="<c:url value="/projects/${execution.project.name}/execution/${execution.id}"/>">${execution.name}</a><span class="divider">/</span></li>												
-						<li id="titleName">TestEvol Report</li>
+						<li id="titleName">Summary report</li>
 					</ul>
 				</div>
 
@@ -64,6 +64,12 @@
                         <th>(P)</th>
                     </tr>
                 </thead>
+                	<tbody>
+                		<tr id="loader"><td colspan="9">
+                			<img src="<c:url value="/img/ajax-loaders/ajax-loader-5.gif"/>">
+                		</td></tr>
+                	</tbody>
+                	
 					  </table>            
 					</div>
 					</div>
@@ -92,7 +98,6 @@
 	for(var i = 1; i < versions.length; i++) {
 		var version = versions[i];
 		document.write('<script type="text/javascript" src=<c:url value="/projects/${execution.project.name}/execution/${execution.id}/report/script/"/>' + version + '.js"><\/script>');
-		//olData += "<li> Pair <a href='" + version + "/report.html' target='_blank'>" + versions[i - 1] + " - " + versions[i] + "</a></li>";
 	}
 
 	$(function() {
@@ -105,8 +110,8 @@
 		$("#versions").html(olData);
 		versionsSummary["total"] = summaryInfo;
 		populateTotals(versionsSummary);
-		createSummaryTable($("#summary_table"), versions, versionsSummary);
-
+		createSummaryTable($("#summary_table"), versions, versionsSummary, '<c:url value="/projects/${execution.project.name}/execution/${execution.id}/report/version"/>');
+		$("#loader").hide();
 	});
 </script>
 
