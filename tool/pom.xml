@@ -13,8 +13,8 @@
 			<url>http://download.eclipse.org/jgit/maven</url>
 		</repository>
 		<repository>
-			<id>wala</id>
-			<url>file://${basedir}/wala-repo</url>
+			<id>local</id>
+			<url>file://${basedir}/local-repo</url>
 		</repository>
 	</repositories>
 	<properties>
@@ -77,7 +77,7 @@
 			<artifactId>commons-io</artifactId>
 			<version>2.4</version>
 		</dependency>
-		<dependency>
+ 		<dependency>
 			<groupId>japa</groupId>
 			<artifactId>javaparser</artifactId>
 			<version>1.0</version>
