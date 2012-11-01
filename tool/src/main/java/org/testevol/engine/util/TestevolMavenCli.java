@@ -33,7 +33,7 @@ public class TestevolMavenCli {
 			args.add(goal);
 		}
 
-		Process process = new ProcessBuilder(args).start();
+		Process process = new ProcessBuilder(args).directory(workingDir).start();
 		process.waitFor();
 
 		String line;
