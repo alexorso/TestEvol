@@ -1,25 +1,23 @@
 package org.testevol.domain;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.maven.cli.MavenCli;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.testevol.engine.driver.TestCoverageDriver;
+import org.testevol.engine.util.TestevolMavenCli;
 import org.testevol.engine.util.Utils;
 import org.testevol.versioncontrol.UpdateResult;
 import org.testevol.versioncontrol.VersionControlSystem;
@@ -341,15 +339,16 @@ public class Version {
 	}
 
 	public String getConfigurationType() {
+		if (!getSourceDir().exists() || !getLibrariesDir().exists()) {
+			return "Invalid";
+		}
 		if (hasTestEvolConfig()) {
 			return "TestEvol";
 		}
 		if (isMavenProject()) {
 			return "Maven";
 		}
-		if (!getSourceDir().exists() || !getLibrariesDir().exists()) {
-			return "Invalid";
-		}
+		System.out.println(getLibrariesDir().getAbsolutePath());
 
 		return null;
 	}
@@ -423,14 +422,16 @@ public class Version {
 		File srcResources = getSrcResourcesDir();
 		File testResources = getTestResourcesDir();
 
-		MavenCli maven = new MavenCli();
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		PrintStream ps = new PrintStream(baos);
-		maven.doMain(new String[] { "clean", "compile", "test",
-				"dependency:copy-dependencies" }, versionDir.getAbsolutePath(),
-				ps, ps);
-
-		boolean result = baos.toString().contains("BUILD SUCCESS");
+		
+		String output;
+		try {
+			output = TestevolMavenCli.execMavenProcess(new String[] { "clean", "compile", "test",
+					"dependency:copy-dependencies" }, versionDir);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;			
+		}
+		boolean result = output.contains("BUILD SUCCESS");
 		if (!result) {
 			return false;
 		}

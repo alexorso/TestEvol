@@ -238,7 +238,6 @@ public class Compiler extends Task {
             	log.log(line);
             }
         }
-
     }
     
     private String getClassName(String relativePath) throws IOException{

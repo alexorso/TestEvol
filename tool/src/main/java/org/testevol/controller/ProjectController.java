@@ -177,7 +177,7 @@ public class ProjectController {
 	      // copy it to response's OutputStream
 	      IOUtils.copy(is, response.getOutputStream());
 	      response.setContentType("text/plain");
-	      response.setHeader("Content-Disposition", "attachment; filename="+execution.getName()+".txt");
+	      response.setHeader("Content-Disposition", "attachment; filename="+execution.getName()+".csv");
 	      response.flushBuffer();
 	    } catch (IOException ex) {
 	      throw new RuntimeException("Error while generating Report!");
