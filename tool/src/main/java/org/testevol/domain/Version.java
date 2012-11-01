@@ -339,16 +339,15 @@ public class Version {
 	}
 
 	public String getConfigurationType() {
+		if (isMavenProject()) {
+			return "Maven";
+		}
 		if (!getSourceDir().exists() || !getLibrariesDir().exists()) {
 			return "Invalid";
 		}
 		if (hasTestEvolConfig()) {
 			return "TestEvol";
 		}
-		if (isMavenProject()) {
-			return "Maven";
-		}
-		System.out.println(getLibrariesDir().getAbsolutePath());
 
 		return null;
 	}
