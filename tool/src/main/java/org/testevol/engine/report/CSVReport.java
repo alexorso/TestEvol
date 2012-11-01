@@ -13,7 +13,7 @@ import org.testevol.engine.domain.Results;
 public class CSVReport {
 
 	public static void generateReport(Version oldVersion,  Version version,
-			Results results, File reportsDir) throws IOException {
+			Results results, File reportsDir, boolean coverageEnabled) throws IOException {
 		
 		File csvResults = new File(reportsDir, "results.txt");
 		
@@ -23,17 +23,41 @@ public class CSVReport {
 		if (!fileAlreadyExists) {
 			csvResults.createNewFile();
 		}
-//		if (!c1Results.exists()) {
-//			c1Results.createNewFile();
-//		}
+		
+		
 		FileWriter fileWriter = new FileWriter(csvResults, true);
-		//FileWriter fileWriterC1 = new FileWriter(c1Results, true);
-
 		String lineSeparator = System.getProperty("line.separator");
-		if (fileAlreadyExists) {
-			fileWriter.append(lineSeparator);
+		if (!fileAlreadyExists) {
+			//write header
+			fileWriter.append("#");
+			fileWriter.append(results.getCategoryC1().getClassification().getLabel());
+			fileWriter.append(",");
+			fileWriter.append(results.getCategoryC2().getClassification().getLabel());
+			fileWriter.append(",");
+			fileWriter.append(results.getCategoryC3().getClassification().getLabel());
+			fileWriter.append(",");
+			fileWriter.append(results.getCategoryC4().getClassification().getLabel());
+			fileWriter.append(",");
+			fileWriter.append(results.getCategoryC5().getClassification().getLabel()+" - SAME COVERAGE ");
+			fileWriter.append(",");
+			fileWriter.append(results.getCategoryC5().getClassification().getLabel()+" - COVERAGE LOSS");
+			fileWriter.append(",");
+			fileWriter.append(results.getCategoryC6().getClassification().getLabel());
+			fileWriter.append(",");
+			fileWriter.append(results.getCategoryC7().getClassification().getLabel());
+			fileWriter.append(",");
+			fileWriter.append(results.getCategoryC6().getClassification().getLabel());
+			fileWriter.append(",");
+			fileWriter.append(results.getCategoryC8().getClassification().getLabel()+" - SAME COVERAGE ");
+			fileWriter.append(",");
+			fileWriter.append(results.getCategoryC8().getClassification().getLabel()+" - COVERAGE IMPROVED");
+			
+			if(!coverageEnabled){
+				fileWriter.append(lineSeparator);
+				fileWriter.append("#ATTENTION: COVERAGE ANALYSIS WAS NOT PERFORMED IN THIS EXECUTION");
+			}			
 		}
-
+		fileWriter.append(lineSeparator);
 		fileWriter.append(oldVersion.getName()).append(",");
 		
 		fileWriter.append(version.getName()).append(",");
@@ -60,15 +84,15 @@ public class CSVReport {
 		fileWriter.append(String.valueOf(sameCoverage)).append(",");//C8
 		fileWriter.append(String.valueOf(diffCoverage));//C8
 
-		fileWriter.append("\n");
-		fileWriter.append(categoryC1.toString());
-		fileWriter.append(results.getCategoryC2().toString());
-		fileWriter.append(results.getCategoryC3().toString());
-		fileWriter.append(results.getCategoryC4().toString());
-		fileWriter.append(categoryC5.toString());
-		fileWriter.append(results.getCategoryC6().toString());
-		fileWriter.append(results.getCategoryC7().toString());
-		fileWriter.append(categoryC8.toString());
+//		fileWriter.append("\n");
+//		fileWriter.append(categoryC1.toString());
+//		fileWriter.append(results.getCategoryC2().toString());
+//		fileWriter.append(results.getCategoryC3().toString());
+//		fileWriter.append(results.getCategoryC4().toString());
+//		fileWriter.append(categoryC5.toString());
+//		fileWriter.append(results.getCategoryC6().toString());
+//		fileWriter.append(results.getCategoryC7().toString());
+//		fileWriter.append(categoryC8.toString());
 		
 		fileWriter.close();
 	//	fileWriterC1.close();

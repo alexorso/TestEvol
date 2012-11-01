@@ -2,15 +2,16 @@ package org.testevol.versioncontrol;
 
 import java.io.File;
 import java.util.List;
-import java.util.UUID;
+
+import org.testevol.domain.RepositoryInfo;
 
 public abstract class VersionControlSystem {
 	
 	public static String GIT = "git";
-
-	public static VersionControlSystem getInstance(String type, String repoUrl){
-		if(GIT.equals(type)){
-			return new GitImpl(repoUrl);
+	
+	public static VersionControlSystem getInstance(RepositoryInfo repositoryInfo){
+		if(GIT.equals(repositoryInfo.getType())){
+			return new GitImpl(repositoryInfo);
 		}
 		
 		return null;

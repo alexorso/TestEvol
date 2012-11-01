@@ -8,6 +8,13 @@
 
 <%@include file="includes/header.jsp" %>
 
+<style type="text/css">
+#execute{
+	margin: 5px;
+	margin-left: 10px;
+
+}
+</style>
 </head>
 
 <body>
@@ -28,7 +35,6 @@
 
 				<div>
 					<ul class="breadcrumb">
-						<li><a href="#">Home</a> <span class="divider">/</span></li>
 						<li><a href="<c:url value="/projects/list"/>">Projects</a><span class="divider">/</span></li>
 						<li> Project ${project.name}</li>
 					</ul>
@@ -36,6 +42,7 @@
 
 		<div class="row-fluid sortable">		
 				<div class="box span12">
+					<button type="button" class="btn btn-success" onclick="executeTestEvol('${project.name}');" id="execute" title="Run TestEvol Analysis for the selected versions"><i class="icon-play icon-white"></i> Run Analysis</button>
 					<div class="box-header well" data-original-title>
 						<h2><i class="icon-tags"></i> Versions</h2>
 					</div>
@@ -45,25 +52,40 @@
 						<table class="table table-striped table-bordered bootstrap-datatable">
 						  <thead>
 							  <tr>
-							  	  <th style="100px;text-align: center;">
-							  	  	<button type="button" class="btn btn-success btn-setting" onclick="executeTestEvol('${project.name}');" id="execute" title="Execute TestEvol for the selected versions"><i class="icon-play icon-white"></i> Execute</button>
+							  	  <th style="150px;text-align: center;">
+							  	  	<input type="checkbox" value="" id="check_all" checked="checked">All
 							  	  </th>
 								  <th>Name</th>
-								  <th style="width:50px;text-align: center">Config</th>
-								  <th style="width:80px;text-align: center">Actions</th>
+								  <th style="width:50px;text-align: center">Configuration</th>
+								  <th style="width:10px;text-align: center">Actions</th>
 							  </tr>
 						  </thead>   
 						  <tbody>
 						  <c:forEach var="version" items="${project.versionsList}" varStatus="i">
 							<tr>
-								<td style="width:100px;text-align: center;"><input type="checkbox" name="versionsToExecute" value="${version.name}" checked="checked"></td>
+								<td style="width:100px;text-align: center;">
+									<c:choose>
+										<c:when test="${version.configurationType eq 'Invalid'}">
+											<a href="#" title="This version has an invalid configuration. <br/> Use the button 'Settings' in the 'Actions' column to configure it properly." data-rel="tooltip" class="btn btn-danger"><i class="icon-warning-sign icon-gray"></i></a>
+										</c:when>
+										<c:otherwise>
+											<input type="checkbox" name="versionsToExecute" value="${version.name}" checked="checked">
+										</c:otherwise>
+									</c:choose>
+								</td>
 								<td><strong>${version.name}</strong></td>
-								<td style="width:80px;text-align: center">${version.type}</td>
-								<td style="width:150px;text-align: center" class="center">
-									<a class="btn btn-info btn-setting" href="#" title="Refresh local copy" onclick="updateVersion('${project.name}','${version.name}')">
+								<td style="width:50px;text-align: center">${version.configurationType}</td>
+								<td style="width:100px;text-align: center" class="center">
+									<c:if test="${version.configurationType != 'Maven'}">
+									<a class="btn btn-info" href="#" title="Settings" onclick='openSettings("${project.name}","${version.name}", eval(${version.versionSettings.jsonRepresentation}))'>
+										<i class="icon-cog icon-white"></i>                                            
+									</a> 
+									</c:if>
+									<!-- <a class="btn btn-info btn-setting" href="#" title="Refresh local copy" onclick="updateVersion('${project.name}','${version.name}')">
 										<i class="icon-refresh icon-white"></i>                                            
-									</a>
-									<!-- <a class="btn btn-info" href="#" title="Edit">
+									</a> -->
+									<!--
+									<a class="btn btn-info" href="#" title="Edit">
 										<i class="icon-edit icon-white"></i>                                            
 									</a> -->
 									<a class="btn btn-danger btn-setting" onclick="deleteVersion('${project.name}','${version.name}')" href="#" title="Delete">
@@ -87,9 +109,23 @@
 		<!--/fluid-row-->
 
 		<hr>
+		
+		<div class="modal hide fade" id="ModalRequired">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"><i class="icon-remove"></i></button>
+				<h3>Error</h3>
+			</div>
+			<div class="modal-body">
+				<p id="error_message"></p>
+			</div>
+			<div class="modal-footer">
+				<a href="#" class="btn" data-dismiss="modal">Close</a>
+			</div>
+		</div>
+		
 		<div class="modal hide fade" id="myModal">
 			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" id="close">×</button>
+				<button type="button" class="close" data-dismiss="modal" id="close"><i class="icon-remove"></i></button>
 				<h3 id="titleModal">Delete Version</h3>
 			</div>
 			<div class="modal-body">
@@ -98,9 +134,75 @@
 			<div class="modal-footer">
 				<a href="#" id="closeButton"  class="btn" data-dismiss="modal">Close</a>
 				<a href="aaa" id="modalButton" class="btn btn-danger">Delete</a>
-			</div>
 		</div>
 	</div>
+			<div class="modal hide fade" id="modalSettings">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" id="close"><i class="icon-remove"></i></button>
+				<h3 id="titleModal">Version Settings</h3>
+			</div>
+			<div class="modal-body">
+				<form class="form-horizontal" id="settings-form" action="${project.name}/version/save_settings" method="post">
+								<input type="hidden" name="project" id="project">
+								<input type="hidden" name="version" id="version">
+								<fieldset>
+									<div class="control-group">
+										<label class="control-label" for="source">Application/Library sources directory</label>
+										<div class="controls">
+											<input class="input-xlarge focused" id="source" name="source"
+												type="text" placeholder="(Using default value: src/main/java)" style="margin-top:5px;">
+										</div>
+									</div>
+									<div class="control-group">
+										<label class="control-label" for="resource">Application/Library resources directory</label>
+										<div class="controls">
+											<input class="input-xlarge" id="resource" name="resource"
+												type="text" placeholder="(Using default value: src/main/resources)"  style="margin-top:5px;">
+										</div>
+									</div>
+									<div class="control-group">
+										<label class="control-label" for="testSources">Test Sources directory</label>
+										<div class="controls">
+											<input class="input-xlarge" id="testSources" name="testSources"
+												type="text" placeholder="(Using default value: src/test/java)">
+										</div>
+									</div>
+									<div class="control-group">
+										<label class="control-label" for="testResource">Test resources directory</label>
+										<div class="controls">
+											<input class="input-xlarge" id="testResource" name="testResource"
+												type="text" placeholder="(Using default value: src/test/resources)"  style="margin-top:5px;">
+										</div>
+									</div>
+									<div class="control-group">
+										<label class="control-label" for="lib">Classpath directory</label>
+										<div class="controls">
+											<input class="input-xlarge" id="lib" name="lib"
+												type="text" placeholder="(Using default value: lib)">
+										</div>
+									</div>
+									<div class="control-group">
+										<label class="control-label" for="javaversion">Java version</label>
+										<div class="controls">
+											<select name ="javaversion" id="javaversion">
+												<option value="1.4">1.4</option>
+												<option value="1.5" selected="selected">1.5</option>
+												<option value="1.6">1.6</option>												
+											</select>
+										</div>
+									</div>
+									
+								</fieldset>
+							</form>
+			</div>
+			<div class="modal-footer">
+				<a href="#" id="closeButton"  class="btn" data-dismiss="modal">Close</a>
+				<button type="submit" id="modalButton" class="btn btn-success" onclick="$('#settings-form').submit();">Save</button>
+		</div>
+	</div>
+	
+		
+		
 	<!--/.fluid-container-->
 	
 	
@@ -109,9 +211,45 @@
  
  	<%@include file="includes/scripts.jsp" %>
 	<script type="text/javascript">
-		//var closeClickEvent
+
+		$(function(){
+			$("#check_all").click(function(){
+				var select = $(this)[0].checked;
+				var ckVersions = document.getElementsByName("versionsToExecute");
+				for(var i = 0;i<ckVersions.length;i++){
+					if((select && !ckVersions[i].checked) ||
+						(!select && ckVersions[i].checked)){
+						ckVersions[i].click();						
+					}
+
+				}
+			});
+		});
+		
+		function openSettings(project, version, settingsStr){
+			$("#project").val(project);
+			$("#version").val(version);
+			
+			var currentSettings = eval(settingsStr);
+			
+			for (var key in currentSettings) {
+				setVal(key, currentSettings);	
+			}
+			$("#modalSettings").modal('show');
+		}
+		
+		function setVal(property, currentSettings){
+			var val = currentSettings[property];
+			if(val && $.trim(val) != ''){
+				$("#"+property).val(val);
+			}
+		}
 
 		function executeTestEvol(project){
+			if(!validate()){
+				return false;
+			}
+			
 			$("#titleModal").html("Execute TestEvol for Project "+project);
 			$("#bodyModal").html("Confirm execution?<br/><input type='checkbox' id='coverageAux'/> Include coverage analysis");
 			$("#modalButton").removeClass();
@@ -120,6 +258,8 @@
 			$("#modalButton").html("Execute");
 			
 			document.getElementById("modalButton").href='javascript:submitExecution()';
+		
+			$('#myModal').modal('show');
 		}
 		
 		function submitExecution(){
@@ -178,6 +318,27 @@
 			});
 		}
 		
+		function validate(){
+			var ckVersions = document.getElementsByName("versionsToExecute");
+			var versions = 0;
+			for(var i = 0;i<ckVersions.length;i++){
+				if(ckVersions[i]['checked']){
+					versions++;
+				}
+			}
+			if(versions < 2){
+				showError("<li>At least two versions of the program are required for a correct analysis to be performed.</li>");
+				return false;
+			}
+			//document.getElementById("all_check")['checked']=false;
+			
+			return true;
+		}
+		
+		function showError(errorMessage){
+			$('#error_message').html('<ul>'+errorMessage+'</ul>');
+			$('#ModalRequired').modal('show');
+		}
 		
 		
 	</script>

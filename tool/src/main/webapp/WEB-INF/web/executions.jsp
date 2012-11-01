@@ -37,7 +37,6 @@
 
 				<div>
 					<ul class="breadcrumb">
-						<li><a href="#">Home</a> <span class="divider">/</span></li>
 						<li><a href="<c:url value="/projects/list"/>">Projects</a><span class="divider">/</span></li>
 						<li><a href="<c:url value="/projects/${project.name}"/>">Project ${project.name}</a><span class="divider">/</span></li>
 						<li> Executions</li>

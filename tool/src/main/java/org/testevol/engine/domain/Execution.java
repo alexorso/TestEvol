@@ -101,4 +101,8 @@ public class Execution {
 
 		
 	}
+
+	public File getCSVReport() {
+		return new File(executionDir,"results.txt");
+	}
 }

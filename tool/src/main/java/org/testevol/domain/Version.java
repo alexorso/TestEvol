@@ -26,6 +26,13 @@ import org.testevol.versioncontrol.VersionControlSystem;
 
 public class Version {
 
+	public static final String LIB_DIR = "lib.dir";
+	public static final String TESTS_SRC = "tests.src";
+	public static final String TESTS_RESOURCES = "tests.resources";
+	public static final String JAVA_RESOURCES = "java.resources";
+	public static final String JAVA_SRC = "java.src";
+	public static final String JAVA_VERSION = "java.version";
+
 	private File versionDir;
 	private File baseBuildDir;
 	private String name;
@@ -34,10 +41,11 @@ public class Version {
 	// Used in case of a maven project
 	private Model mavenModel;
 	private Properties testEvolProperties;
+	private VersionSettings versionSettings;
 
 	public Version(File versionDir) throws Exception {
 		super();
-		this.versionDir = versionDir;		
+		this.versionDir = versionDir;
 		name = versionDir.getName();
 		properties = new Properties();
 		if (getPropertiesFile().exists()) {
@@ -46,29 +54,28 @@ public class Version {
 		loadConfiguration();
 	}
 
-	private void deleteClassesFromResources(File dir) throws IOException{
-		
-		
-		for(Object fileObj : FileUtils.listFiles(dir, new String[]{"class"}, true)){
-			if(fileObj instanceof File){
+	private void deleteClassesFromResources(File dir) throws IOException {
+
+		for (Object fileObj : FileUtils.listFiles(dir,
+				new String[] { "class" }, true)) {
+			if (fileObj instanceof File) {
 				((File) fileObj).delete();
 			}
 		}
 		deleteEmptyDirectories(dir);
-		
+
 	}
 
-	private boolean deleteEmptyDirectories(File dir){
+	private boolean deleteEmptyDirectories(File dir) {
 		boolean empty = true;
-		for(File file:dir.listFiles()){
-			if(file.isDirectory()){
+		for (File file : dir.listFiles()) {
+			if (file.isDirectory()) {
 				empty = deleteEmptyDirectories(file) && empty;
-			}
-			else{
+			} else {
 				empty = false;
 			}
 		}
-		if(empty){
+		if (empty) {
 			dir.delete();
 		}
 		return empty;
@@ -90,50 +97,72 @@ public class Version {
 		return new File(getBuildDir(), "bintmp");
 	}
 
-	
-	private File getTestEvolConfigFile(){
+	public File getTestEvolConfigFile() {
 		return new File(versionDir, "testevol.config");
 	}
-	
-	private Properties getTestEvolConfig(){
+
+	public VersionSettings getVersionSettings() {
+		Properties properties = getTestEvolConfig();
+		if (properties == null) {
+			return null;
+		}
+		if (versionSettings == null) {
+			versionSettings = new VersionSettings(
+					properties.getProperty(JAVA_SRC),
+					properties.getProperty(JAVA_RESOURCES),
+					properties.getProperty(TESTS_SRC),
+					properties.getProperty(TESTS_RESOURCES),
+					properties.getProperty(LIB_DIR),
+					properties.getProperty(JAVA_VERSION));
+
+		}
+		return versionSettings;
+
+	}
+
+	private Properties getTestEvolConfig() {
 		File testEvolConfig = getTestEvolConfigFile();
-		if(testEvolProperties == null){
+		if (testEvolProperties == null) {
 			testEvolProperties = new Properties();
 			try {
 				testEvolProperties.load(new FileInputStream(testEvolConfig));
 			} catch (Exception e) {
-				e.printStackTrace();
-			}		
+				//file does not exist
+				//e.printStackTrace();
+			}
 		}
 		return testEvolProperties;
 	}
-	
+
 	public File getBuildDir() {
-		if(baseBuildDir == null){
-			return new File(versionDir,"build");
+		if (baseBuildDir == null) {
+			return new File(versionDir, "build");
 		}
-		return new File(baseBuildDir,"build"+File.separator+getName());
+		return new File(baseBuildDir, "build" + File.separator + getName());
 	}
 
-	private File getLibrariesDir(){
+	private File getLibrariesDir() {
 		String libDir = "lib";
-		if(hasTestEvolConfig()){
-			String libDirAux = getProperty("lib.dir"); 
-			if(libDirAux != null){
+		if (hasTestEvolConfig()) {
+			String libDirAux = getProperty(LIB_DIR);
+			if (libDirAux != null) {
 				libDir = libDirAux;
 			}
 		}
 		return new File(versionDir, libDir);
 	}
-	
-	private String getProperty(String propertyName){
+
+	private String getProperty(String propertyName) {
 		Properties properties = getTestEvolConfig();
-		if(properties.containsKey(propertyName)){
-			return properties.getProperty(propertyName);
+		if (properties.containsKey(propertyName)) {
+			String value = properties.getProperty(propertyName);
+			if (value != null && !value.trim().isEmpty()) {
+				return value;
+			}
 		}
 		return null;
 	}
-	
+
 	public String getClassPath() {
 		String classpath = ".";
 		File cpfile = new File(versionDir, "classpath.txt");
@@ -154,7 +183,7 @@ public class Version {
 		return classpath;
 	}
 
-	public File getCodeJar(){
+	public File getCodeJar() {
 		return new File(getBuildDir(), "code.jar");
 	}
 
@@ -173,10 +202,10 @@ public class Version {
 				String artifactId = plugin.getArtifactId();
 				if ("org.apache.maven.plugins".equals(groupId)
 						&& "maven-compiler-plugin".equals(artifactId)) {
-					Xpp3Dom dom = ((Xpp3Dom)plugin.getConfiguration());
-					if("configuration".equals(dom.getName())){
-						for(Xpp3Dom children:dom.getChildren()){
-							if(children.getName().matches("target|source")){
+					Xpp3Dom dom = ((Xpp3Dom) plugin.getConfiguration());
+					if ("configuration".equals(dom.getName())) {
+						for (Xpp3Dom children : dom.getChildren()) {
+							if (children.getName().matches("target|source")) {
 								return children.getValue();
 							}
 						}
@@ -187,8 +216,8 @@ public class Version {
 		}
 
 		String javaVersion = "1.5";
-		String javaVersionAux = getProperty("java.version");
-		if(javaVersionAux != null){
+		String javaVersionAux = getProperty(JAVA_VERSION);
+		if (javaVersionAux != null) {
 			javaVersion = javaVersionAux;
 		}
 
@@ -199,7 +228,6 @@ public class Version {
 		return name;
 	}
 
-	
 	private File getPropertiesFile() {
 		return new File(versionDir, "testevol.properties");
 	}
@@ -214,9 +242,9 @@ public class Version {
 
 	public File getSourceDir() {
 		String srcDir = "src/main/java";
-		if(hasTestEvolConfig()){
-			String srcDirAux = getProperty("java.src"); 
-			if(srcDirAux != null){
+		if (hasTestEvolConfig()) {
+			String srcDirAux = getProperty(JAVA_SRC);
+			if (srcDirAux != null) {
 				srcDir = srcDirAux;
 			}
 		}
@@ -228,43 +256,43 @@ public class Version {
 		}
 		return new File(versionDir, srcDir);
 	}
-	
-	public File getSrcResourcesDir(){
-		if(isMavenProject()){
+
+	public File getSrcResourcesDir() {
+		if (isMavenProject()) {
 			return new File(getBuildDir(), ".src-resources");
 		}
 
 		String dir = "src/main/resources";
-		if(hasTestEvolConfig()){
-			String dirAux = getProperty("java.resources"); 
-			if(dirAux != null){
+		if (hasTestEvolConfig()) {
+			String dirAux = getProperty(JAVA_RESOURCES);
+			if (dirAux != null) {
 				dir = dirAux;
 			}
 		}
 		return new File(versionDir, dir);
 	}
-	
-	public File getTestResourcesDir(){
-		if(isMavenProject()){
+
+	public File getTestResourcesDir() {
+		if (isMavenProject()) {
 			return new File(getBuildDir(), ".src-test-resources");
 		}
 		String dir = "src/test/resources";
-		if(hasTestEvolConfig()){
-			String dirAux = getProperty("tests.resources"); 
-			if(dirAux != null){
+		if (hasTestEvolConfig()) {
+			String dirAux = getProperty(TESTS_RESOURCES);
+			if (dirAux != null) {
 				dir = dirAux;
 			}
 		}
 		return new File(versionDir, dir);
 	}
-	
-	public File getTestsJar(){
+
+	public File getTestsJar() {
 		return new File(getBuildDir(), "tests.jar");
 	}
-	
-	public Set<String> getTestsList(){
+
+	public Set<String> getTestsList() {
 		Set<String> tests = new HashSet<String>();
-		
+
 		File testsFile = getTestslistFile();
 
 		BufferedReader reader = null;
@@ -272,10 +300,8 @@ public class Version {
 		try {
 			String test = null;
 
-			reader = new BufferedReader(
-					new FileReader(testsFile));
-			while ((test = reader
-					.readLine()) != null) {
+			reader = new BufferedReader(new FileReader(testsFile));
+			while ((test = reader.readLine()) != null) {
 				tests.add(test);
 			}
 		} catch (FileNotFoundException e) {
@@ -283,24 +309,25 @@ public class Version {
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
-			if(reader != null){
+			if (reader != null) {
 				try {
 					reader.close();
-				} catch (IOException e) {}
+				} catch (IOException e) {
+				}
 			}
 		}
 		return tests;
 	}
-	
+
 	public File getTestslistFile() {
 		return new File(getBuildDir(), "data-testslist.txt");
 	}
-	
+
 	public File getTestsSourceDir() {
 		String srcDir = "src/test/java";
-		if(hasTestEvolConfig()){
-			String srcDirAux = getProperty("tests.src"); 
-			if(srcDirAux != null){
+		if (hasTestEvolConfig()) {
+			String srcDirAux = getProperty(TESTS_SRC);
+			if (srcDirAux != null) {
 				srcDir = srcDirAux;
 			}
 		}
@@ -312,22 +339,25 @@ public class Version {
 		}
 		return new File(versionDir, srcDir);
 	}
-	
-	public String getType() {
-		if(hasTestEvolConfig()){
+
+	public String getConfigurationType() {
+		if (hasTestEvolConfig()) {
 			return "TestEvol";
 		}
 		if (isMavenProject()) {
 			return "Maven";
 		}
+		if (!getSourceDir().exists() || !getLibrariesDir().exists()) {
+			return "Invalid";
+		}
 
 		return null;
 	}
-	
+
 	private boolean isMavenProject() {
 		return new File(versionDir, "pom.xml").exists();
 	}
-	
+
 	private boolean hasTestEvolConfig() {
 		return getTestEvolConfigFile().exists();
 	}
@@ -337,7 +367,7 @@ public class Version {
 			loadMavenConfiguration();
 		}
 	}
-	
+
 	private void loadMavenConfiguration() throws Exception {
 
 		MavenXpp3Reader m2pomReader = new MavenXpp3Reader();
@@ -353,7 +383,7 @@ public class Version {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void setBaseBuildDir(File baseBuildDir) {
 		this.baseBuildDir = baseBuildDir;
 	}
@@ -362,81 +392,88 @@ public class Version {
 		properties.setProperty("index", String.valueOf(index));
 	}
 
-	public boolean setUp(File configDir) throws Exception{
+	public boolean setUp(File configDir) throws Exception {
 		boolean result = true;
-		
+
 		File buildDir = getBuildDir();
-		if(buildDir.exists()){
+		if (buildDir.exists()) {
 			FileUtils.deleteDirectory(buildDir);
 		}
 		buildDir.mkdirs();
-		
+
 		getBinTmpDir().mkdirs();
 		getBinDir().mkdirs();
 		getBinTestTmpDir().mkdirs();
 		getBinTestDir().mkdirs();
-		
-		if(isMavenProject()){
+
+		if (isMavenProject()) {
 			result = setUpMavenProject();
 		}
-		
-		File libDir = new File(versionDir, "lib");
-		if(libDir.exists()){
-			FileUtils.copyDirectory(new File(configDir, TestCoverageDriver.COVERAGE_JARS), libDir);
+
+		File libDir = getLibrariesDir();
+		if (libDir.exists()) {
+			FileUtils.copyDirectory(new File(configDir,
+					TestCoverageDriver.COVERAGE_JARS), libDir);
 		}
-		
+
 		return result;
 	}
-	
+
 	private boolean setUpMavenProject() throws IOException {
 		File srcResources = getSrcResourcesDir();
 		File testResources = getTestResourcesDir();
-		
+
 		MavenCli maven = new MavenCli();
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		PrintStream ps = new PrintStream(baos);
-		maven.doMain(new String[]{"clean","compile","test","dependency:copy-dependencies"}, versionDir.getAbsolutePath(), ps, ps);
-		
+		maven.doMain(new String[] { "clean", "compile", "test",
+				"dependency:copy-dependencies" }, versionDir.getAbsolutePath(),
+				ps, ps);
+
 		boolean result = baos.toString().contains("BUILD SUCCESS");
-		if(!result){
+		if (!result) {
 			return false;
 		}
-		
+
 		String outputDirectory = mavenModel.getBuild().getOutputDirectory();
-		if(outputDirectory == null){
+		if (outputDirectory == null) {
 			outputDirectory = "target/classes";
 		}
-		
-		FileUtils.copyDirectory(new File(versionDir,outputDirectory), srcResources); 
+
+		FileUtils.copyDirectory(new File(versionDir, outputDirectory),
+				srcResources);
 		deleteClassesFromResources(srcResources);
-		
-		String testOutputDirectoryName = mavenModel.getBuild().getTestOutputDirectory();
-		if(testOutputDirectoryName == null){
+
+		String testOutputDirectoryName = mavenModel.getBuild()
+				.getTestOutputDirectory();
+		if (testOutputDirectoryName == null) {
 			testOutputDirectoryName = "target/test-classes";
 		}
-		
-		File testOutputDirectory = new File(versionDir,testOutputDirectoryName);
-		if(testOutputDirectory.exists()){
-			FileUtils.copyDirectory(testOutputDirectory, testResources); 
-			deleteClassesFromResources(testResources);			
-		}		
-		
-		File lib = new File(versionDir,"lib");
-		if(lib.exists()){
+
+		File testOutputDirectory = new File(versionDir, testOutputDirectoryName);
+		if (testOutputDirectory.exists()) {
+			FileUtils.copyDirectory(testOutputDirectory, testResources);
+			deleteClassesFromResources(testResources);
+		}
+
+		File lib = new File(versionDir, "lib");
+		if (lib.exists()) {
 			FileUtils.deleteDirectory(lib);
 		}
-		FileUtils.copyDirectory(new File(versionDir, "target"+File.separatorChar+"dependency"), lib);			
+		FileUtils.copyDirectory(new File(versionDir, "target"
+				+ File.separatorChar + "dependency"), lib);
 		return true;
-		//maven.doMain(new String[]{"clean"}, versionDir.getAbsolutePath(), ps, ps);
+		// maven.doMain(new String[]{"clean"}, versionDir.getAbsolutePath(), ps,
+		// ps);
 	}
-	
+
 	public UpdateResult updateLocalFilesFromRepository() throws Exception {
 		VersionControlSystem vcs = VersionControlSystem.getInstance(
 				getRepoType(), versionDir);
 		return vcs.update();
 
 	}
-	
+
 	@Override
 	public String toString() {
 		return getName();

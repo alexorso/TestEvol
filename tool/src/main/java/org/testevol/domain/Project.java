@@ -4,13 +4,10 @@ import java.util.List;
 
 import org.testevol.versioncontrol.VersionControlSystem;
 
-import static org.testevol.versioncontrol.VersionControlSystem.GIT;
-
 public class Project {
 
 	private String name;
-	private String vcs;
-	private String gitUrl;
+	private RepositoryInfo repositoryInfo;
 	private List<Version> versionsList;
 	private List<String> versionsToExecute;
 	private List<String> branchesToCheckout;
@@ -39,30 +36,11 @@ public class Project {
 	public void setName(String name) {
 		this.name = name;
 	}
-
-	public String getVcs() {
-		return vcs;
-	}
-
-	public void setVcs(String vcs) {
-		this.vcs = vcs;
-	}
-
-	public String getGitUrl() {
-		return gitUrl;
-	}
 	
 	public String getUrl() {
-		if(GIT.equals(vcs)){
-			return getGitUrl();	
-		}
-		return null;
+		return repositoryInfo.getUrl();
 	}
-
-	public void setGitUrl(String gitUrl) {
-		this.gitUrl = gitUrl;
-	}
-
+	
 	public List<Version> getVersionsList() {
 		return versionsList;
 	}
@@ -80,7 +58,15 @@ public class Project {
 	}
 
 	public VersionControlSystem getVersionControlSystem(){
-		return VersionControlSystem.getInstance(getVcs(), getUrl());
+		return VersionControlSystem.getInstance(repositoryInfo);
+	}
+	
+	public void setRepositoryInfo(RepositoryInfo repositoryInfo) {
+		this.repositoryInfo = repositoryInfo;
+	}
+	
+	public RepositoryInfo getRepositoryInfo() {
+		return repositoryInfo;
 	}
 	
 	public void setVersionsToExecute(List<String> versionsToExecute) {
@@ -95,15 +81,16 @@ public class Project {
 		if(getName() == null || getName().trim().isEmpty()){
 			return false;
 		}
-		String vcs = getVcs();
+		if(getRepositoryInfo() == null){
+			return false;
+		}
+		String vcs = getRepositoryInfo().getType();
 		if(vcs == null || vcs.trim().isEmpty()){
 			return false;
 		}
-		if(GIT.equals(vcs)){
-			if(getGitUrl() == null || getGitUrl().trim().isEmpty()){
-				return false;
-			}	
-		}
+		if(getUrl() == null || getUrl().trim().isEmpty()){
+			return false;
+		}	
 		if((versionsList == null || versionsList.size() < 2) &&
 		   (branchesToCheckout == null || branchesToCheckout.size() < 2)){
 			return false;

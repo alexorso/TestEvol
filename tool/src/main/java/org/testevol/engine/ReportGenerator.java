@@ -95,7 +95,7 @@ public class ReportGenerator extends Task {
         	Version version = versionPair.getVersion();
         	log.log("Generating report for pair " + oldVersion.getName() + " - " + version.getName());
         	Results results = resultsMap.get(versionPair);
-            CSVReport.generateReport(oldVersion, version, results, reportsFolder);
+            CSVReport.generateReport(oldVersion, version, results, reportsFolder, !skipCoverageAnalysis);
     		new HtmlReport().generateReport(oldVersion, version, results, reportsFolder);
         }
 	

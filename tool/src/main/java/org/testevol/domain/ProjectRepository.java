@@ -22,5 +22,6 @@ public interface ProjectRepository {
 	public void saveExecution(String projectName, String id, String name, ExecutionStatus status) throws Exception;
 	public List<Execution> getExecutions(Project project) throws Exception;
 	public void deleteExecution(String projectName, String id) throws IOException;
+	public void updateVersionSettings(VersionSettings versionSettings) throws Exception;
 	
 }

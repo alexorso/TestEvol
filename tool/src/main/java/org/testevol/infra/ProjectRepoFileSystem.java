@@ -2,6 +2,7 @@ package org.testevol.infra;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Repository;
 import org.testevol.domain.Project;
 import org.testevol.domain.ProjectRepository;
 import org.testevol.domain.Version;
+import org.testevol.domain.VersionSettings;
 import org.testevol.engine.domain.Execution;
 import org.testevol.engine.report.ExecutionStatus;
 import org.testevol.engine.util.Utils;
@@ -49,11 +51,19 @@ public class ProjectRepoFileSystem implements ProjectRepository {
 			throw new RuntimeException("Project already exists");
 		}
 
+		
+		
 		//TODO: implement this inside version object
 		VersionControlSystem versionControlSystem = project
 				.getVersionControlSystem();
 		File projectDir = new File(projectsDir, project.getName());
-		versionControlSystem.checkout(projectDir, project.getBranchesToCheckout());
+		projectDir.mkdirs();		
+		try {
+			versionControlSystem.checkout(projectDir, project.getBranchesToCheckout());
+		} catch (Exception e) {
+			FileUtils.deleteDirectory(projectDir);
+			throw e;
+		}
 	}
 
 	public boolean exists(String projectName) {
@@ -243,6 +253,29 @@ public class ProjectRepoFileSystem implements ProjectRepository {
 	public List<String> getProjectsNames() {
 		return Arrays.asList(projectsDir.list());
 	
+	}
+
+	@Override
+	public void updateVersionSettings(VersionSettings versionSettings) throws Exception {
+		File projectDir = new File(projectsDir, versionSettings.getProject());
+		File versionDir = new File(projectDir, versionSettings.getVersion());
+		
+		Properties properties = new Properties();
+		properties.setProperty(Version.JAVA_SRC, versionSettings.getSource());
+		properties.setProperty(Version.JAVA_RESOURCES, versionSettings.getResource());
+		properties.setProperty(Version.TESTS_SRC, versionSettings.getTestSources());
+		properties.setProperty(Version.TESTS_RESOURCES, versionSettings.getTestResource());
+		properties.setProperty(Version.LIB_DIR, versionSettings.getLib());
+		properties.setProperty(Version.JAVA_VERSION, versionSettings.getJavaversion());
+
+		Version version = new Version(versionDir);
+		File configFile = version.getTestEvolConfigFile();
+		if(configFile.exists()){
+			configFile.delete();
+		}
+		configFile.createNewFile();
+		properties.store(new FileOutputStream(configFile), "TestEvol config" );
+		
 	}
 	
 	

@@ -1,6 +1,9 @@
 package org.testevol.controller;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -9,7 +12,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.eclipse.jgit.api.errors.TransportException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -22,7 +29,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import org.testevol.domain.Project;
 import org.testevol.domain.ProjectRepository;
+import org.testevol.domain.RepositoryInfo;
 import org.testevol.domain.Version;
+import org.testevol.domain.VersionSettings;
 import org.testevol.engine.DataAnalysis;
 import org.testevol.engine.domain.Execution;
 import org.testevol.engine.report.ExecutionStatus;
@@ -157,6 +166,25 @@ public class ProjectController {
 		return mav;
 	}
 	
+	@RequestMapping(value = "{project}/execution/{id}/report/csv", method = RequestMethod.GET)
+	public void getFile( @PathVariable("project") String projectName, 
+						  @PathVariable("id") String id,
+						  HttpServletResponse response) throws Exception {
+		Execution execution = projectRepo.getExecution(projectName, id);
+	    try {
+	      // get your file as InputStream
+	      InputStream is = new FileInputStream(execution.getCSVReport());
+	      // copy it to response's OutputStream
+	      IOUtils.copy(is, response.getOutputStream());
+	      response.setContentType("text/plain");
+	      response.setHeader("Content-Disposition", "attachment; filename="+execution.getName()+".txt");
+	      response.flushBuffer();
+	    } catch (IOException ex) {
+	      throw new RuntimeException("Error while generating Report!");
+	    }
+
+	}
+	
 	@RequestMapping(value="{project}/execution/{id}/report/version",method = RequestMethod.GET)
 	public ModelAndView getDetailedExecutionReport(@PathVariable("project") String projectName, 
 													@PathVariable("id") String id,
@@ -230,26 +258,38 @@ public class ProjectController {
 	}
 
 	@RequestMapping(method = RequestMethod.POST)
-	public String save(@ModelAttribute Project project) throws Exception {
+	public String save(@ModelAttribute Project project, @ModelAttribute RepositoryInfo repositoryInfo) throws Exception {
+		project.setRepositoryInfo(repositoryInfo);
 		projectRepo.save(project);
 		return "redirect:/projects/"+project.getName();
 	}
 	
-	@RequestMapping(value = "getBranches", method = RequestMethod.GET, produces = "application/json")
+	@RequestMapping(value="{project}/version/save_settings", method = RequestMethod.POST)
+	public String saveSettings(@ModelAttribute VersionSettings versionSettings) throws Exception {
+		projectRepo.updateVersionSettings(versionSettings);
+		return "redirect:/projects/"+versionSettings.getProject();
+	}
+	
+	@RequestMapping(value = "getBranches", method = RequestMethod.POST, produces = "application/json")
 	public @ResponseBody
-	Map getBranches(@RequestParam("vcs") String versionControlSystem,
-					@RequestParam("url") String url) {
-
-		VersionControlSystem versionControlSystemInstance = VersionControlSystem
-				.getInstance(versionControlSystem, url);
+	Map getBranches(@ModelAttribute RepositoryInfo repositoryInfo) {
+		VersionControlSystem versionControlSystemInstance = VersionControlSystem.getInstance(repositoryInfo);
 		Map map = new HashMap<String, String>();
 		try {
 			map.put("branches", versionControlSystemInstance.getBranches());
 			map.put("success", true);
-		} catch (Exception e) {
+		} catch (TransportException e) {
+			String message = e.getMessage();
+			if(message.contains("Auth fail") || message.contains("not authorized")){
+				map.put("auth_fail", true);
+			}
+			map.put("success", false);
+			map.put("error",getStringFromException(e));
+		} catch (Exception e){
 			map.put("success", false);
 			map.put("error",getStringFromException(e));
 		}
+		
 		return map;
 	}
 	

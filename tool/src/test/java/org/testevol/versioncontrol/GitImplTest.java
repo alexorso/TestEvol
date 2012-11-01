@@ -5,23 +5,31 @@ import java.util.Arrays;
 
 import junit.framework.Assert;
 
+import org.junit.Ignore;
 import org.junit.Test;
+import org.testevol.domain.RepositoryInfo;
 
 public class GitImplTest {
 
-	//@Test
+	@Test
+	@Ignore
 	public void checkouTest() throws Exception {
-		GitImpl git = new GitImpl("git://github.com/leandroshp/math.git");
+		RepositoryInfo repositoryInfo = new RepositoryInfo();
+		repositoryInfo.setUrl("git://github.com/testevol/google-gson.git");
+		
+		GitImpl git = new GitImpl(repositoryInfo);
 		git.checkout(new File(
-				"/home/leandro/Documents/Atlanta/tmp/Versions/math"), Arrays
-				.asList("refs/heads/v1", "refs/heads/master"));
+				"/tmp/gson"), Arrays
+				.asList("v.1.1", "v.1.0"));
 	}
 
 	@Test
 	public void getBranches() throws Exception {
-		GitImpl git = new GitImpl("git://github.com/testevol/google-gson.git");
-		Assert.assertEquals(Arrays.asList("refs/heads/master",
-				"refs/heads/v.1.1.1", "refs/heads/v.1.1", "refs/heads/v.1.0"),
+		RepositoryInfo repositoryInfo = new RepositoryInfo();
+		repositoryInfo.setUrl("git://github.com/testevol/google-gson.git");
+		
+		GitImpl git = new GitImpl(repositoryInfo);
+		Assert.assertEquals(Arrays.asList("v.1.2","v.1.1","v.1.0"),
 				git.getBranches());
 	}
 

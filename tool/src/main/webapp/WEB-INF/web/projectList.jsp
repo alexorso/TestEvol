@@ -45,14 +45,6 @@
 			<div id="content" class="span10">
 				<!-- content starts -->
 
-
-				<div>
-					<ul class="breadcrumb">
-						<li><a href="#">Home</a> <span class="divider">/</span></li>
-						<li>Projects</li>
-					</ul>
-				</div>
-
 		<div class="row-fluid sortable">		
 				<div class="box span12">
 					<div class="box-header well" data-original-title>
@@ -71,7 +63,7 @@
 							<tr>
 								<td><strong>${project.name}</strong></td>
 								<td style="width:120px;text-align: center" class="center">
-									<a class="btn btn-success" href="<c:url value="/projects/${project.name}"/>" title="Execute TestEvol for this project">
+									<a class="btn btn-success" href="<c:url value="/projects/${project.name}"/>" title="Run TestEvol Analysis for project ${project.name}">
 										<i class="icon-play icon-white"></i>                                            
 									</a>
 									<a class="btn btn-info" href="<c:url value="/projects/${project.name}/executions"/>" title="Show TestEvol executions for project ${project.name}">
