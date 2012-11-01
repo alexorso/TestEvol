@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.testevol</groupId>
-	<artifactId>testevol-web</artifactId>
+	<artifactId>testevol</artifactId>
 	<packaging>war</packaging>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>testevol-web Maven Webapp</name>
@@ -126,7 +126,7 @@
 		</dependency>
 	</dependencies>
 	<build>
-		<finalName>testevol-web</finalName>
+		<finalName>testevol</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -140,6 +140,9 @@
 				<groupId>org.apache.tomcat.maven</groupId>
 				<artifactId>tomcat6-maven-plugin</artifactId>
 				<version>2.0-beta-1</version>
+				<configuration>
+				    <port>8081</port>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.tomcat.maven</groupId>
