@@ -24,6 +24,7 @@ public class GitImplTest {
 	}
 
 	@Test
+	@Ignore
 	public void getBranches() throws Exception {
 		RepositoryInfo repositoryInfo = new RepositoryInfo();
 		repositoryInfo.setUrl("git://github.com/testevol/google-gson.git");
