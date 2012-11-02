@@ -153,9 +153,9 @@ orso@cc.gatech.edu}
   facilitate investigation of test-suite evolution. To tackle this
   problem, we developed \tool, a tool that enables the systematic
   study of test-suite evolution for Java programs and JUnit test
-  cases.  This demo presents \tool and demonstrates its usefulness and
-  practical applicability by showing how \tool\ can be used on
-  real-world software and unit test suites.
+  cases.  This demonstration presents \tool and demonstrates its
+  usefulness and practical applicability by showing how \tool\ can be
+  used on real-world software and unit test suites.
 \end{abstract}
 
 % A category with the (minimum) three required fields
@@ -167,7 +167,7 @@ orso@cc.gatech.edu}
 
 %\keywords{ACM proceedings, \LaTeX, text tagging}
 
-\section{Introduction}
+\section{Motivation and Overview}
 \label{sec:intro}
 
 Test suites are not static entities: they constantly evolve along with
@@ -253,38 +253,44 @@ but rather because they have become obsolete, and that test cases are
 not only added to check bug fixes and test new functionality, as
 expected, but also to validate changes in the code.
 
-This demo presents a tool that implements our technique and that we
-developed to allow other researchers and practitioners to perform
-studies such as we the ones we just summarized. The tool, which is
-called \tool, enables a systematic study of test-suite evolution.
-Given two versions of a program and corresponding test suites, \tool\
-automatically computes differences in the behavior of the test suites
-on the two program versions, classifies the actual repairs performed
-between the two versions, and computes the coverage attained by the
-tests on the versions.
+This demonstration presents a tool that implements our technique and
+that we developed to allow other researchers and practitioners to
+perform studies such as we the ones we just summarized. The tool,
+which is called \tool, enables a systematic study of test-suite
+evolution.  Given two versions of a program and corresponding test
+suites, \tool\ automatically computes differences in the behavior of
+the test suites on the two program versions, classifies the actual
+repairs performed between the two versions, and computes the coverage
+attained by the tests on the versions.
 
-After presenting \tool's features and technical details, the demo
-shows how the tool can be used to study how test suites evolved over
-the years for a software project.  To do so, we show examples of
-application of \tool\ to a set of real-world open-source software
-systems.  Specifically, we show how to use \tool\ to investigate
-relevant questions on test evolution, such as the following ones: What
-types of test-suite changes occur in practice and with what frequency?
-How often do test repairs require complex modifications of the tests?
-Why are tests deleted and added? Overall, we show how \tool\ is a
-useful and practically applicable tool for researchers in the area of
-test repair (and test evolution in general), developers and testers
-who want to better understand their software maintenance process.
+After presenting \tool's features and technical details, the
+demonstration shows how the tool can be used to study how test suites
+evolved over the years for a software project.  To do so, we show
+examples of application of \tool\ to a set of real-world open-source
+software systems.  Specifically, we show how to use \tool\ to
+investigate relevant questions on test evolution, such as the
+following ones: What types of test-suite changes occur in practice and
+with what frequency?  How often do test repairs require complex
+modifications of the tests?  Why are tests deleted and added? Overall,
+we show how \tool\ is a useful and practically applicable tool for
+researchers in the area of test repair (and test evolution in
+general), developers and testers who want to better understand their
+software maintenance process.
 
-\section{Studying Test-Suite Evolution}
+\section{The \tool\ Tool}
 \label{sec:test-evolution}
 
-\subsection{Definitions and Terminology}
-\label{sec:terminology}
+In this section we firs summarize our technique, implemented in the
+\tool\ tool, and then discuss the main characteristics of the tool
+implementation. A detailed description of the approach can be found
+in~\cite{pinto12}.
 
-A \textit{system} $S = (P, T)$ consists of a program $P$ and a test
-suite $T$.  A \textit{test suite} $T = \{t_1, t_2, \ldots, t_n\}$
-consists of a set of unit test cases.
+\subsection{Underlying Technique}
+
+Before describing the characteristics of our technique, we introduce
+some necessary terminology.  A \textit{system} $S = (P, T)$ consists
+of a program $P$ and a test suite $T$.  A \textit{test suite} $T =
+\{t_1, t_2, \ldots, t_n\}$ consists of a set of unit test cases.
 % A unit test case $t$ is a method (or function) and it is identified
 % by its name plus the name of the class it is associated with.
 $\testfunc{P}{t}$ is a function that executes test case $t$ on program
@@ -341,7 +347,7 @@ scenarios can be further classified based on the behavior of $t$ in
 $S$ and $S'$, as summarized in Figure~\ref{fig:study-design} and
 discussed in the rest of this section.
 
-\subsection{Test Modifications}
+\paragraph*{\textbf{Test Modifications}}
 \label{sec:test-mod}
 
 Figure~\ref{fig:study-design}(a) illustrates the scenario in which $t$
@@ -425,7 +431,7 @@ too difficult to fix \\
 \label{fig:study-design}
 \end{figure}
 
-\subsubsection{Category \catrep{} (Repaired Tests)}
+\paragraph{Category \catrep{} (Repaired Tests)}
 \label{sec:category-rep}
 
 The \catrep{} category corresponds to the case where $t$ is repaired
@@ -517,7 +523,7 @@ test to work correctly.
 %% approach would in fact repair broken tests. In this case too, however,
 %% such a solution is in general not enough.
 
-\subsubsection{Category \catref{} (Refactored Tests)}
+\paragraph{Category \catref{} (Refactored Tests)}
 \label{sec:category-c2}
 
 The \catref{} category captures scenarios in which a test $t$ is
@@ -538,7 +544,7 @@ modified in $S'$ even though $t$ passes on $P'$.
 %%   from class Vector3DTest} (Commons Math v2.2),
 %% captionpos=t,frame=tb]{code/TestRef.java}
 
-\subsection{Test Deletions}
+\paragraph*{\textbf{Test Deletions}}
 \label{sec:test-ref}
 
 Figure~\ref{fig:study-design}(b) illustrates the scenario in which a
@@ -546,7 +552,7 @@ test $t$ is deleted. To study the reasons for this, we examine the
 behavior of $t$ on the new program version $P'$ and consider three
 types of behaviors.
 
-\subsubsection{Category \catdelaere{} (Hard-To-Fix Tests)}
+\paragraph{Category \catdelaere{} (Hard-To-Fix Tests)}
 \label{sec:category-delaere}
 
 %%COMMENT PLEASE READ ME: I guess here we should focus more
@@ -566,7 +572,7 @@ to aid the developer might be particularly useful.
 %% manually examining ten randomly selected tests in this category and
 %% found that all the examined tests were in fact obsolete.
 
-\subsubsection{Category \catdelce (Obsolete Tests)}
+\paragraph{Category \catdelce (Obsolete Tests)}
 \label{sec:category-delce}
 
 A test that fails with a compilation error on the new program version
@@ -596,7 +602,7 @@ simply because the tested methods were no longer present.
 %% methods, which requires the development of new tests rather than fixes
 %% to the existing ones.
 
-\subsubsection{Category \catdelp: (Redundant Tests)}
+\paragraph{Category \catdelp: (Redundant Tests)}
 \label{sec:category-delp}
 
 This category includes tests that are removed even though they pass on
@@ -620,7 +626,7 @@ replaced with a different one.
 %%   test implemented to replace the removed one} (Commons Lang
 %% v2.2),frame=tb] {code/TestDel-PII.java}
 
-\subsection{Test Additions}
+\paragraph*{\textbf{Test Additions}}
 \label{sec:test-add}
 
 Figure~\ref{fig:study-design}(c) illustrates the cases of test-suite
@@ -628,7 +634,7 @@ augmentation, where a new test $t'$ is added to the test suite. The
 behavior of $t'$ on the old program can indicate the reason why it may
 have been added.
 
-\subsubsection{Category \cataddaere: (Bug-Fix Tests)}
+\paragraph{Category \cataddaere: (Bug-Fix Tests)}
 \label{sec:category-addaere}
 
 This category includes added tests that fail on $P$ with a runtime
@@ -652,7 +658,7 @@ to the test suite to validate the bug fix.
 %% captionpos=t,frame=tb]{code/TestAdd-AeRe.java}
 %% % \end{figure}
 
-\subsubsection{Category \cataddce (New-Features Tests)}
+\paragraph{Category \cataddce (New-Features Tests)}
 \label{sec:category-addce}
 
 The added tests in this category fail on $P$ with a compilation error,
@@ -669,7 +675,7 @@ likely, to add new functionality.
 %%   test from class TimeSeriesTests} (JFreeChart v1.0.14),
 %% captionpos=t,frame=tb]{code/TestAdd-Ce.java}
 
-\subsubsection{Category \cataddp (Coverage-Augmentation Tests)}
+\paragraph{Category \cataddp (Coverage-Augmentation Tests)}
 \label{sec:category-addp}
 
 This category considers cases where the added test $t'$ passes on
@@ -693,24 +699,65 @@ modified code).
 %% from class XYErrorRendererTests} (JFreeChart v1.0.14),frame=tb]
 %% {code/TestAdd-P.java}
 
-\section{Implementation of \tool}
+\section{Implementation}
 \label{sec:implementation}
 
-\todo{Add the discussion of clone analysis.}
+% \todo{Add the discussion of clone analysis.}
+% \todo{In general, add more details.}
+% \todo{Discuss the availability of the tool.}
 
-\todo{In general, add more details.}
+In our demonstration, we show an implementation of our technique,
+\tool, that works for Java programs and JUnit test suites ({\small
+  \url{http://www.junit.org/}}). We chose Java and JUnit because the
+former is a widely used language, and the latter is the de-facto
+standard unit-testing framework for Java.  \tool\ analyzes a sequence
+of versions of a software system, where each version consists of
+application code and test code and can be an actual release or an
+internal build.
 
-\todo{Discuss the availability of the tool.}
+\tool\ is implemented as a Java based web application that runs on
+Apache Tomcat ({\small \url{http://tomcat.apache.org/}}). Although the
+tool can be installed locally, using a local server, users who want to
+get familiar with \tool\ without having to install it can access it
+remotely on our servers. The tool is currently available at {\small
+  \url{http://cheetah.cc.gt.atl.ga.us:8081/testevol/}}, and
+unregistered users can access the tool using account ``icse'', with
+password ``icse2013''.
 
-We implemented our approach for studying test suite evolution in a
-tool, called \tool, which facilitates a systematic study of test-suite
-evolution for Java programs and JUnit test suites.  \tool\ analyzes a
-sequence of versions of a software system, where each version consists
-of application code and test code. The versions can be actual releases
-or internal builds.  \tool\ consists of five components, as
-illustrated in the architecture diagram shown in
-Figure~\ref{fig:trex}.
+Due to space limitations, we can only provide a few examples of
+\tool's graphical interface. The companion video demonstration for
+this paper illustrates the tool interface in full detail. Figure...
 
+\begin{figure}[t]
+	\centering
+	\includegraphics[width=\columnwidth]{1-summary}
+        \vspace*{-16pt}
+	\caption{TBD.}
+        \vspace*{-8pt}
+	\label{fig:summary}
+\end{figure}
+
+\begin{figure}[t]
+	\centering
+	\includegraphics[width=\columnwidth]{2-versiondetails}
+        \vspace*{-16pt}
+	\caption{TBD.}
+        \vspace*{-8pt}
+	\label{fig:versiondetails}
+\end{figure}
+
+\begin{figure}[t]
+	\centering
+	\includegraphics[width=\columnwidth]{3-testdetails}
+        \vspace*{-16pt}
+	\caption{TBD.}
+        \vspace*{-8pt}
+	\label{fig:testdetails}
+\end{figure}
+
+\tool\ consists of five components, as illustrated in the architecture
+diagram shown in Figure~\ref{fig:trex}. 
+%
 The \emph{compiler} component builds each system version and creates
 two jar files, one containing the application classes and the other
 containing the test classes.
@@ -748,7 +795,7 @@ attained by the new test suite.
 
 \begin{figure}
 	\centering
-	\includegraphics[width=\columnwidth]{architecture.png}
+	\includegraphics[width=\columnwidth]{architecture}
         \vspace*{-16pt}
 	\caption{High-level architecture of \tool.}
         \vspace*{-8pt}
@@ -767,15 +814,16 @@ techniques (\eg \cite{Daniel:2009, Daniel:2010, Mirzaaghaei:2012}).
 To support the development of more effective repair techniques, we
 developed \tool, a tool for systematic investigation of test-suite
 evolution that can provide its users with a comprehensive
-understanding of how test cases evolve. In this demo, we present
-\tool, its main features, and its technical characteristics. We also
-demonstrate how \tool\ can be run on real-world software systems and
-produce a wealth of useful information, such as the types of
-test-suite changes that occur, the frequency of the changes, and why
-tests are deleted and added.  Overall, we show how \tool\ is a useful
-tool not only for researchers working in the area of test repair, and
-test evolution in general, but also for developers and testers who
-wish to understand their software systems better.
+understanding of how test cases evolve. In this demonstration, we
+present \tool, its main features, and its technical
+characteristics. We also demonstrate how \tool\ can be run on
+real-world software systems and produce a wealth of useful
+information, such as the types of test-suite changes that occur, the
+frequency of the changes, and why tests are deleted and added.
+Overall, we show how \tool\ is a useful tool not only for researchers
+working in the area of test repair, and test evolution in general, but
+also for developers and testers who wish to understand their software
+systems better.
 
 % \section*{Acknowledgments}
 
