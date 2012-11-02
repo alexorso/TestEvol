@@ -62,7 +62,7 @@
 					<ul class="breadcrumb">
 						<li><a href="<c:url value="/projects/list"/>">Projects</a><span class="divider">/</span></li>
 						<li><a href="<c:url value="/projects/${execution.project.name}"/>">Project ${execution.project.name}</a><span class="divider">/</span></li>
-						<li><a href="<c:url value="/projects/${execution.project.name}/executions"/>">Executions</a><span class="divider">/</span></li>
+						<li><a href="<c:url value="/projects/${execution.project.name}/executions"/>">Analysis</a><span class="divider">/</span></li>
 						<li><a href="<c:url value="/projects/${execution.project.name}/execution/${execution.id}"/>">${execution.name}</a><span class="divider">/</span></li>
 						<li><a href="<c:url value="/projects/${execution.project.name}/execution/${execution.id}/report"/>">Summary report</a><span class="divider">/</span></li>
 						<li id="titleName">Detailed report for versions <span id="oldVersionTitle"></span> and <span id="newVersionTitle"></span></li>

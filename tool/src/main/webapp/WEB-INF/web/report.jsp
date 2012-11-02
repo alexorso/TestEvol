@@ -31,7 +31,7 @@
 					<ul class="breadcrumb">
 						<li><a href="<c:url value="/projects/list"/>">Projects</a><span class="divider">/</span></li>
 						<li><a href="<c:url value="/projects/${execution.project.name}"/>">Project ${execution.project.name}</a><span class="divider">/</span></li>
-						<li><a href="<c:url value="/projects/${execution.project.name}/executions"/>">Executions</a><span class="divider">/</span></li>
+						<li><a href="<c:url value="/projects/${execution.project.name}/executions"/>">Analysis</a><span class="divider">/</span></li>
 						<li><a href="<c:url value="/projects/${execution.project.name}/execution/${execution.id}"/>">${execution.name}</a><span class="divider">/</span></li>												
 						<li id="titleName">Summary report</li>
 					</ul>
@@ -40,7 +40,7 @@
 				<div class="row-fluid sortable">
 					<div class="box span12">
 						<div class="box-header well" data-original-title>
-						<h2><i class="icon-inbox"></i> Summary for Project ${execution.project.name} - Execution "${execution.name}"</h2>
+						<h2><i class="icon-inbox"></i> Summary for Project ${execution.project.name} - Analysis "${execution.name}"</h2>
 						<div class="box-icon">
 							<a href="<c:url value="/projects/${execution.project.name}/execution/${execution.id}/report/csv"/>" class="btn btn-round" title="Click here to download the report as a text file." data-rel="tooltip"><i class="icon-download"></i></a>
 						</div>

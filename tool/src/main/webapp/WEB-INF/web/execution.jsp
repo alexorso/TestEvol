@@ -52,7 +52,7 @@
 					<ul class="breadcrumb">
 						<li><a href="<c:url value="/projects/list"/>">Projects</a><span class="divider">/</span></li>
 						<li><a href="<c:url value="/projects/${execution.project.name}"/>">Project ${execution.project.name}</a><span class="divider">/</span></li>
-						<li><a href="<c:url value="/projects/${execution.project.name}/executions"/>">Executions</a><span class="divider">/</span></li>						
+						<li><a href="<c:url value="/projects/${execution.project.name}/executions"/>">Analysis</a><span class="divider">/</span></li>						
 						<li id="titleName">${execution.name}</li>
 					</ul>
 				</div>
@@ -62,7 +62,7 @@
 						<div class="box-content">
 							<form class="form-horizontal" action="projects" method="POST" onsubmit="return validate();">
 								<fieldset>
-									<legend>TestEvol Execution</legend>
+									<legend>TestEvol Analysis</legend>
 									<div class="control-group" style="margin-bottom:10px;" id="nameDiv">
 										<label class="control-label" for="executionName">Name</label>
 										<div class="controls">
@@ -94,7 +94,7 @@
 										<div class="alert alert-info">
 											<div>
 												<br/>
-												<strong style="font-size: 18px;">Execution Output</strong><br/><br/>
+												<strong style="font-size: 18px;">Analysis Output</strong><br/><br/>
 												<div id="log_message">${execution.executionLog}</div>
 											</div>
 										</div>
@@ -206,7 +206,7 @@
 				  		function(data){saveNameCallback(data, name);});
 			 }
 			 else{
-				 toggleError('show', 'Execution name is required!');
+				 toggleError('show', 'Analysis name is required!');
 			 }
 		}
 		

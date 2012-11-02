@@ -174,7 +174,7 @@ public class ProjectRepoFileSystem implements ProjectRepository {
 				}
 			}
 			
-			Execution execution = new Execution(project, "Untitled execution", reportDir, Calendar.getInstance().getTimeInMillis(), versions, ExecutionStatus.INITIALIZED);
+			Execution execution = new Execution(project, "New Analysis", reportDir, Calendar.getInstance().getTimeInMillis(), versions, ExecutionStatus.INITIALIZED);
 			execution.saveProperties(new File(reportDir, EXECUTION_PROPERTIES));
 			
 			return execution;

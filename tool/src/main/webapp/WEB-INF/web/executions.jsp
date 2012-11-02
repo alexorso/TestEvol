@@ -39,14 +39,14 @@
 					<ul class="breadcrumb">
 						<li><a href="<c:url value="/projects/list"/>">Projects</a><span class="divider">/</span></li>
 						<li><a href="<c:url value="/projects/${project.name}"/>">Project ${project.name}</a><span class="divider">/</span></li>
-						<li> Executions</li>
+						<li> Analysis</li>
 					</ul>
 				</div>
 
 		<div class="row-fluid sortable">		
 				<div class="box span12">
 					<div class="box-header well" data-original-title>
-						<h2><i class="icon-tasks"></i> Executions</h2>
+						<h2><i class="icon-tasks"></i>  Analysis</h2>
 					</div>
 					<form action="${project.name}/execute" method="POST">
 					<div class="box-content">
@@ -99,7 +99,7 @@
 		<div class="modal hide fade" id="myModal">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal" id="close">×</button>
-				<h3 id="titleModal">Delete Execution</h3>
+				<h3 id="titleModal">Delete Analysis</h3>
 			</div>
 			<div class="modal-body">
 				<p id="bodyModal"></p>
@@ -123,7 +123,7 @@
 			addFeedbackMessage();
 			$(function(){
 				if(successExecution()){
-					showFeedbackMessage('Execution deleted successfully!');					
+					showFeedbackMessage('Analysis deleted successfully!');					
 				}
 				else{
 					showFeedbackMessage('An exception was thrown while deleting the Execution!');
@@ -135,7 +135,7 @@
 		//var closeClickEvent	
 		function deleteExecution(projectName, executionId, executionName){
 						
-			$("#titleModal").html("Delete Execution "+executionName);
+			$("#titleModal").html("Delete Analysis "+executionName);
 			$("#bodyModal").html("Are you sure you want to delete the execution "+executionName+"?");
 			
 			document.getElementById("modalButton").href='<c:url value="/projects/"/>'+projectName+'/execution/'+executionId+'/delete';
