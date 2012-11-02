@@ -46,7 +46,7 @@ public class ProjectRepoFileSystem implements ProjectRepository {
 	private File getProjectsDir(String user) throws IOException{
 		File userDir = new File(projectsDir, user);
 		if(!userDir.exists()){
-			userDir.createNewFile();
+			userDir.mkdirs();
 		}
 		return userDir;
 	}
