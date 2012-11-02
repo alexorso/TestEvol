@@ -87,6 +87,8 @@ public class ProjectController {
 	public String execute(@PathVariable("project") final String projectName,
 			final @ModelAttribute Project projectModel, final Principal principal)
 			throws Exception {
+		
+		final String username = principal.getName();
 
 		final Execution execution = projectRepo.createExecution(projectName,
 				projectModel.getVersionsToExecute(), principal.getName());
@@ -109,16 +111,16 @@ public class ProjectController {
 						!projectModel.isIncludeCoverageAnalysis());
 				try {
 					projectRepo.saveExecution(projectName, execution.getId(),
-							execution.getName(), ExecutionStatus.RUNNING, principal.getName());
+							execution.getName(), ExecutionStatus.RUNNING, username);
 					dataAnalysis.start();
 					projectRepo.saveExecution(projectName, execution.getId(),
-							execution.getName(), ExecutionStatus.SUCCESS, principal.getName());
+							execution.getName(), ExecutionStatus.SUCCESS, username);
 				} catch (Exception e) {
 					e.printStackTrace();
 					try {
 						projectRepo.saveExecution(projectName,
 								execution.getId(), execution.getName(),
-								ExecutionStatus.ERROR, principal.getName());
+								ExecutionStatus.ERROR, username);
 					} catch (Exception e1) {
 					}
 				}
