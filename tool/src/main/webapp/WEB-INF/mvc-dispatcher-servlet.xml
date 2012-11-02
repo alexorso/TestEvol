@@ -1,13 +1,15 @@
 <beans xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns="http://www.springframework.org/schema/beans"
+	xmlns="http://www.springframework.org/schema/beans" xmlns:security="http://www.springframework.org/schema/security"
 	xsi:schemaLocation="
         http://www.springframework.org/schema/beans     
         http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
         http://www.springframework.org/schema/context 
         http://www.springframework.org/schema/context/spring-context-3.0.xsd
         http://www.springframework.org/schema/mvc
-        http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
+        http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+        http://www.springframework.org/schema/security
+		http://www.springframework.org/schema/security/spring-security-3.1.xsd">
 
 	<context:component-scan base-package="org.testevol.controller" />
 	<context:component-scan base-package="org.testevol.domain" />
@@ -37,10 +39,28 @@
 		<property name="suffix" value=".jsp" />
 	</bean>
 
-	<!-- <bean id="libraryDao" class="it.readit.infra.LibraryJdbcDao"> <property 
-		name="dataSource" ref="dataSource" /> </bean> <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" 
-		destroy-method="close"> <property name="driverClassName" value="org.postgresql.Driver" 
-		/> <property name="url" value="dbc:postgresql://ec2-23-21-107-210.compute-1.amazonaws.com:5432/d64h21qjbmdt2j?user=zqorqvdjouqaqp&amp;password=wevMv9sthQo8syxiJqH1JK95qj&amp;ssl=true&amp;sslfactory=org.postgresql.ssl.NonValidatingFactory" 
-		/> <property name="username" value="zqorqvdjouqaqp" /> <property name="password" 
-		value="wevMv9sthQo8syxiJqH1JK95qj" /> </bean> -->
+	<security:http auto-config="true">
+		<security:intercept-url pattern="/projects/**"
+			access="ROLE_USER" />
+		<security:form-login login-page="/login"
+							 default-target-url="/projects/list"
+							 authentication-failure-url="/login?success=false" />
+		<security:logout logout-success-url="/login" />
+		
+	</security:http>
+
+	<security:authentication-manager>
+		<security:authentication-provider>
+			<security:password-encoder hash="sha" />
+			<security:user-service>
+                              <security:user name="icse"
+                                        password="5ea31ff90aab047dcc26272004960e9de8a1b704" authorities="ROLE_USER" />
+				<security:user name="alex"
+					password="5ea31ff90aab047dcc26272004960e9de8a1b704" authorities="ROLE_USER" />
+                              <security:user name="leandro"
+                                        password="5ea31ff90aab047dcc26272004960e9de8a1b704" authorities="ROLE_USER" />
+
+			</security:user-service>
+		</security:authentication-provider>
+	</security:authentication-manager>
 </beans>

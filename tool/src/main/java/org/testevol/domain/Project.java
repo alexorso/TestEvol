@@ -12,69 +12,68 @@ public class Project {
 	private List<String> versionsToExecute;
 	private List<String> branchesToCheckout;
 	private boolean includeCoverageAnalysis;
-	
-	public boolean isIncludeCoverageAnalysis() {
-		return includeCoverageAnalysis;
-	}
 
-	public void setIncludeCoverageAnalysis(boolean includeCoverageAnalysis) {
-		this.includeCoverageAnalysis = includeCoverageAnalysis;
-	}
+	public Project() {}
 
-	public Project() {
-	}
 	
 	public Project(String name) {
-		super();
 		this.name = name;
+	}
+
+	public List<String> getBranchesToCheckout() {
+		return branchesToCheckout;
 	}
 	
 	public String getName() {
 		return name;
 	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
 	
+	public RepositoryInfo getRepositoryInfo() {
+		return repositoryInfo;
+	}
+
 	public String getUrl() {
 		return repositoryInfo.getUrl();
+	}
+	
+	public VersionControlSystem getVersionControlSystem(){
+		return VersionControlSystem.getInstance(repositoryInfo);
 	}
 	
 	public List<Version> getVersionsList() {
 		return versionsList;
 	}
 
-	public void setVersionsList(List<Version> versionsList) {
-		this.versionsList = versionsList;
+	public List<String> getVersionsToExecute() {
+		return versionsToExecute;
+	}
+	
+	public boolean isIncludeCoverageAnalysis() {
+		return includeCoverageAnalysis;
 	}
 	
 	public void setBranchesToCheckout(List<String> branchesToCheckout) {
 		this.branchesToCheckout = branchesToCheckout;
 	}
-	
-	public List<String> getBranchesToCheckout() {
-		return branchesToCheckout;
-	}
 
-	public VersionControlSystem getVersionControlSystem(){
-		return VersionControlSystem.getInstance(repositoryInfo);
+	public void setIncludeCoverageAnalysis(boolean includeCoverageAnalysis) {
+		this.includeCoverageAnalysis = includeCoverageAnalysis;
+	}
+	
+	public void setName(String name) {
+		this.name = name;
 	}
 	
 	public void setRepositoryInfo(RepositoryInfo repositoryInfo) {
 		this.repositoryInfo = repositoryInfo;
 	}
 	
-	public RepositoryInfo getRepositoryInfo() {
-		return repositoryInfo;
+	public void setVersionsList(List<Version> versionsList) {
+		this.versionsList = versionsList;
 	}
 	
 	public void setVersionsToExecute(List<String> versionsToExecute) {
 		this.versionsToExecute = versionsToExecute;
-	}
-	
-	public List<String> getVersionsToExecute() {
-		return versionsToExecute;
 	}
 	
 	public boolean validate() {

@@ -160,9 +160,11 @@
 		var projects = [];
 		var loaded=true;
 		
-		$.get('<c:url value="/projects/names"/>', function(data) {
+		if((typeof load_projects == 'undefined') || load_projects){
+			$.get('<c:url value="/projects/names"/>', function(data) {
 				loadProjects(data);
-		});
+			});			
+		}
 
 		function loadProjects(data) {
 			for ( var i = 0; i < data.length; i++) {

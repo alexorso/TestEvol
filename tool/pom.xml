@@ -124,6 +124,24 @@
 			<!-- <exclusions> <exclusion> <groupId>junit</groupId> <artifactId>junit</artifactId> 
 				</exclusion> </exclusions> -->
 		</dependency>
+		<!-- Spring Security -->
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-core</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-web</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-config</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>testevol</finalName>
@@ -141,7 +159,7 @@
 				<artifactId>tomcat6-maven-plugin</artifactId>
 				<version>2.0-beta-1</version>
 				<configuration>
-				    <port>8081</port>
+					<port>8081</port>
 				</configuration>
 			</plugin>
 			<plugin>

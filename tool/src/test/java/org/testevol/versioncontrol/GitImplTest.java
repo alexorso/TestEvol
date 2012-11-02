@@ -29,7 +29,7 @@ public class GitImplTest {
 		repositoryInfo.setUrl("git://github.com/testevol/google-gson.git");
 		
 		GitImpl git = new GitImpl(repositoryInfo);
-		Assert.assertEquals(Arrays.asList("v.1.2","v.1.1","v.1.0"),
+		Assert.assertEquals(Arrays.asList("v.1.2.2","v.1.2.1","v.1.2","v.1.1","v.1.0"),
 				git.getBranches());
 	}
 

@@ -1,3 +1,5 @@
+<%@page import="org.springframework.security.core.context.SecurityContextHolder"%>
+<%@page import="org.springframework.security.core.Authentication"%>
 <div class="navbar">
 	<div class="navbar-inner">
 		<div class="container-fluid">
@@ -41,14 +43,19 @@
 
 			<!-- user dropdown starts -->
 			<div class="btn-group pull-right">
+				<%
+					Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			      	String name = auth.getName(); //get logged in username
+				%>
+			
 				<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-					<i class="icon-user"></i><span class="hidden-phone"> guest </span>
+					<i class="icon-user"></i><span class="hidden-phone"> <%=name %> </span>
 					<span class="caret"></span>
 				</a>
 				<ul class="dropdown-menu">
-					<li><a href="#">Profile</a></li>
-					<li class="divider"></li>
-					<li><a href="<c:url value="/"/>">Logout</a></li>
+					<!-- <li><a href="#">Profile</a></li> 
+					<li class="divider"></li>-->
+					<li><a href="<c:url value="/j_spring_security_logout"/>">Logout</a></li>
 				</ul>
 			</div>
 			<!-- user dropdown ends -->

@@ -31,32 +31,38 @@ public class ProjectRepoFileSystem implements ProjectRepository {
 
 	private static final String EXECUTION_PROPERTIES = "execution.properties";
 	private static final String EXECUTIONS_DIR = "reports";
+	
 	private File projectsDir = null;
-
+	
 	@Autowired
-	public ProjectRepoFileSystem(
-			@Value("#{testEvolProperties.projects_dir}") String dir) {
+	public ProjectRepoFileSystem(@Value("#{testEvolProperties.projects_dir}") String dir) {
 		projectsDir = new File(dir);
 		if (!projectsDir.exists()) {
 			projectsDir.mkdirs();
 		}
 
 	}
+	
+	private File getProjectsDir(String user) throws IOException{
+		File userDir = new File(projectsDir, user);
+		if(!userDir.exists()){
+			userDir.createNewFile();
+		}
+		return userDir;
+	}
 
-	public void save(Project project) throws Exception {
+	public void save(Project project, String user) throws Exception {
 		if (!project.validate()) {
 			throw new RuntimeException("Missing requried fields");
 		}
-		if (exists(project.getName())) {
+		if (exists(project.getName(), user)) {
 			throw new RuntimeException("Project already exists");
 		}
 
-		
-		
 		//TODO: implement this inside version object
 		VersionControlSystem versionControlSystem = project
 				.getVersionControlSystem();
-		File projectDir = new File(projectsDir, project.getName());
+		File projectDir = new File(getProjectsDir(user), project.getName());
 		projectDir.mkdirs();		
 		try {
 			versionControlSystem.checkout(projectDir, project.getBranchesToCheckout());
@@ -66,13 +72,13 @@ public class ProjectRepoFileSystem implements ProjectRepository {
 		}
 	}
 
-	public boolean exists(String projectName) {
-		File projectDir = new File(projectsDir, projectName);
+	public boolean exists(String projectName, String user) throws Exception {
+		File projectDir = new File(getProjectsDir(user), projectName);
 		return projectDir.exists();
 	}
 
-	public Project getProject(String projectName) throws Exception{
-		File f = new File(projectsDir,projectName);
+	public Project getProject(String projectName, String user) throws Exception{
+		File f = new File(getProjectsDir(user),projectName);
 		Project project = new Project();
 		project.setName(projectName);
 		File[] files = f.listFiles();
@@ -107,23 +113,24 @@ public class ProjectRepoFileSystem implements ProjectRepository {
 		return project;
 	}
 
-	public List<Project> getProjects() {
-		String[] projectsName = projectsDir.list();
+	public List<Project> getProjects(String user) throws Exception {
+		String[] projectsName = getProjectsDir(user).list();
 		List<Project> projects = new ArrayList<Project>();
-		for(String projectName:projectsName){
-			projects.add(new Project(projectName));
-		}
-		
+		if(projectsName != null){
+			for(String projectName:projectsName){
+				projects.add(new Project(projectName));
+			}			
+		}		
 		return projects;
 	}
 
-	public void deleteProject(String projectName) throws IOException {
-		File projectDir = new File(projectsDir, projectName);
+	public void deleteProject(String projectName, String user) throws IOException {
+		File projectDir = new File(getProjectsDir(user), projectName);
 		FileUtils.deleteDirectory(projectDir);
 	}
 
-	public void deleteVersion(String projectName, String versionName) throws Exception {
-		File projectDir = new File(projectsDir, projectName);
+	public void deleteVersion(String projectName, String versionName, String user) throws Exception {
+		File projectDir = new File(getProjectsDir(user), projectName);
 		File versionDir = new File(projectDir,versionName);
 		
 		Version version = new Version(versionDir);
@@ -141,21 +148,21 @@ public class ProjectRepoFileSystem implements ProjectRepository {
 		}
 	}
 
-	public UpdateResult updateRepo(String projectName, String versionName) throws Exception {
-		File projectDir = new File(projectsDir, projectName);
+	public UpdateResult updateRepo(String projectName, String versionName, String user) throws Exception {
+		File projectDir = new File(getProjectsDir(user), projectName);
 		File versionDir = new File(projectDir,versionName);
 		Version version = new Version(versionDir);
 		return version.updateLocalFilesFromRepository();
 	}
 
 	@Override
-	public Execution createExecution(String projectName, List<String> versionsToExecute) throws Exception {
+	public Execution createExecution(String projectName, List<String> versionsToExecute, String user) throws Exception {
 		File reportDir = null;
 		try{
-			Project project = getProject(projectName);
+			Project project = getProject(projectName, user);
 			project.setVersionsToExecute(versionsToExecute);
 			
-			File projectDir = new File(projectsDir, project.getName());
+			File projectDir = new File(getProjectsDir(user), project.getName());
 			reportDir = Utils.getTempDir(new File(projectDir, EXECUTIONS_DIR));
 			reportDir.mkdirs();
 		
@@ -182,9 +189,9 @@ public class ProjectRepoFileSystem implements ProjectRepository {
 	}
 
 	@Override
-	public Execution getExecution(String projectName, String executionId) throws Exception {
-		Project project = getProject(projectName);
-		File executionDir = getExecutionDir(projectName, executionId);
+	public Execution getExecution(String projectName, String executionId, String user) throws Exception {
+		Project project = getProject(projectName, user);
+		File executionDir = getExecutionDir(projectName, executionId,user);
 		Properties properties = new Properties();
 		properties.load(new FileInputStream(new File(executionDir, EXECUTION_PROPERTIES)));	
 		String executionLog = "";
@@ -196,15 +203,15 @@ public class ProjectRepoFileSystem implements ProjectRepository {
 		return new Execution(project, executionDir, properties).setExecutionLog(executionLog);
 	}
 	
-	private File getExecutionDir(String projectName, String executionId){
-		File projectDir = new File(projectsDir, projectName);
+	private File getExecutionDir(String projectName, String executionId, String user) throws IOException{
+		File projectDir = new File(getProjectsDir(user), projectName);
 		File executions = new File(projectDir, EXECUTIONS_DIR);
 		return new File(executions,executionId);
 	}
-
+	
 	@Override
-	public void saveExecution(String projectName, String executionId, String name, ExecutionStatus status) throws Exception {
-		Execution execution = getExecution(projectName, executionId);
+	public void saveExecution(String projectName, String executionId, String name, ExecutionStatus status, String user) throws Exception {
+		Execution execution = getExecution(projectName, executionId, user);
 		if(name != null){
 			execution.setName(name);	
 		}
@@ -216,8 +223,8 @@ public class ProjectRepoFileSystem implements ProjectRepository {
 	}
 
 	@Override
-	public List<Execution> getExecutions(Project project) throws Exception {
-		File projectDir = new File(projectsDir,project.getName());
+	public List<Execution> getExecutions(Project project, String user) throws Exception {
+		File projectDir = new File(getProjectsDir(user),project.getName());
 		File executionsDir = new File(projectDir, EXECUTIONS_DIR);
 		
 		List<Execution> executions = new ArrayList<Execution>();
@@ -241,8 +248,8 @@ public class ProjectRepoFileSystem implements ProjectRepository {
 	}
 
 	@Override
-	public void deleteExecution(String projectName, String id) throws IOException {
-		File projectDir = new File(projectsDir, projectName);
+	public void deleteExecution(String projectName, String id, String user) throws IOException {
+		File projectDir = new File(getProjectsDir(user), projectName);
 		File executionsDir = new File(projectDir, EXECUTIONS_DIR);
 		File executionDir = new File(executionsDir,id);
 		
@@ -250,14 +257,14 @@ public class ProjectRepoFileSystem implements ProjectRepository {
 	}
 
 	@Override
-	public List<String> getProjectsNames() {
-		return Arrays.asList(projectsDir.list());
+	public List<String> getProjectsNames(String user) throws Exception {
+		return Arrays.asList(getProjectsDir(user).list());
 	
 	}
 
 	@Override
-	public void updateVersionSettings(VersionSettings versionSettings) throws Exception {
-		File projectDir = new File(projectsDir, versionSettings.getProject());
+	public void updateVersionSettings(VersionSettings versionSettings, String user) throws Exception {
+		File projectDir = new File(getProjectsDir(user), versionSettings.getProject());
 		File versionDir = new File(projectDir, versionSettings.getVersion());
 		
 		Properties properties = new Properties();
