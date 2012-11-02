@@ -226,40 +226,55 @@ understanding, we risk to develop techniques that may not be generally
 applicable and may not perform the kind of repairs that are actually
 needed in real-world software systems.
 
-To the best of our knowledge, to date there are no studies in the
-literature that investigate how unit test suites evolve. To address
-this issue, we defined a technique~\cite{pinto12} that combines
-various static- and dynamic-analysis techniques to compute the
-differences between the test suites associated with two versions of a
-program and categorize such changes along two dimensions: the static
-differences between the tests in the two test suites and the
-behavioral differences between such tests.
+More generally, the ability to analyze how test suites evolve can be
+beneficial for developers, as it can help them better understand the
+cost and tradeoffs of test evolution. Similarly, project managers can
+use information about test-suite evolution to get insight into the
+test maintenance process (\eg how often tests are deleted and cause
+oss of coverage, how often tests must be adapted because of changes in
+the system's API) and ultimately improve it.
 
-We implemented our technique in a tool, \tool, which enables a
-systematic study of test-suite evolution. \tool\ targets Java programs
-and JUnit test suites, as Java is a widely used language and JUnit is
-the de-facto standard unit-testing framework for Java.  Given two
-versions of a program and its test suite, \tool\ automatically
-computes differences in the behavior of the test suites on the two
-program versions, classifies the actual repairs performed between the
-versions, and computes the coverage attained by the tests on the two
-program versions.
+Until recently there were no empirical studies in the literature that
+investigated how unit test suites evolve and tools that could support
+such studies. To address this issue, we defined a technique that
+combines various static- and dynamic-analysis techniques to compute
+the differences between the test suites associated with two versions
+of a program and categorize such changes along two dimensions: the
+static differences between the tests in the two test suites and the
+behavioral differences between such tests~\cite{pinto12}. Applying our
+technique to a number of real-world programs, we were able to discover
+several important aspects of test evolution. For example, we found
+evidence that, although test repairs are a relatively small fraction
+of the activities performed during test evolution, they are indeed
+relevant.  We also found that repair techniques that just focus on
+oracles (\ie assertions) are likely to be inapplicable in many cases,
+that test cases are rarely removed because they are difficult to fix,
+but rather because they have become obsolete, and that test cases are
+not only added to check bug fixes and test new functionality, as
+expected, but also to validate changes in the code.
 
-In this demo, we present \tool, its features and technical details,
-and show how it can be used to study how test suites evolved over the
-years for a project.  To do so, we will show examples of application
-of the tool to a set of real-world open-source software systems.
-Specifically, we will show how to use \tool\ to investigate relevant
-questions on test evolution, such as: What types of test-suite changes
-occur in practice and with what frequency? How often do test repairs
-require complex modifications of the tests? Why are tests deleted and
-added? Overall, we will show how \tool\ is a useful tool not only for
-researchers in the area of test repair (and test evolution in
-general), but also to developers and testers who want to better
-understand their software systems.
+This demo presents a tool that implements our technique and that we
+developed to allow other researchers and practitioners to perform
+studies such as we the ones we just summarized. The tool, which is
+called \tool, enables a systematic study of test-suite evolution.
+Given two versions of a program and corresponding test suites, \tool\
+automatically computes differences in the behavior of the test suites
+on the two program versions, classifies the actual repairs performed
+between the two versions, and computes the coverage attained by the
+tests on the versions.
 
-\todo{Discuss \tool's availability at
-  \url{http://cheetah.cc.gt.atl.ga.us:8081/testevol/}}.
+After presenting \tool's features and technical details, the demo
+shows how the tool can be used to study how test suites evolved over
+the years for a software project.  To do so, we show examples of
+application of \tool\ to a set of real-world open-source software
+systems.  Specifically, we show how to use \tool\ to investigate
+relevant questions on test evolution, such as the following ones: What
+types of test-suite changes occur in practice and with what frequency?
+How often do test repairs require complex modifications of the tests?
+Why are tests deleted and added? Overall, we show how \tool\ is a
+useful and practically applicable tool for researchers in the area of
+test repair (and test evolution in general), developers and testers
+who want to better understand their software maintenance process.
 
 \section{Studying Test-Suite Evolution}
 \label{sec:test-evolution}
