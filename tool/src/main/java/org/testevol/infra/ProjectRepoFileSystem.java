@@ -30,7 +30,7 @@ import org.testevol.versioncontrol.VersionControlSystem;
 public class ProjectRepoFileSystem implements ProjectRepository {
 
 	private static final String EXECUTION_PROPERTIES = "execution.properties";
-	private static final String EXECUTIONS_DIR = "reports";
+	private static final String EXECUTIONS_DIR = "executions";
 	
 	private File projectsDir = null;
 	
