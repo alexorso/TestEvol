@@ -1,57 +1,85 @@
 \documentclass[conference]{IEEEtran}
 \synctex=1
 
-\usepackage[linesnumbered,boxed,ruled,nofillcomment]{algorithm2e} % add vlined,
-\usepackage{amsmath}
-%\usepackage{amsthm}
-\usepackage[usenames]{color}
-\usepackage[light,first]{draftcopy}
-% \usepackage{draftwatermark}
-% \usepackage[firstpage]{draftwatermark}
-\usepackage{epsfig}
-%\usepackage{fullpage}
-%\usepackage[pdftex]{graphicx}
-\usepackage{graphicx}
-%\usepackage{latex8}
-\usepackage{listings}
-\lstloadlanguages{Java}
-\usepackage{multirow}
-%\usepackage{palatino}
-\usepackage{alltt}
 \usepackage{times}
+\usepackage{graphicx}
+\usepackage{epsfig}
 % \usepackage{url}
-\usepackage{hyperref}
-\usepackage{cite}
+% \usepackage{hyperref}
+\usepackage[bookmarks=false]{hyperref}
 \usepackage{xspace}
-\usepackage[linesnumbered,boxed,ruled,nofillcomment]{algorithm2e} % add vlined,
-% \usepackage[small,compact]{titlesec}
+\usepackage{float}
+\usepackage{latexsym}
+\usepackage{natbib}
+\usepackage[usenames]{color}
+\usepackage{multirow}
+\usepackage{listings}
+\usepackage{textcomp}
 
-\newcommand{\subparagraph}{}
-%\usepackage[compact]{titlesec}
-%\titlespacing{\section}{0pt}{1ex}{1ex}
-%\titlespacing{\subsection}{0pt}{1ex}{0ex}
-%\titlespacing{\subsubsection}{0pt}{0.5ex}{0ex}
+\bibpunct{[}{]}{,}{n}{}{}
 
-% Use the following to make modification
-% \SetWatermarkAngle{45}
-% \SetWatermarkLightness{0.8}
-% \SetWatermarkFontSize{5cm}
-% \SetWatermarkScale{1}
-% \SetWatermarkText{DRAFT -- Do not redistribute}
-
-%\renewcommand{\topfraction}{0.85}
-%\renewcommand{\textfraction}{0.1}
-%\renewcommand{\floatpagefraction}{0.75}
-%\addtolength{\textfloatsep}{-0.3in}
+\def\denseitems{
+  \itemsep1pt plus1pt minus1pt
+  \parsep0pt plus0pt
+  \parskip0pt\topsep0pt}
 
 \input{mymacros}
-\newcommand{\tool}{\textsc{TestEvol}\xspace}
+
+\makeatletter
+\newcommand\tabcaption{\def\@captype{table}\caption}
+\makeatother
+
+\renewcommand\lstlistingname{\small{Listing}}
+
+\newcommand{\lang}[1]{\texttt{\small #1}}
+\newcommand{\subject}[1]{\texttt{\small #1}}
+\newcommand{\mt}{\mathit}
+\newcommand{\trex}{\textsc{TestEvol}}
+\newcommand{\pass}{\mt{Pass}}
+\newcommand{\fail}{\mt{Fail}}
+\newcommand{\failce}{\mt{Fail}_{CE}}
+\newcommand{\failre}{\mt{Fail}_{RE}}
+\newcommand{\failae}{\mt{Fail}_{AE}}
+\newcommand{\testfunc}[2]{\mt{Test(#1, #2)}}
+\newcommand{\covfunc}[2]{\mt{Cov(#1, #2)}}
+% \newcommand{\note}[1]{{\color{red}$\blacktriangleright$ \bf #1
+%     $\blacktriangleleft$}}
+
+\newcommand{\catrep}{\textsc{TestRep}}
+\newcommand{\catref}{\textsc{TestModNotRep}}
+\newcommand{\catdelaere}{\textsc{TestDel}$_\mt{(AE|RE)}$}
+\newcommand{\catdelce}{\textsc{TestDel}$_\mt{(CE)}$}
+\newcommand{\catdelp}{\textsc{TestDel}$_\mt{(P)}$}
+\newcommand{\cataddaere}{\textsc{TestAdd}$_\mt{(AE|RE)}$}
+\newcommand{\cataddce}{\textsc{TestAdd}$_\mt{(CE)}$}
+\newcommand{\cataddp}{\textsc{TestAdd}$_\mt{(P)}$}
+
+\newcommand{\smcatrep}{{\small \textsc{TestRep}}}
+\newcommand{\smcatref}{{\small \textsc{TestRef}}}
+\newcommand{\smcatdelaere}{{\small \textsc{TestDel}$_\mt{(AE|RE)}$}}
+\newcommand{\smcatdelce}{{\small \textsc{TestDel}$_\mt{(CE)}$}}
+\newcommand{\smcatdelp}{{\small \textsc{TestDel}$_\mt{(P)}$}}
+\newcommand{\smcataddaere}{{\small \textsc{TestAdd}$_\mt{(AE|RE)}$}}
+\newcommand{\smcataddce}{{\small \textsc{TestAdd}$_\mt{(CE)}$}}
+\newcommand{\smcataddp}{{\small \textsc{TestAdd}$_\mt{(P)}$}}
+
+\lstset{ %
+upquote=true,
+basicstyle=\tiny\sffamily,
+showspaces=false,               % show spaces adding particular underscores
+  showstringspaces=false,         % underline spaces within strings
+  showtabs=false
+}
 
 %\linespread{0.97}
 %\columnsep 0.11in
 \clubpenalty = 10000
 \widowpenalty = 10000
 \displaywidowpenalty = 10000
+
+\hyphenation{Test-Evol}
+
+\newcommand{\tool}{\textsc{TestEvol}\xspace}
 
 \let\oldthebibliography=\thebibliography
 \let\endoldthebibliography=\endthebibliography
@@ -68,19 +96,39 @@
 
 \begin{document}
 
-\title{TestEvol: A Tool for Analyzing\\Test-Suite Evolution}
+\title{TestEvol: A Tool for Analyzing Test-Suite Evolution}
 
 \author{\IEEEauthorblockN{XXX}
 \IEEEauthorblockA{
-College of Computing\\
+% College of Computing\\
 Georgia Institute of Technology\\
-Atlanta, USA\\
+% Atlanta, USA\\
 \{orso\}@cc.gatech.edu}
 }
 
 \maketitle
 
 \pagestyle{empty}
+
+\note{This is a VERY rough draft that I put together by copying and
+  pasting from the FSE paper. I left some specific TODOs in, but the
+  paper really needs a major pass.}
+
+\todo{Restructure the content to make sure we comply with what is
+  requested from a demo paper: Tool-based demonstrations describe
+  novel aspects of early prototypes or mature tools. The tool
+  demonstrations must communicate clearly the following information to
+  the audience:\\
+  - the envisioned users;\\
+  - the software engineering challenge it proposes to address;\\
+  - the methodology it implies for its users; and\\
+  - the results of validation studies already conducted for mature tools, or the design of planned studies for early prototypes.}
+
+\todo{Reduce the description of the approach and extend the
+  description of the implementation. Leandro, can you add some details
+  there?}
+
+\todo{Add snapshots.}
 
 \begin{abstract}
   Test suites, once created, rarely remain static. Just like the
@@ -98,21 +146,11 @@ Atlanta, USA\\
   tests or, worse, that may not work at all in most realistic cases.
   Unfortunately, to date there are no studies in the literature that
   investigate how test suites evolve. To tackle this problem, in this
-  paper we present a technique for studying test-suite evolution, a
-  tool that implements the technique, and an extensive empirical study
-  in which we used our technique to study many versions of six
-  real-world programs and their unit test suites. This is the first
-  study of this kind, and our results reveal several interesting
-  aspects of test-suite evolution. In particular, our findings show
-  that test repair is just one possible reason for test-suite
-  evolution, whereas most changes involve refactorings, deletions, and
-  additions of test cases.  Our results also show that test
-  modifications tend to involve complex, and hard-to-automate, changes
-  to test cases, and that existing test-repair techniques that focus
-  exclusively on assertions may have limited practical applicability.
-  More generally, our findings provide initial insight on how test
-  cases are added, removed, and modified in practice, and can guide
-  future research efforts in the area of test-suite evolution.
+  demo we present \tool, a tool that enables the systematic study of
+  test-suite evolution for Java programs and JUnit test cases. We also
+  present examples of applications of \tool\ to real-world programs
+  and their unit test suites that show the usefulness and practical
+  applicability of the tool.
 \end{abstract}
 
 % A category with the (minimum) three required fields
@@ -125,19 +163,601 @@ Atlanta, USA\\
 %\keywords{ACM proceedings, \LaTeX, text tagging}
 
 \section{Introduction}
+\label{sec:intro}
 
+Test cases form the first line of defense against the introduction of
+software faults, especially when retesting modified software.  With
+the availability of convenient testing frameworks, such as JUnit, and
+the adoption of agile development methodologies, in particular,
+writing unit test cases is an increasingly common practice nowadays.
+Developers routinely create test suites that consist of unit tests and
+that they run periodically on their code.
+
+Test suites are not static entities: they constantly evolve along with
+the application they test.  In particular, changes in the application
+can break test cases---in some cases, even a small change in the
+application code can affect a large number of tests. In general, a
+test failure on a new version of the software can either expose
+application faults or result from a problem with the test itself.  On
+observing a failure, the first task for the developer is to determine
+which of these two is the cause of the failure and, once this
+distinction is made, either fix the problem in the code or fix the
+broken~test.
+
+A broken test, if it covers a valid functionality, should ideally be
+repaired. Alternatively, if the repair is unduly complex to perform or
+if the test was designed to cover a functionality that no longer
+exists in the application, the test should be removed from the test
+suite. To illustrate with an example,
+Figure~\ref{fig:pmd-javatokenizertest} shows two versions of a unit
+test case from the test suite of \subject{PMD}, one of the programs
+used in our demo. A change in \subject{PMD}'s API broke the original
+version of the test case, which had to be fixed by adding a call to
+method \lang{SourceCode.readSource} and removing one parameter from
+the call to method \lang{Tokenizer.tokenize} (lines 6 and 7 in
+Figure~\ref{fig:pmd-javatokenizertest}(b), respectively).
+
+\begin{figure}[t]
+\lstinputlisting[language=java,
+captionpos=t,frame=tb,stepnumber=1,numbers=left,numbersep=5pt]{code/a.java}
+\vspace*{-4pt}
+\centerline{(a)}
+\lstinputlisting[language=java,
+captionpos=t,frame=tb,stepnumber=1,numbers=left,numbersep=5pt]{code/b.java}
+\vspace*{-4pt}
+\centerline{(b)}
+\vspace*{-8pt}
+\caption{Two versions of a test case from \subject{PMD}'s unit test
+  suite: (a) version~1.4, broken, and (b) version~1.6, repaired.}
+\vspace*{-12pt}
+\label{fig:pmd-javatokenizertest}
+\end{figure}
+
+Because test repair can be an expensive activity, automating it---even
+if only partially---could save a considerable amount of resources
+during maintenance. This is the motivation behind the development of
+automated test-repair techniques, such as the ones targeted at unit
+test cases~\cite{Daniel:2009, Daniel:2010, Mirzaaghaei:2012} and those
+focused on GUI (or system) test cases~\cite{Choudhary:2011,
+  Grechanik:2009, Huang:2010, Memon:2008}.
+
+We believe that, to develop effective techniques for assisting manual
+test repair, we must first understand how test suites evolve in
+practice. That is, we must understand when and how tests are created,
+removed, and modified. This is a necessary, preliminary step because
+it can (1) provide evidence that test cases do get repaired, (2)
+support the hypothesis that test repairs can be (at least partially)
+automated, and (3) suitably direct research efforts.  Without such
+understanding, we risk to develop techniques that may not be generally
+applicable and may not perform the kind of repairs that are actually
+needed in real-world software systems.
+
+To the best of our knowledge, to date there are no studies in the
+literature that investigate how unit test suites evolve. To address
+this issue, we defined a technique~\cite{pinto12} that combines
+various static- and dynamic-analysis techniques to compute the
+differences between the test suites associated with two versions of a
+program and categorize such changes along two dimensions: the static
+differences between the tests in the two test suites and the
+behavioral differences between such tests.  We implemented our
+technique in a tool, \tool, which enables a systematic study of
+test-suite evolution. \tool\ targets Java programs and JUnit test
+suites, as Java is a widely used language and JUnit is the de-facto
+standard unit-testing framework for Java.  Given two versions of a
+program and its test suite, \tool\ automatically computes differences
+in the behavior of the test suites on the two program versions,
+classifies the actual repairs performed between the versions, and
+computes the coverage attained by the tests on the two program
+versions.
+
+In this demo, we present \tool, its features and technical details,
+and show how it can be used to study how test suites evolved over the
+years for a project.  To do so, we will show examples of application
+of the tool to a set of real-world open-source software systems.
+Specifically, we will show how to use \tool\ to investigate relevant
+questions on test evolution, such as: What types of test-suite changes
+occur in practice and with what frequency? How often do test repairs
+require complex modifications of the tests? Why are tests deleted and
+added? Overall, we will show how \tool\ is a useful tool not only for
+researchers in the area of test repair (and test evolution in
+general), but also to developers and testers who want to better
+understand their software systems.
+
+\todo{Discuss \tool's availability at
+  \url{http://cheetah.cc.gt.atl.ga.us:8081/testevol/}}.
+
+\section{Our Approach for Studying Test-Suite Evolution}
+\label{sec:test-evolution}
+\subsection{Definitions and Terminology}
+\label{sec:terminology}
+
+A \textit{system} $S = (P, T)$ consists of a program $P$ and a test
+suite $T$.  A \textit{test suite} $T = \{t_1, t_2, \ldots, t_n\}$
+consists of a set of unit test cases. 
+% A unit test case $t$ is a method (or function) and it is identified
+% by its name plus the name of the class it is associated with.
+$\testfunc{P}{t}$ is a function that executes test case $t$ on program
+$P$ and returns the outcome of the test execution.  A \textit{test
+  outcome} can be of one of four types:
+
+\begin{itemize}\denseitems
+
+\item $\pass$: The execution of $P$ against $t$ succeeds.
+
+\item $\failce$: The execution of $P$ against $t$ fails because a
+  class or method accessed in $t$ does not exist in
+  $P$.\footnote{\small These failures can obviously be detected at
+    compile-time. For the sake of consistency in the discussion,
+    however, we consider such cases to be detected at runtime via
+    ``class not found'' or ``no such method'' exceptions. In fact, our
+    \tool{} tool detects such failures at runtime by executing the
+    tests compiled using the previous version of $P$ on $P$.}
+
+\item $\failre$: The execution of $P$ against $t$ fails due to an
+  uncaught runtime exception (\eg a ``null pointer'' exception).
+
+\item $\failae$: The execution of $P$ against $t$ fails due to an
+  assertion violation.
+
+\end{itemize}
+
+We use the generic term $\fail$ to refer to failures for which the
+distinction among the above three types of failures is unnecessary.
+
+$\covfunc{P}{t}$ is a function that instruments program $P$, executes
+test case $t$ on $P$, and returns the set of all statements in $P$
+covered by $t$. $\covfunc{P}{T}$ returns the cumulative coverage
+achieved on $P$ by all the tests in test suite $T$.
+
+% $\covfunc{P}{t}$ is a function that instruments program $P$, executes
+% test case $t$ on $P$, and returns the number of branches in $P$
+% covered by $t$. $\covfunc{P}{T}$ returns the cumulative coverage
+% attained on $P$ by all the tests in test suite $T$.
+
+%% Unit tests are run very frequently---often from the IDE, soon after
+%% the code is changed, or even while the code is being changed. In a
+%% typical testing process, developers may run the test suite after
+%% editing the code. In the run, some tests may fail, whereas others
+%% would pass. The developer would want to fix the broken tests online to
+%% ensure that all tests pass.
+
+Given a system $S = (P, T)$, a modified version of $S$, $S'=(P', T')$,
+and a test case $t$ in $T \cup T'$, there are three possible scenarios
+to consider: (1) $t$ exists in $T$ and $T'$, (2) $t$ exists in $T$ but
+not $T'$ (\ie $t$ was removed from the test suite), and (3) $t$ exists
+in $T'$ but not in $T$ (\ie $t$ was added to the test suite). These
+scenarios can be further classified based on the behavior of $t$ in
+$S$ and $S'$, as summarized in Figure~\ref{fig:study-design} and
+discussed in the rest of this section.
+
+\subsection{Test Modifications}
+\label{sec:test-mod}
+
+Figure~\ref{fig:study-design}(a) illustrates the scenario in which $t$
+is present in the test suites for both the old and the new versions of
+the system. To study different cases, we consider whether $t$ is
+modified (to $t'$) and, if so, whether the behaviors of $t$ and $t'$
+differ. (We have not considered the cases in which $t$ is not modified
+because they are irrelevant for studying test evolution.)  For
+\textit{behavioral differences}, there are two cases, shown in the two
+rows of the table: either $t$ fails on $P'$ and $t'$ passes on $P'$ or
+both $t$ and $t'$ pass on $P'$.
+
+\begin{figure}[t]
+\centering
+\small
+\tabcolsep=3pt
+\textbf{(a) Test $t$ exists in $S$ and $S'$ and is modified}
+\\ [2pt]
+\begin{tabular}{|l||l|}
+\hline
+%\multicolumn{1}{|c||}{} & \multicolumn{1}{|c}{} &
+%\multicolumn{1}{|c|}{$t$ is not} \\
+%\multicolumn{1}{|c||}{} & \multicolumn{1}{|c|}{$t$ is modified}\\
+%\hline \hline
+$\testfunc{P'}{t} = \fail \; \wedge$ &
+$t$ is repaired \\
+$\testfunc{P'}{t'} = \pass$ &
+\multicolumn{1}{r|}{\scriptsize [\catrep{}]}\\
+\hline
+\multirow{3}{28mm}{$\testfunc{P'}{t} = \pass \; \wedge \testfunc{P'}{t'} = \pass$} &
+$t$ is refactored, updated to test a different \\
+& scenario, or is made more/less discriminating \\
+& \multicolumn{1}{r|}{\scriptsize [\catref{}]} \\
+\hline
+\end{tabular}
+\\ [8pt]
+%
+\textbf{(b) Test $t$ is removed in $S'$}
+\\ [2pt]
+\begin{tabular}{|l||l|}
+\hline
+\multirow{2}{*}{$\testfunc{P'}{t} = \failre \, | \, \failae$} &
+$t$ is too difficult to fix \\
+& \multicolumn{1}{r|}{\scriptsize [\catdelaere{}]} \\
+\hline
+\multirow{2}{*}{$\testfunc{P'}{t} = \failce$} & $t$ is obsolete or is
+too difficult to fix \\
+& \multicolumn{1}{r|}{\scriptsize [\catdelce{}]} \\
+\hline
+\multirow{2}{*}{$\testfunc{P'}{t} = \pass$} & $t$ is redundant \\
+& \multicolumn{1}{r|}{\scriptsize [\catdelp{}]} \\
+\hline 
+\end{tabular}
+\\ [8pt]
+%
+\textbf{(c) Test $t'$ is added in $S'$}
+\\ [2pt]
+\begin{tabular}{|l||l|}
+  \hline
+  \multirow{2}{*}{$\testfunc{P}{t'} = \failre \, | \, \failae$} &
+  $t'$ is added to validate a bug fix \\
+  & \multicolumn{1}{r|}{\scriptsize [\cataddaere{}]} \\
+  \hline
+  \multirow{3}{*}{$\testfunc{P}{t'} = \failce$} &
+  $t'$ is added to test a new functionality \\
+  & or a code refactoring \\
+  & \multicolumn{1}{r|}{\scriptsize [\cataddce{}]} \\
+  \hline
+  \multirow{3}{*}{$\testfunc{P}{t'} = \pass$} &
+  %% TODO: Check: $t'$ is added to test a new functionality \\
+  $t'$ is added to test an existing feature\\
+  & or for coverage-based augmentation \\
+  & \multicolumn{1}{r|}{\scriptsize [\cataddp{}]} \\
+  \hline
+\end{tabular}
+\caption{Scenarios considered in our investigation. Given two system
+  versions $S = (P, T)$ and $S' = (P', T')$, the three scenarios are:
+  (a) $t$ exists in $T$ and $T'$ and is modified, (b) $t$ exists in
+  $T$ but not in $T'$, (c) $t'$ exists in $T'$ but not in $T$.}
+\vspace*{-5pt}
+\label{fig:study-design}
+\end{figure}
+
+\subsubsection{Category \catrep{}: Repaired Tests}
+\label{sec:category-rep}
+
+The \catrep{} category corresponds to the case where $t$ is repaired
+so that, after the modifications, it passes on $P'.$ As discussed in
+the Introduction, Figure~\ref{fig:pmd-javatokenizertest} shows an
+example of such a test repair. The code fragments in
+Listings~\ref{c1-old} and~\ref{c1-new} present another example of
+repair that involves a simpler code modification than the one in
+Figure~\ref{fig:pmd-javatokenizertest}. The example is taken from
+\subject{Gson}, one of the programs used in our demo, and involves a
+test case from \subject{Gson} version~2.0 that was fixed in the
+subsequent version~2.1. Test \lang{testNullField} had to be fixed
+because constructor \lang{FieldAttributes(Class<?> declClazz, Field
+  f)} from version~2.0 was modified in version~2.1 to take only one
+parameter (of type \lang{Field}).
+%% was no longer available on version 2.1. In the new version of the
+%% \lang{FieldAttributes} class, the constructor receives only one
+%% parameter of type \lang{Field}.
+
+\vspace*{-10pt}
+\lstinputlisting[language=java,label=c1-old,caption=\small{Unit test
+  for class FieldAttributes} (Gson v2.0),
+captionpos=t,frame=tb]{code/OldTestRep.java}
+
+\vspace*{-5pt}
+\lstinputlisting[language=java,label=c1-new,caption=\small{Unit test
+  for class FieldAttributes} (Gson v2.1),
+captionpos=t,belowcaptionskip=4pt,frame=tb]{code/TestRep.java}
+
+For this category, we wish to study the types of modifications that
+are made to $t$. A test repair may involve changing the sequence of
+method calls, assertions, data values, or control flow. Based on our
+experience, for \textit{method-call sequence changes}, we consider
+five types of modifications:
+
+\begin{enumerate}
+\denseitems
+
+\item \textit{Method call added}: a new method call is added.
+
+\item \textit{Method call deleted}: an existing method call is
+  removed.
+
+\item \textit{Method parameter added}: a method call is modified such
+  that new parameters are added.
+
+\item \textit{Method parameter deleted}: a method call is modified
+  such that existing parameters are deleted.
+
+\item \textit{Method parameter modified}: a method call is modified
+  via changes in the values of its actual parameters.
+
+\end{enumerate}
+
+A test repair may involve multiple such changes. For example, the
+repair shown in Figure~\ref{fig:pmd-javatokenizertest} involves the
+addition of a method call~(in~line~6) and the deletion of a method
+parameter (in line~7). The repair illustrated in Listings~\ref{c1-old}
+and~\ref{c1-new} also involves the deletion of a method parameter.
+%
+For \textit{assertion changes}, we consider cases in which an
+assertion is added, an assertion is deleted, the expected value of an
+assertion is modified, or the assertion is modified but the expected
+value is unchanged.
+%
+Finally, we currently group together \textit{data-value changes} and
+\textit{control-flow changes}.
+
+The rationale underlying our classification scheme is that different
+classes of changes may require different types of repair analyses.
+Although this is not necessarily the case, at least the search
+strategy for candidate repairs would differ for the different
+categories of changes. Consider the case of method-parameter deletion,
+for instance, for which one could attempt a repair by simply deleting
+some of the actual parameters. Whether this repair would work depends
+on the situation. For the code in
+Figure~\ref{fig:pmd-javatokenizertest}, for example, it would not work
+because the deletion of one of the parameters in the call to
+\lang{tokenize()} is insufficient by itself to fix the test---a new
+method call (to \lang{readSource()}) has to be added as well for the
+test to work correctly.  Similarly, for the case of method-parameter
+addition, one could conceivably attempt straightforward fixes by
+constructing equivalence classes for the new parameters and selecting
+a value from each equivalence class (\eg positive, negative, and zero
+values for an integer parameter). In our study, we found cases where
+such an approach would in fact repair broken tests. In this case too,
+however, such a solution is in general not enough.
+
+\subsubsection{Category \catref{}: Refactored Tests}
+\label{sec:category-c2}
+
+The \catref{} category captures scenarios in which a test $t$ is
+modified in $S'$ even though $t$ passes on $P'$.
+Listings~\ref{c2-old} and~\ref{c2-new} show an example of one such
+change from \subject{Commons Math}. Unit test \lang{testDistance} was
+refactored to invoke method \lang{sqrt()} in class \lang{FastMath}, a
+newly added class in the new release, instead of the same method in
+\lang{java.lang.Math}.  There are different reasons why changes in
+this category might occur.
+
+\vspace{-8pt}
+\lstinputlisting[language=java,label=c2-old,caption=\small{Unit test
+  from class Vector3DTest} (Commons Math v2.1),
+captionpos=t,frame=tb]{code/OldTestRef.java}
+
+\vspace{-8pt}
+\lstinputlisting[language=java,label=c2-new,caption=\small{Unit test
+  from class Vector3DTest} (Commons Math v2.2),
+captionpos=t,frame=tb]{code/TestRef.java}
+
+\subsection{Test Deletions}
+\label{sec:test-ref}
+
+Figure~\ref{fig:study-design}(b) illustrates the scenario in which a
+test $t$ is deleted. To study the reasons for this, we examine the
+behavior of $t$ on the new program version $P'$ and consider three
+types of behaviors.
+
+\subsubsection{Category \catdelaere{}: Hard-To-Fix Tests}
+\label{sec:category-delaere}
+
+%%COMMENT PLEASE READ ME: I guess here we should focus more
+%%in the cases that tests are removed because they have become
+%%obsolete. Actually, in the examples I was not able to find one
+%%case in which it was removed because it was too difficult to
+%% be fixed. It was always obsolete tests.
+
+This category includes tests that fail on $P'$ with a runtime
+exception or an assertion violation. These may be instances where the
+tests should have been fixed, as the functionality that they test in
+$P$ still exists in $P'$, but the tests were discarded instead. One
+plausible hypothesis is that tests in this category involve repairs of
+undue complexity, for which the investigation of new repair techniques
+to aid the developer might be particularly useful.  We performed a
+preliminary investigation of this hypothesis by manually examining ten
+randomly selected tests in this category and found that all the
+examined tests were in fact obsolete.
+
+\subsubsection{Category \catdelce: Obsolete Tests}
+\label{sec:category-delce}
+
+A test that fails with a compilation error on the new program version
+is obsolete because of API changes. Listing~\ref{c4-example}
+illustrates a test in this category taken from \subject{JodaTime}.
+This test was deleted because the tested method
+\lang{Chronology.getBuddhist()} was removed in the subsequent version
+of \subject{JodaTime}.
+
+% \vspace{-4pt}
+\lstinputlisting[language=java,label=c4-example,caption=\small{Unit
+  test from class TestChronology} (JodaTime v2.0),frame=tb]
+{code/TestDel-Ce.java}
+%This method was
+%already marked as deprecated in the previous version.
+
+Although for this category of deletion too, one could postulate that
+the tests were removed because they were too difficult to fix, we
+believe this not to be the case in most practical occurrences.
+Instead, the more likely explanation is that the tests were removed
+simply because the tested methods were no longer present. Also in this
+case, we investigated our hypothesis by manually examining ten
+randomly selected cases. Indeed, our manual investigation confirmed
+that, for the cases we analyzed, the tested functionality was either
+removed or provided through alternative methods, which requires the
+development of new tests rather than fixes to the existing ones.
+
+\subsubsection{Category \catdelp: Redundant Tests}
+\label{sec:category-delp}
+
+This category includes tests that are removed even though they pass on
+$P'$.  Listing~\ref{c5-example} illustrates an example of one such
+test, taken from \subject{Commons Lang}. In the new version, this test
+was replaced by a more sophisticated one, shown in
+Listing~\ref{c5.2-example}.
+
+\begin{figure}[h]
+\lstinputlisting[language=java,label=c5-example,caption=\small{Unit
+  test from class MatrixIndexExceptionTest} (Commons Lang
+v2.1),frame=tb] {code/TestDel-P.java}
 \vspace{4pt}
-The rest of the paper is organized as follows.  
+\end{figure}
 
-\section{Conclusion and future work}
-\label{sec:concl-future-work}
+\lstinputlisting[language=java,label=c5.2-example,caption=\small{Unit
+  test implemented to replace the removed one} (Commons Lang
+v2.2),frame=tb] {code/TestDel-PII.java}
 
+\subsection{Test Additions}
+\label{sec:test-add}
 
-\section*{Acknowledgments}
+Figure~\ref{fig:study-design}(c) illustrates the cases of test-suite
+augmentation, where a new test $t'$ is added to the test suite. The
+behavior of $t'$ on the old program can indicate the reason why it may
+have been added.
 
-This work was supported in part by NSF awards CCF-0916605 and
-CCF-0964647 to Georgia Tech, and by funding from IBM Research and
-Microsoft Research.
+\subsubsection{Category \cataddaere: Bug-Fix Tests}
+\label{sec:category-addaere}
+
+This category includes added tests that fail on $P$ with a runtime
+exception or an assertion violation. In this case, the functionality
+that the added test $t'$ was designed to test exists in $P$ but is not
+working as expected (most likely because of a fault). The program
+modifications between $P$ and $P'$ would ostensibly have been made to
+fix the fault, which causes $t'$ to pass on $P'$. Thus, $t'$ is added
+to the test suite to validate the bug fix. Listing~\ref{c6-example}
+illustrates a test that fits this profile, as it was added to
+\subject{Commons Math} version 2.1 to validate a bug fix ({\small
+  \url{https://issues.apache.org/jira/browse/MATH-391}}). In the
+previous version of \lang{ArrayRealVector}, the creation of a
+zero-length vector results in a runtime exception.
+
+% \begin{figure}[h]
+\lstinputlisting[language=java,label=c6-example,caption=\small{\mbox{Unit
+  test from class ArrayRealVectorTest (Commons Math v2.2)}},
+captionpos=t,frame=tb]{code/TestAdd-AeRe.java}
+% \end{figure}
+
+\subsubsection{Category \cataddce: New-Features Tests}
+\label{sec:category-addce}
+
+The added tests in this category fail on $P$ with a compilation error,
+which indicates that the API accessed by the tests does not exist in
+$P$. Thus, the added test $t'$ is created to test new code in $P'$,
+where the code could have been added as part of a refactoring or, more
+likely, to add new functionality.  Listing~\ref{c7-example}
+illustrates a test from \subject{JFreeChart} that covers a new
+functionality: method \lang{getMinY()} did not exist in previous
+versions of class \lang{TimeSeries}.
+
+\lstinputlisting[language=java,label=c7-example,caption=\small{Unit
+  test from class TimeSeriesTests} (JFreeChart v1.0.14),
+captionpos=t,frame=tb]{code/TestAdd-Ce.java}
+
+\subsubsection{Category \cataddp: Coverage-Augmentation Tests}
+\label{sec:category-addp}
+
+This category considers cases where the added test $t'$ passes on
+$P$. Clearly, $t'$ would have been a valid test in the old system as
+well. One would expect that the addition of $t'$ increases program
+coverage (\ie $\covfunc{P'}{T'} \supset \covfunc{P'}{T' -
+  \{t'\}}$). Moreover, if $t'$ covers different statements in $P$ and
+$P'$ (assuming that there is a way of matching statements between $P$
+and $P'$), the plausible explanation is that $t'$ was added to test
+the changes made between $P$ and $P'$. However, if $t'$ covers the
+same statements in both program versions, it would have been added
+purely to increase code coverage (and not to test any added or
+modified code).  Listing~\ref{c8-example} illustrates an added test
+case that increases code coverage: the new test method
+\lang{testFindRangeBounds} covers the case where the parameter of
+method \lang{findRangeBounds()} is null.
+
+\lstinputlisting[language=java,label=c8-example,caption=\small{Unit test
+from class XYErrorRendererTests} (JFreeChart v1.0.14),frame=tb]
+{code/TestAdd-P.java}
+
+\section{Implementation of \tool}
+\label{sec:implementation}
+
+\todo{Add the discussion of clone analysis.}
+
+\todo{In general, add more details.}
+
+\todo{Discuss the availability of the tool.}
+
+We implemented our approach for studying test suite evolution in a
+tool, called \tool, which facilitates a systematic study of test-suite
+evolution for Java programs and JUnit test suites.  \tool\ analyzes a
+sequence of versions of a software system, where each version consists
+of application code and test code. The versions can be actual releases
+or internal builds.  \tool\ consists of five components, as
+illustrated in the architecture diagram shown in
+Figure~\ref{fig:trex}.
+
+The \emph{compiler} component builds each system version and creates
+two jar files, one containing the application classes and the other
+containing the test classes.
+%
+The \emph{test-execution engine} analyzes each pair of system versions
+$(S, S')$, where $S = (P, T)$ and $S' = (P', T')$.  First, it executes
+$T$ on program $P$ and $T'$ on program $P'$ (\ie it runs the tests on
+the respective program versions).  Then, it executes $T'$ on $P$ and
+$T$ on $P'$. For each execution, it records the test outcome: $\pass,
+\failce, \failae, or \failre$.
+%
+The \emph{differencing component} compares $T$ and $T'$ to identify
+modified, deleted, and added tests. This component is implemented
+using the \textsc{wala} analysis infrastructure for Java ({\small
+  \url{wala.sourceforge.net}}).
+
+The test outcomes, collected by the test-execution engine, and the
+test-suite changes, computed by the differencing component, are then
+passed to the \emph{test classifier}, which analyzes the information
+about test outcomes and test updates to classify each update into one
+of the eight test-evolution categories presented in
+Section~\ref{sec:test-evolution}.  For each pair of broken test case
+and its repaired version, the test classifier also compares the test
+cases to identify the types of repair changes---different types of
+method-sequence changes and assertion changes---as discussed in
+Section~\ref{sec:category-rep}; this analysis is also implemented
+using \textsc{wala}.
+
+\tool\ performs a further step for the test cases in categories
+\catdelp{}and \cataddp{}. For these tests, the test classifier
+leverages the \emph{coverage analyzer} to compute the branch coverage
+achieved by each test; this facilitates the investigation of whether
+the deleted or added tests cause any variations in the coverage
+attained by the new test suite.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\columnwidth]{architecture.png}
+        \vspace*{-16pt}
+	\caption{High-level architecture of \tool.}
+        \vspace*{-8pt}
+	\label{fig:trex}
+\end{figure}
+
+\vspace*{-8pt}
+\section{Conclusion}
+\label{sec:summary}
+
+Test suites evolve throughout their lifetime and change together with
+the applications they are testing. Modifying existing test cases
+manually to adapt them to an evolving system, however, can be
+extremely time consuming, especially for large test suites, which has
+motivated the recent development of automated test-repair techniques.
+To support the development of more effective repair techniques, we
+developed \tool, a tool for systematic investigation of test-suite
+evolution that can provide its users with a thorough understanding of
+how test cases evolve in practice. In this demo we present \tool, its
+main features, and its technical characteristics. We also demonstrate
+how \tool\ can be run on real-world software systems and produce a
+wealth of useful information, such as the types of test-suite changes
+that occur in practice and their frequency and why tests are deleted
+and added.  Overall, we show how \tool\ is a useful tool not only for
+researchers in the area of test repair, and test evolution in general,
+but also to developers and testers who want to better understand their
+software systems.
+
+% \section*{Acknowledgments}
+
+% This work was supported in part by NSF awards CCF-0916605 and
+% CCF-0964647 to Georgia Tech, and by funding from IBM Research and
+% Microsoft Research.
 
 \bibliographystyle{abbrv}
 \bibliography{paper}

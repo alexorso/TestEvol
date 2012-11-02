@@ -1,3 +1,20 @@
 # Package Files #
 *.war
 *.ear
+.DS_Store
+auto
+*.aux
+*.bbl
+*.blg
+*.dvi
+*.log
+*.ps
+*.pdf
+*.class
+BCK
+CameraReady
+Submitted
+paper.rel
+scrap.txt
+.dhistory
+paper.out
