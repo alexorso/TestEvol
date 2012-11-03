@@ -11,6 +11,7 @@ auto
 *.ps
 *.pdf
 *.class
+*.bak
 BCK
 CameraReady
 Submitted
