@@ -79,10 +79,10 @@ showspaces=false,               % show spaces adding particular underscores
 \hypersetup{
 colorlinks=true,
 bookmarksnumbered=true,
-pdftitle={Isolating Failure Causes through Test Case Generation},
-pdfauthor={Jeremias R\"o\ss{}ler and Gordon Fraser and Andreas Zeller and Alessandro Orso},
-pdfsubject={Automated Testing},
-pdfkeywords={Automated Debugging, Diagnostics, Testing tools}
+pdftitle={TestEvol: A Tool for Analyzing Test-Suite Evolution},
+pdfauthor={Leandro Sales Pinto and Saurabh Sinha and Alessandro Orso},
+pdfsubject={Test Evolution},
+pdfkeywords={Test Repair, Test-Suite Evolution, Test Maintenance}
 }
 
 \hyphenation{Test-Evol}
@@ -127,44 +127,35 @@ orso@cc.gatech.edu}
 
 \pagestyle{empty}
 
-% \note{This is a VERY rough draft that I put together by copying and
-%   pasting from the FSE paper. I left some specific TODOs in, but the
-%   paper really needs a major pass.}
-% \todo{Restructure the content to make sure we comply with what is
-%   requested from a demo paper: Tool-based demonstrations describe
-%   novel aspects of early prototypes or mature tools. The tool
-%   demonstrations must communicate clearly the following information to
-%   the audience:\\
-%   - the envisioned users;\\
-%   - the software engineering challenge it proposes to address;\\
-%   - the methodology it implies for its users; and\\
-%   - the results of validation studies already conducted for mature tools, or the design of planned studies for early prototypes.}
-% \todo{Reduce the description of the approach and extend the
-%   description of the implementation. Leandro, can you add some details
-%   there?}
-% \todo{Add snapshots.}
+% Tool-based demonstrations describe novel aspects of early prototypes
+% or mature tools. The tool demonstrations must communicate clearly
+% the following information to the audience:\\
+% - the envisioned users;\\
+% - the software engineering challenge it proposes to address;\\
+% - the methodology it implies for its users; and\\
+% - the results of validation studies already conducted for mature
+% tools, or the design of planned studies for early prototypes.}
 
 \begin{abstract}
-  Test suites, once created, rarely remain static. Just like the
-  application they are testing, they evolve throughout their lifetime.
-  Test obsolescence is probably the most known reason for test-suite
-  evolution---test cases cease to work because of changes in the code
-  and must be suitably repaired. There are several reasons why it is
-  important to achieve a thorough understanding of how test cases
-  evolve in practice. In particular, researchers who develop automated
-  test-repair techniques---an increasingly active research area---can
-  use such understanding to develop more effective repair techniques
-  that are applicable in real-world scenarios. More generally,
-  analyzing test-suite evolution can help testers better understand
-  how test cases are modified during maintenance and improve the test
-  evolution process, an extremely time consuming activity for any non
-  trivial test suite.  Unfortunately, there are no existing tools that
-  facilitate investigation of test-suite evolution. To tackle this
-  problem, we developed \tool, a tool that enables the systematic
-  study of test-suite evolution for Java programs and JUnit test
-  cases.  This demonstration presents \tool and demonstrates its
+  Test suites, just like the applications they are testing, evolve
+  throughout their lifetime.  One of the main reasons for test-suite
+  evolution is test obsolescence: test cases cease to work because of
+  changes in the code and must be suitably repaired. There are several
+  reasons why it is important to achieve a thorough understanding of
+  how test cases evolve in practice. In particular, researchers who
+  develop automated test-repair techniques---an increasingly active
+  research area---can use such understanding to develop more effective
+  repair techniques that are applicable in real-world scenarios. More
+  generally, analyzing test-suite evolution can help testers better
+  understand how test cases are modified during maintenance and
+  improve the test evolution process, an extremely time consuming
+  activity for any non-trivial test suite.  Unfortunately, there are
+  no existing tools that facilitate investigation of test evolution.
+  To tackle this problem, we developed \tool, a tool that enables the
+  systematic study of test-suite evolution for Java programs and JUnit
+  test cases. This demonstration presents \tool\ and illustrates its
   usefulness and practical applicability by showing how \tool\ can be
-  used on real-world software and unit test suites.
+  successfully used on real-world software and test suites.
 
   \noindent
   Demo video at {\small \url{http://www.cc.gatech.edu/~orso/software/testevol/}}
@@ -184,24 +175,21 @@ orso@cc.gatech.edu}
 \label{sec:intro}
 
 Test suites are not static entities: they constantly evolve along with
-the application they test. For instance, new tests can be added to
-test new functionality and existing tests can be refactored, repaired,
-or deleted.  In particular, changes in the application can break test
-cases---in some cases, even a small change in the application code can
-affect a large number of tests.
-
-A broken test, if it covers a valid functionality, should ideally be
-repaired. Alternatively, if the repair is unduly complex to perform or
-if the test was designed to cover a functionality that no longer
-exists in the application, the test should be removed from the test
-suite. To illustrate with an example,
-Figure~\ref{fig:pmd-javatokenizertest} shows two versions of a unit
-test case from the test suite of \subject{PMD}, one of the programs we
-analyzed in our previous work~\cite{pinto12}. A change in
-\subject{PMD}'s API broke the original version of the test case, which
-had to be fixed by adding a call to method
-\lang{SourceCode.readSource} and removing one parameter from the call
-to method \lang{Tokenizer.tokenize} (lines 6 and 7 in
+the applications they test. For instance, new tests can be added to
+test new functionality, and existing tests can be refactored,
+repaired, or deleted. Often, test cases have to be modified because
+changes in the application break them. In these cases, if the broken
+test covers a valid functionality, it should ideally be repaired.
+Alternatively, if the repair is unduly complex to perform, or if the
+test was designed to cover a functionality that no longer exists in
+the application, the test should be removed from the test suite. To
+illustrate with an example, Figure~\ref{fig:pmd-javatokenizertest}
+shows two versions of a unit test case from the test suite of
+\subject{PMD}, one of the programs we analyzed in previous
+work~\cite{pinto12}.  A change in \subject{PMD}'s API broke the
+original version of the test case, which had to be fixed by adding a
+call to method \lang{SourceCode.readSource} and removing one parameter
+from the call to method \lang{Tokenizer.tokenize} (lines 6 and 7 in
 Figure~\ref{fig:pmd-javatokenizertest}(b), respectively).
 
 \begin{figure}[t]
@@ -230,70 +218,70 @@ focused on GUI (or system) test cases~\cite{Choudhary:2011,
 
 We believe that, to develop effective techniques for assisting manual
 test repair, we must first understand how test suites evolve in
-practice. That is, we must understand when and how tests are created,
-removed, and modified. This is a necessary, preliminary step because
-it can (1) provide evidence that test cases do get repaired, (2)
-support the hypothesis that test repairs can be (at least partially)
-automated, and (3) suitably direct research efforts.  Without such
-understanding, we risk to develop techniques that may not be generally
-applicable and may not perform the kind of repairs that are actually
-needed in real-world software systems.
+practice.  That is, we must understand when and how tests are created,
+removed, and modified. Such understanding can (1) provide evidence
+that test cases do get repaired, (2) support the hypothesis that test
+repairs can be (at least partially) automated, and (3) suitably guide
+research efforts.  Otherwise, we risk to develop techniques that may
+not be generally applicable and may not perform the kind of repairs
+that are actually needed in real-world software systems.
 
 More generally, the ability to analyze how test suites evolve can be
 beneficial for developers, as it can help them better understand the
 cost and tradeoffs of test evolution. Similarly, project managers can
 use information about test-suite evolution to get insight into the
 test maintenance process (\eg how often tests are deleted and cause
-oss of coverage, how often tests must be adapted because of changes in
-the system's API) and ultimately improve it.
+loss of coverage or how often tests must be adapted because of changes
+in the system's API) and ultimately improve it.
 
-Until recently there were no empirical studies in the literature that
-investigated how unit test suites evolve and tools that could support
-such studies. To address this issue, we defined a technique that
-combines various static- and dynamic-analysis techniques to compute
-the differences between the test suites associated with two versions
-of a program and categorize such changes along two dimensions: the
-static differences between the tests in the two test suites and the
-behavioral differences between such tests~\cite{pinto12}. Applying our
-technique to a number of real-world programs, we were able to discover
-several important aspects of test evolution. For example, we found
-evidence that, although test repairs are a relatively small fraction
-of the activities performed during test evolution, they are indeed
-relevant.  We also found that repair techniques that just focus on
-oracles (\ie assertions) are likely to be inapplicable in many cases,
-that test cases are rarely removed because they are difficult to fix,
-but rather because they have become obsolete, and that test cases are
-not only added to check bug fixes and test new functionality, as
-expected, but also to validate changes in the code.
+Until recently, there were no empirical studies in the literature that
+investigated how unit test suites evolve, and no tools that could
+support such studies existed. To address this issue, we defined a
+technique that combines various static- and dynamic-analysis
+techniques to (1) compute the differences between the test suites
+associated with two versions of a program and (2) categorize such
+changes along two dimensions: the static differences between the tests
+in the two test suites and the behavioral differences between such
+tests~\cite{pinto12}. Applying our technique to a number of real-world
+programs, we were able to discover several important aspects of test
+evolution. For example, we found evidence that, although test repairs
+are a relatively small fraction of the activities performed during
+test evolution, they are indeed relevant.  We also found that repair
+techniques that just focus on oracles (\ie assertions) are likely to
+be inapplicable in many cases, that test cases are rarely removed
+because they are difficult to fix, but rather because they have become
+obsolete, and that test cases are not only added to check bug fixes
+and test new functionality, as expected, but also to validate modified
+code.
 
-This demonstration presents a tool that implements our technique and
-that we developed to allow other researchers and practitioners to
-perform studies such as we the ones we just summarized. The tool,
-which is called \tool, enables a systematic study of test-suite
-evolution.  Given two versions of a program and corresponding test
-suites, \tool\ automatically computes differences in the behavior of
-the test suites on the two program versions, classifies the actual
-repairs performed between the two versions, and computes the coverage
-attained by the tests on the versions.
+This demonstration presents a tool, \tool, that implements our
+technique and that we developed to allow other researchers and
+practitioners to perform additional studies on test evolution. Given
+two versions of a program and corresponding test suites, \tool\
+automatically computes and classifies both static and behavioral
+differences between the test suites for the two program versions.
+\tool\ can identify deleted, added, and repaired test cases, together
+with the effect that such deletions, additions, and repairs have on
+code coverage.
 
 After presenting \tool's features and technical details, the
-demonstration shows how the tool can be used to study how test suites
-evolved over the years for a software project.  To do so, we show
-examples of application of \tool\ to a set of real-world open-source
-software systems.  Specifically, we show how to use \tool\ to
-investigate relevant questions on test evolution, such as the
-following ones: What types of test-suite changes occur in practice and
-with what frequency?  How often do test repairs require complex
-modifications of the tests?  Why are tests deleted and added? Overall,
-we show how \tool\ is a useful and practically applicable tool for
-researchers in the area of test repair (and test evolution in
-general), developers and testers who want to better understand their
-software maintenance process.
+demonstration shows how the tool can be used to study the evolution,
+over the years, of a software project's test suite.  To do so, we show
+examples of application of \tool\ to several real-world open-source
+software systems. In particular, we show how to use \tool\ to
+investigate relevant questions on test evolution, such as what types
+of test-suite changes occur in practice and with what frequency, how
+often test repairs require complex modifications of the tests, and why
+tests are deleted and added. We demonstrate how \tool\ is a useful and
+practically applicable tool for researchers and practitioners
+interested in test repair (and test evolution in general), and for
+developers and testers who want to better understand their test
+maintenance process.
 
 \section{The \tool\ Tool}
 \label{sec:test-evolution}
 
-In this section we firs summarize our technique, implemented in the
+In this section we first summarize our technique, implemented in the
 \tool\ tool, and then discuss the main characteristics of the tool
 implementation. A detailed description of the approach can be found
 in~\cite{pinto12}.
@@ -310,34 +298,33 @@ $\testfunc{P}{t}$ is a function that executes test case $t$ on program
 $P$ and returns the outcome of the test execution.  A \textit{test
   outcome} can be of one of four types:
 
-\begin{itemize}\denseitems
+\noindent
+1) $\pass$: The execution of $P$ against $t$ succeeds.
 
-\item $\pass$: The execution of $P$ against $t$ succeeds.
+\noindent
+2) $\failce$: The execution of $P$ against $t$ fails because a class
+or method accessed in $t$ does not exist in $P$.\footnote{\small These
+  failures can obviously be detected at compile-time. For consistency
+  in the discussion, however, we consider such cases to be detected at
+  runtime via ``class not found'' or ``no such method'' exceptions. In
+  fact, \tool\ detects such failures at runtime by executing the tests
+  compiled using the previous version of $P$ on $P$.}
 
-\item $\failce$: The execution of $P$ against $t$ fails because a
-  class or method accessed in $t$ does not exist in
-  $P$.\footnote{\small These failures can obviously be detected at
-    compile-time. For the sake of consistency in the discussion,
-    however, we consider such cases to be detected at runtime via
-    ``class not found'' or ``no such method'' exceptions. In fact, our
-    \tool{} tool detects such failures at runtime by executing the
-    tests compiled using the previous version of $P$ on $P$.}
+\noindent
+3) $\failre$: The execution of $P$ against $t$ fails due to an
+uncaught runtime exception (\eg a ``null pointer'' exception).
 
-\item $\failre$: The execution of $P$ against $t$ fails due to an
-  uncaught runtime exception (\eg a ``null pointer'' exception).
-
-\item $\failae$: The execution of $P$ against $t$ fails due to an
-  assertion violation.
-
-\end{itemize}
+\noindent
+4) $\failae$: The execution of $P$ against $t$ fails due to an
+assertion violation.
 
 We use the generic term $\fail$ to refer to failures for which the
-distinction among the above three types of failures is unnecessary.
+distinction among different types of failures is unnecessary.
 
-$\covfunc{P}{t}$ is a function that instruments program $P$, executes
-test case $t$ on $P$, and returns the set of all statements in $P$
-covered by $t$. $\covfunc{P}{T}$ returns the cumulative coverage
-achieved on $P$ by all the tests in test suite $T$.
+% $\covfunc{P}{t}$ is a function that instruments program $P$, executes
+% test case $t$ on $P$, and returns the set of all statements in $P$
+% covered by $t$. $\covfunc{P}{T}$ returns the cumulative coverage
+% achieved on $P$ by all the tests in test suite $T$.
 
 % $\covfunc{P}{t}$ is a function that instruments program $P$, executes
 % test case $t$ on $P$, and returns the number of branches in $P$
@@ -367,11 +354,9 @@ Figure~\ref{fig:study-design}(a) illustrates the scenario in which $t$
 is present in the test suites for both the old and the new versions of
 the system. To study different cases, we consider whether $t$ is
 modified (to $t'$) and, if so, whether the behaviors of $t$ and $t'$
-differ. (We have not considered the cases in which $t$ is not modified
-because they are irrelevant for studying test evolution.)  For
-\textit{behavioral differences}, there are two cases, shown in the two
-rows of the table: either $t$ fails on $P'$ and $t'$ passes on $P'$ or
-both $t$ and $t'$ pass on $P'$.
+differ. For \textit{behavioral differences} there are two cases, shown
+in the two rows of the table: either $t$ fails on $P'$ and $t'$ passes
+on $P'$ or both $t$ and $t'$ pass on $P'$.
 
 \begin{figure}[t]
 \centering
@@ -436,21 +421,18 @@ too difficult to fix \\
   & \multicolumn{1}{r|}{\scriptsize [\cataddp{}]} \\
   \hline
 \end{tabular}
-\caption{Scenarios considered in our investigation. Given two system
-  versions $S = (P, T)$ and $S' = (P', T')$, the three scenarios are:
-  (a) $t$ exists in $T$ and $T'$ and is modified, (b) $t$ exists in
-  $T$ but not in $T'$, (c) $t'$ exists in $T'$ but not in $T$.}
-\vspace*{-5pt}
+\caption{Scenarios considered in our approach, given two system
+  versions $S = (P, T)$ and $S' = (P', T')$: (a) $t$ exists in $T$ and
+  $T'$ and is modified, (b) $t$ exists in $T$ but not in $T'$, (c)
+  $t'$ exists in $T'$ but not in $T$.}
+\vspace*{-12pt}
 \label{fig:study-design}
 \end{figure}
 
-\paragraph{Category \catrep{} (Repaired Tests)}
-\label{sec:category-rep}
-
-The \catrep{} category corresponds to the case where $t$ is repaired
-so that, after the modifications, it passes on $P'.$ As discussed in
-the Introduction, Figure~\ref{fig:pmd-javatokenizertest} shows an
-example of such a test repair.
+\textit{a) Category \catrep{} (Repaired Tests)} corresponds to cases
+where $t$ is repaired so that, after the modifications, it passes on
+$P'.$ (See Figure~\ref{fig:pmd-javatokenizertest} and discussion in
+Section~\ref{sec:intro}.)
 
 %% The code fragments in Listings~\ref{c1-old} and~\ref{c1-new} present
 %% another example of repair that involves a simpler code modification
@@ -536,11 +518,9 @@ test to work correctly.
 %% approach would in fact repair broken tests. In this case too, however,
 %% such a solution is in general not enough.
 
-\paragraph{Category \catref{} (Refactored Tests)}
-\label{sec:category-c2}
-
-The \catref{} category captures scenarios in which a test $t$ is
-modified in $S'$ even though $t$ passes on $P'$.
+\textit{b) Category \catref{} (Refactored Tests)} captures
+scenarios in which a test $t$ is modified in $S'$ even though $t$
+passes on $P'$.
 %% Listings~\ref{c2-old} and~\ref{c2-new} show an example of one such
 %% change from \subject{Commons Math}. Unit test \lang{testDistance} was
 %% refactored to invoke method \lang{sqrt()} in class \lang{FastMath}, a
@@ -565,31 +545,21 @@ test $t$ is deleted. To study the reasons for this, we examine the
 behavior of $t$ on the new program version $P'$ and consider three
 types of behaviors.
 
-\paragraph{Category \catdelaere{} (Hard-To-Fix Tests)}
-\label{sec:category-delaere}
-
-%%COMMENT PLEASE READ ME: I guess here we should focus more
-%%in the cases that tests are removed because they have become
-%%obsolete. Actually, in the examples I was not able to find one
-%%case in which it was removed because it was too difficult to
-%% be fixed. It was always obsolete tests.
-
-This category includes tests that fail on $P'$ with a runtime
-exception or an assertion violation. These may be instances where the
-tests should have been fixed, as the functionality that they test in
-$P$ still exists in $P'$, but the tests were discarded instead. One
-plausible hypothesis is that tests in this category involve repairs of
-undue complexity, for which the investigation of new repair techniques
-to aid the developer might be particularly useful.
+\textit{a) Category \catdelaere{} (Hard-To-Fix Tests)} includes tests
+that fail on $P'$ with a runtime exception or an assertion
+violation. These may be instances where the tests should have been
+fixed, as the functionality that they test in $P$ still exists in
+$P'$, but the tests were discarded instead. One plausible hypothesis
+is that tests in this category involve repairs of undue complexity,
+for which the investigation of new repair techniques to aid the
+developer might be particularly useful.
 %% We performed a preliminary investigation of this hypothesis by
 %% manually examining ten randomly selected tests in this category and
 %% found that all the examined tests were in fact obsolete.
 
-\paragraph{Category \catdelce (Obsolete Tests)}
-\label{sec:category-delce}
-
-A test that fails with a compilation error on the new program version
-is obsolete because of API changes.
+\textit{b) Category \catdelce (Obsolete Tests)} includes tests that
+are obsolete because of API changes, and thus fail with a compilation
+error on the new program version.
 %
 %% Listing~\ref{c4-example} illustrates a test in this category taken
 %% from \subject{JodaTime}.  This test was deleted because the tested
@@ -615,29 +585,9 @@ simply because the tested methods were no longer present.
 %% methods, which requires the development of new tests rather than fixes
 %% to the existing ones.
 
-\paragraph{Category \catdelp: (Redundant Tests)}
-\label{sec:category-delp}
-
-This category includes tests that are removed even though they pass on
-$P'$. These tests would typically be redundant, by some measure of
-redundancy (\eg code-coverage based). In some cases, a test may be
-replaced with a different one.
-
-%% Listing~\ref{c5-example} illustrates an example of one such test,
-%% taken from \subject{Commons Lang}. In the new version, this test was
-%% replaced by a more sophisticated one, shown in
-%% Listing~\ref{c5.2-example}.
-
-%% \begin{figure}[h]
-%% \lstinputlisting[language=java,label=c5-example,caption=\small{Unit
-%%   test from class MatrixIndexExceptionTest} (Commons Lang
-%% v2.1),frame=tb] {code/TestDel-P.java}
-%% \vspace{4pt}
-%% \end{figure}
-
-%% \lstinputlisting[language=java,label=c5.2-example,caption=\small{Unit
-%%   test implemented to replace the removed one} (Commons Lang
-%% v2.2),frame=tb] {code/TestDel-PII.java}
+\textit{c) Category \catdelp (Redundant Tests)} includes tests that
+are removed even though they pass on $P'$. These tests would typically
+be redundant according to some criterion, such as code coverage.
 
 \paragraph*{\textbf{Test Additions}}
 \label{sec:test-add}
@@ -647,16 +597,14 @@ augmentation, where a new test $t'$ is added to the test suite. The
 behavior of $t'$ on the old program can indicate the reason why it may
 have been added.
 
-\paragraph{Category \cataddaere: (Bug-Fix Tests)}
-\label{sec:category-addaere}
-
-This category includes added tests that fail on $P$ with a runtime
-exception or an assertion violation. In this case, the functionality
-that the added test $t'$ was designed to test exists in $P$ but is not
-working as expected (most likely because of a fault). The program
-modifications between $P$ and $P'$ would ostensibly have been made to
-fix the fault, which causes $t'$ to pass on $P'$. Thus, $t'$ is added
-to the test suite to validate the bug fix.
+\textit{a) Category \cataddaere (Bug-Fix Tests)} includes added tests
+that fail on $P$ with a runtime exception or an assertion
+violation. In this case, the functionality that the added test $t'$
+was designed to test exists in $P$ but is not working as expected
+(most likely because of a fault). The program modifications between
+$P$ and $P'$ would ostensibly have been made to fix the fault, which
+causes $t'$ to pass on $P'$. Thus, $t'$ is added to the test suite to
+validate the bug fix.
 
 %% Listing~\ref{c6-example} illustrates a test that fits this profile, as
 %% it was added to \subject{Commons Math} version 2.1 to validate a bug
@@ -671,46 +619,20 @@ to the test suite to validate the bug fix.
 %% captionpos=t,frame=tb]{code/TestAdd-AeRe.java}
 %% % \end{figure}
 
-\paragraph{Category \cataddce (New-Features Tests)}
-\label{sec:category-addce}
+\textit{b) Category \cataddce (New-Features Tests)} includes tests
+that fail on $P$ with a compilation error, which indicates that the
+API accessed by the tests does not exist in $P$. Thus, the added test
+$t'$ is created to test new code in $P'$.
 
-The added tests in this category fail on $P$ with a compilation error,
-which indicates that the API accessed by the tests does not exist in
-$P$. Thus, the added test $t'$ is created to test new code in $P'$,
-where the code could have been added as part of a refactoring or, more
-likely, to add new functionality.
-
-%% Listing~\ref{c7-example} illustrates a test from \subject{JFreeChart}
-%% that covers a new functionality: method \lang{getMinY()} did not exist
-%% in previous versions of class \lang{TimeSeries}.
-
-%% \lstinputlisting[language=java,label=c7-example,caption=\small{Unit
-%%   test from class TimeSeriesTests} (JFreeChart v1.0.14),
-%% captionpos=t,frame=tb]{code/TestAdd-Ce.java}
-
-\paragraph{Category \cataddp (Coverage-Augmentation Tests)}
-\label{sec:category-addp}
-
-This category considers cases where the added test $t'$ passes on
-$P$. Clearly, $t'$ would have been a valid test in the old system as
-well. One would expect that the addition of $t'$ increases program
-coverage (\ie $\covfunc{P'}{T'} \supset \covfunc{P'}{T' -
-  \{t'\}}$). Moreover, if $t'$ covers different statements in $P$ and
-$P'$ (assuming that there is a way of matching statements between $P$
-and $P'$), the plausible explanation is that $t'$ was added to test
-the changes made between $P$ and $P'$. However, if $t'$ covers the
-same statements in both program versions, it would have been added
-purely to increase code coverage (and not to test any added or
-modified code).
-
-%% Listing~\ref{c8-example} illustrates an added test case that increases
-%% code coverage: the new test method \lang{testFindRangeBounds} covers
-%% the case where the parameter of method \lang{findRangeBounds()} is
-%% null.
-
-%% \lstinputlisting[language=java,label=c8-example,caption=\small{Unit test
-%% from class XYErrorRendererTests} (JFreeChart v1.0.14),frame=tb]
-%% {code/TestAdd-P.java}
+\textit{c) Category \cataddp (Coverage-Augmentation Tests)} considers
+cases where the added test $t'$ passes on $P$. Clearly, $t'$ would
+have been a valid test in the old system as well. One would expect
+that the addition of $t'$ increases program coverage. Moreover, if
+$t'$ covers different statements in $P$ and $P'$, the plausible
+explanation is that $t'$ was added to test the changes made between
+$P$ and $P'$. However, if $t'$ covers the same statements in both
+program versions, it would have been added purely to increase code
+coverage, and not to test any added or modified code.
 
 \section{Implementation}
 \label{sec:implementation}
@@ -719,8 +641,7 @@ modified code).
 % \todo{In general, add more details.}
 % \todo{Discuss the availability of the tool.}
 
-In our demonstration, we show an implementation of our technique,
-\tool, that works on Java programs and JUnit test suites ({\small
+\tool works on Java programs and JUnit test suites ({\small
   \url{http://www.junit.org/}}). We chose Java and JUnit because the
 former is a widely used language, and the latter is the de-facto
 standard unit-testing framework for Java.  \tool\ analyzes a sequence
@@ -730,25 +651,25 @@ code.
 
 \tool\ is implemented as a Java based web application that runs on
 Apache Tomcat ({\small \url{http://tomcat.apache.org/}}). Although the
-tool can be installed locally, users who want to get familiar with
-\tool\ without having to install it can also access it remotely at
-{\small \url{http://cheetah.cc.gt.atl.ga.us:8081/testevol/}},
-specifying user ``icse'' and password ``icse2013''.
+tool can be installed locally, users can also run it without any
+install by accessing it remotely at {\small
+  \url{http://cheetah.cc.gt.atl.ga.us:8081/testevol/}} and specifying
+user ``icse'' and password ``icse2013'' (or requesting an account).
 
 Due to space limitations, we can only provide a few examples of
 \tool's graphical interface. (The companion demo video illustrates the
 tool interface in full detail.) Figure~\ref{fig:summary} shows the
 summary report generated by \tool\ for two pairs of versions of
 project \subject{google-gson}. The report shows the number of tests,
-both total and per version, that fall in each of the eight categories
-defined in our approach.  By clicking on a pair of versions, the user
-can obtain detailed report for a specific pair of versions. To
-illustrate, Figure~\ref{fig:versiondetails} shows the detailed report
-for versions $v.1.1$--$v.1.2$ and a specific category of differences
-(\catrep). By further clicking on a test case in the list, users can
-also inspect, in the case of modified tests, the actual differences
-between the two versions of that test, as shown in
-Figure~\ref{fig:summary} for test case \subject{TypeInfoTest}.
+both total and per version, that fall in each of the test-evolution
+categories considered in our approach.  By clicking on a pair of
+versions, the user can obtain a detailed report for a specific pair of
+versions.  To illustrate, Figure~\ref{fig:versiondetails} shows the
+detailed report for versions $v.1.1$--$v.1.2$ and for a specific
+category of differences (\catrep). By further clicking on a test case
+in the list, users can also inspect, if it is a modified test, the
+actual differences between the two versions of that test, as shown in
+Figure~\ref{fig:testdetails} for test case \subject{TypeInfoTest}.
 
 \begin{figure}[t]
 	\centering
@@ -802,19 +723,19 @@ test-suite changes, computed by the differencing component, are then
 passed to the \emph{test classifier}, which analyzes the information
 about test outcomes and test updates to classify each update into one
 of the eight test-evolution categories presented in
-Section~\ref{sec:test-evolution}. For each pair consisting of a broken
-test case and its repaired version, the test classifier also compares
-the test cases to identify the types of repair changes---different
-types of method-sequence changes and assertion changes---as discussed
-in Section~\ref{sec:category-rep}; this analysis is also implemented
-using \textsc{wala}.
+Section~\ref{sec:test-evolution}.  For each pair consisting of a
+broken test case and its repaired version, the test classifier also
+compares the test cases to identify the types of repair changes (\eg
+different types of method-sequence changes and assertion changes), as
+discussed in Section~\ref{sec:test-mod}. This analysis is also
+implemented using \textsc{wala}.
 
 \tool\ performs a further step for the test cases in categories
 \catdelp{}and \cataddp{}. For these tests, the test classifier
 leverages the \emph{coverage analyzer} to compute the branch coverage
 achieved by each test; this facilitates the investigation of whether
 the deleted or added tests cause any variations in the coverage
-attained by the new test suite.
+achieved by the new test suite.
 
 \begin{figure}
 	\centering
@@ -829,23 +750,22 @@ attained by the new test suite.
 \section{Conclusion}
 \label{sec:summary}
 
-Test suites evolve throughout their lifetime and change with the
-applications under test. Adapting existing test cases manually,
+Test suites evolve throughout their lifetime and change together with
+the applications under test. Adapting existing test cases manually,
 however, can be extremely tedious, especially for large test suites,
 which has motivated the recent development of automated test-repair
-techniques (\eg \cite{Daniel:2009, Daniel:2010, Mirzaaghaei:2012}).
-To support the development of more effective repair techniques, we
-developed \tool, a tool for systematic investigation of test-suite
-evolution that can provide its users with a comprehensive
-understanding of how test cases evolve. In this demonstration, we
-present \tool, its main features, and its technical characteristics.
-We also demonstrate how \tool\ can be run on real-world software
-systems and produce a wealth of useful information, such as the types
-of test-suite changes that occur, the frequency of the changes, and
-why tests are deleted and added.  Overall, we show how \tool\ is a
-useful tool not only for researchers working in the area of test
-repair, and test evolution in general, but also for developers and
-testers who wish to understand their software systems better.
+techniques. To support the development of more effective repair
+techniques, and to help developers and testers better understand test
+maintenance in general, we developed \tool. \tool is a tool for
+systematic investigation of test-suite evolution that can provide its
+users with a comprehensive understanding of how test cases evolve
+throughout the lifetime of a software system. This demonstration
+presents \tool, its main features, and its technical characteristics.
+It also shows how \tool\ can be run on real-world software systems and
+produce a wealth of useful information on how test-suite changes.
+
+Complete information on \tool\ can be found on the tool's web page, at
+{\small \url{http://www.cc.gatech.edu/~orso/software/testevol/}}.
 
 % \section*{Acknowledgments}
 
@@ -855,7 +775,59 @@ testers who wish to understand their software systems better.
 
 \bibliographystyle{abbrv}
 {\footnotesize
-\bibliography{paper}
+% \bibliography{paper}
+\begin{thebibliography}{1}
+
+\bibitem{Choudhary:2011}
+S.~R. Choudhary, D.~Zhao, H.~Versee, and A.~Orso.
+\newblock {WATER: Web Application TEst Repair}.
+\newblock In {\em Proceedings of the First International Workshop on End-to-End
+  Test Script Engineering}, pages 24--29, 2011.
+
+\bibitem{Daniel:2010}
+B.~Daniel, T.~Gvero, and D.~Marinov.
+\newblock On test repair using symbolic execution.
+\newblock In {\em Proceedings of the 19th International Symposium on Software
+  Testing and Analysis}, pages 207--218, 2010.
+
+\bibitem{Daniel:2009}
+B.~Daniel, V.~Jagannath, D.~Dig, and D.~Marinov.
+\newblock {ReAssert: Suggesting repairs for broken unit tests}.
+\newblock In {\em Proceedings of the International Conference on Automated
+  Software Engineering}, pages 433--444, 2009.
+
+\bibitem{Grechanik:2009}
+M.~Grechanik, Q.~Xie, and C.~Fu.
+\newblock Maintaining and evolving gui-directed test scripts.
+\newblock In {\em Proceedings of the 31st International Conference on Software
+  Engineering}, pages 408--418, 2009.
+
+\bibitem{Huang:2010}
+S.~Huang, M.~B. Cohen, and A.~M. Memon.
+\newblock Repairing {GUI} test suites using a genetic algorithm.
+\newblock In {\em Proceedings of the 3rd International Conference on Software
+  Testing, Verification and Validation}, pages 245--254, 2010.
+
+\bibitem{Memon:2008}
+A.~M. Memon.
+\newblock {Automatically repairing event sequence-based GUI test suites for
+  regression testing}.
+\newblock {\em ACM Trans. Softw. Eng. Methodol.}, 18:1--36, November 2008.
+
+\bibitem{Mirzaaghaei:2012}
+M.~Mirzaaghaei, F.~Pastore, and M.~Pezz{\'e}.
+\newblock Supporting test suite evolution through test case adaptation.
+\newblock In {\em Proceedings of the 5th IEEE International Conference on
+  Software Testing, Verification and Validation}, pages 231--240, 2012.
+
+\bibitem{pinto12}
+L.~S. Pinto, S.~Sinha, and A.~Orso.
+\newblock Understanding myths and realities of test-suite evolution.
+\newblock In {\em Proceedings of the 20th ACM SIGSOFT International Symposium
+  on the Foundations of Software Engineering (FSE 2012), to appear}.
+
+\end{thebibliography}
+
 }
 
 \end{document}
