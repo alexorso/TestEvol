@@ -26,11 +26,28 @@ public class RequestAccountController {
 	String password;
 
 	@RequestMapping(method = RequestMethod.GET)
-	public 	String getBranches(@RequestParam("username") String username) {
+	public 	String requestAccount(@RequestParam("username") String username) {
 		if(username == null || username.trim().length() == 0){
 			return "redirect:/login";
 		}
 
+		request("Testevol Access Request", username);
+		
+		return "redirect:/login?accessRequested=true";
+	}
+
+	@RequestMapping(value="tool", method = RequestMethod.GET)
+	public 	String requestTool(@RequestParam("username") String username) {
+		if(username == null || username.trim().length() == 0){
+			return "redirect:/login";
+		}
+
+		request("Testevol Tool Request", username);
+		
+		return "redirect:/login?toolRequested=true";
+	}
+	
+	private void request(String messageBody, String username){
 		Properties props = new Properties();
 		props.put("mail.smtp.auth", "true");
 		props.put("mail.smtp.starttls.enable", "true");
@@ -50,15 +67,13 @@ public class RequestAccountController {
 			message.setFrom(new InternetAddress(email));
 			message.setRecipients(Message.RecipientType.TO,
 				InternetAddress.parse("leandro.shp@gmail.com"));
-			message.setSubject("Testevol Access Request");
+			message.setSubject(messageBody);
 			message.setText(username+" is requesting access to Testevol.");
  
 			Transport.send(message);
 		} catch (MessagingException e) {
 			throw new RuntimeException(e);
 		}
-		
-		return "redirect:/login?accessRequested=true";
 	}
 
 }
