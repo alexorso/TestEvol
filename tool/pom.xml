@@ -16,6 +16,10 @@
 			<id>local</id>
 			<url>file://${basedir}/local-repo</url>
 		</repository>
+		<repository>
+			<id>Java.Net</id>
+			<url>http://download.java.net/maven/2/</url>
+		</repository>
 	</repositories>
 	<properties>
 		<spring.version>3.1.2.RELEASE</spring.version>
@@ -141,6 +145,12 @@
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-config</artifactId>
 			<version>${spring.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
+			<version>1.4.4</version>
 		</dependency>
 	</dependencies>
 	<build>

@@ -188,6 +188,11 @@ public class Version {
 	public File getDirectory() {
 		return versionDir;
 	}
+	
+	public void setDirectory(File versionDir) {
+		this.versionDir = versionDir;
+	}
+
 
 	public int getIndex() {
 		return Integer.parseInt(properties.getProperty("index"));
