@@ -192,22 +192,6 @@ call to method \lang{SourceCode.readSource} and removing one parameter
 from the call to method \lang{Tokenizer.tokenize} (lines 6 and 7 in
 Figure~\ref{fig:pmd-javatokenizertest}(b), respectively).
 
-\begin{figure}[t]
-\lstinputlisting[language=java,
-captionpos=t,frame=tb,stepnumber=1,numbers=left,numbersep=5pt]{code/a.java}
-\vspace*{-4pt}
-\centerline{(a)}
-\lstinputlisting[language=java,
-captionpos=t,frame=tb,stepnumber=1,numbers=left,numbersep=5pt]{code/b.java}
-\vspace*{-4pt}
-\centerline{(b)}
-\vspace*{-8pt}
-\caption{Two versions of a test case from \subject{PMD}'s unit test
-  suite: (a) version~1.4, broken, and (b) version~1.6, repaired.}
-\vspace*{-12pt}
-\label{fig:pmd-javatokenizertest}
-\end{figure}
-
 Because test repair can be an expensive activity, automating it---even
 if only partially---could save a considerable amount of resources
 during maintenance. This is the motivation behind the development of
@@ -277,6 +261,22 @@ practically applicable tool for researchers and practitioners
 interested in test repair (and test evolution in general), and for
 developers and testers who want to better understand their test
 maintenance process.
+
+\begin{figure}[t]
+\lstinputlisting[language=java,
+captionpos=t,frame=tb,stepnumber=1,numbers=left,numbersep=5pt]{code/a.java}
+\vspace*{-4pt}
+\centerline{(a)}
+\lstinputlisting[language=java,
+captionpos=t,frame=tb,stepnumber=1,numbers=left,numbersep=5pt]{code/b.java}
+\vspace*{-4pt}
+\centerline{(b)}
+\vspace*{-8pt}
+\caption{Two versions of a test case from \subject{PMD}'s unit test
+  suite: (a) version~1.4, broken, and (b) version~1.6, repaired.}
+\vspace*{-12pt}
+\label{fig:pmd-javatokenizertest}
+\end{figure}
 
 \section{The \tool\ Tool}
 \label{sec:test-evolution}
