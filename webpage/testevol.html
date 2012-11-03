@@ -1,0 +1,155 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>.:: TestEvol ::.</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+        <link href="css/style.css" rel="stylesheet" type="text/css" />
+        <script type="text/javascript" src="js/jquery-1.6.4.min.js"></script>
+        <script type="text/javascript" src="js/site.js"></script>
+        <script type="text/javascript">
+			var _gaq = _gaq || [];
+			_gaq.push(['_setAccount', 'UA-33881026-1']);
+			_gaq.push(['_trackPageview']);
+
+			(function() {
+				var ga = document.createElement('script');
+				ga.type = 'text/javascript';
+				ga.async = true;
+				ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+				var s = document.getElementsByTagName('script')[0];
+				s.parentNode.insertBefore(ga, s);
+			})();
+        </script>
+    </head>
+    <body>
+        <div id="background_top"></div>
+
+        <!-- wrapper -->
+        <div class="rapidxwpr">
+            <!-- header -->
+            <div id="header" style="z-index: 1000;">
+                <div class="title">
+                    TestEvol <span>{Enabling a better understanding of test-suite evolution}</span>
+                </div>
+                <div class="subtitle">
+
+                </div>
+                <div id="topmenu"></div>
+            </div>
+            <div id="middle">
+                <div id="main" class="clearingfix">
+
+                    <div id="mainmiddle" class="floatbox">
+
+                        <!-- right column -->
+
+                        <!-- / right column -->
+
+                        <!-- content column -->
+                        <div id="content" class="clearingfix">
+                            <div class="floatbox">
+                                <!-- features -->
+                                <div class="box">
+                                    <ul class="features clearingfix">
+                                        <li>
+                                            <div class="details">
+                                                <h2 style="font-size: 25px;">TestEvol is now available! Click <a href="http://cheetah.cc.gt.atl.ga.us:8081/testevol/" class="link">here</a> to try it out.</h2>
+
+                                                <p>
+                                                <iframe width="560" height="315" src="http://www.youtube.com/embed/X9sX3SII5nI?rel=0" frameborder="0" allowfullscreen></iframe>
+                                                </p>
+                                                <!--<h2>(If you want to be notified when the tool is officially released, just <a
+                                                href="mailto:orso@cc.gatech.edu?subject=TestEvol%20request">let us know</a>.)</h2>-->
+
+                                                <h2><span>TestEvol</span> is a tool for analyzing test-suite evolution. </h2>
+                                                <p>
+                                                    TestEvol facilitates the systematic study of test-suite evolution
+                                                    for Java programs and JUnit test suites. The tool analyzes a
+                                                    sequence of versions of a software system, where a system
+                                                    consists of an application together with its test suite, and allows for
+                                                    studying how the test cases in the test suite evolved when going
+                                                    from one version to the next.
+                                                    </p>
+
+                                                        <p>
+                                                            TestEvol consists of five components, as illustrated in the architecture diagram
+                                                            shown below.
+                                                        </p>
+
+
+                                                        <ul>
+                                                                    <li>
+                                                                        The <em>compiler</em> component builds each system
+                                                                        version and creates two jar files, one containing
+                                                                        the application classes and the other containing
+                                                                        the test classes.
+                                                                    </li>
+                                                                    <li>
+                                                                        The <em>test-execution engine</em> analyzes each pair
+                                                                        of system versions <em>(S, S')</em>, where <em>S = (P, T)</em> and <em>S' = (P', T')</em>.  First, it executes <em>T</em> on program <em>P</em>
+                                                                        and <em>T'</em> on program <em>P'</em> (\ie it runs the tests on the
+                                                                        respective program versions). Then, it executes <em>T'</em> on <em>P</em> and <em>T</em> on <em>P'</em>. For each execution, it records the
+                                                                        test outcome.
+
+                                                                    </li>
+                                                                    </ul>
+                                                        <div>
+                                                            <div style="float:left;width:50%;">
+                                                                <ul>
+                                                                    <li>
+                                                                        The <em>differencing component</em> compares <em>T</em> and <em>T'</em>
+                                                                        to identify modified, deleted, and added tests. This
+                                                                        component is implemented using the <a class="link" href="wala.sourceforge.net">wala</a>
+                                                                        analysis infrastructure for Java bytecode.
+                                                                    </li>
+                                                                    <li>
+                                                                        The test outcomes, collected by the test-execution engine, and the
+                                                                        test-suite changes, computed by the differencing component, are then
+                                                                        passed to the <em>test classifier</em>, which analyzes the information
+                                                                        about test outcomes and test updates to classify each update into eight
+                                                                        different categories.  For each pair of broken test case
+                                                                        and its repaired version, the test classifier also compares the test
+                                                                        cases to identify the types of repair changes&mdash;different types of
+                                                                        method-sequence changes and assertion changes. The classifier is also augmented 
+                                                                        with a clone detector to avoid tests that where only renamed to be classified
+                                                                        as an added test in the new version of the system and as a deleted test in
+                                                                        the old one.
+                                                                    </li>
+                                                                    <li>
+                                                                        The test classifier also leverages the <em>coverage analyzer</em> to
+                                                                        compute the branch coverage achieved by each test; this facilitates
+                                                                        the investigation of whether the deleted or added tests cause any
+                                                                        variations in the coverage attained by the new test suite.
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                            <div style="padding-left:20px;float:right;width:47%;">
+                                                                <img id="approach" src="images/testevol.png" alt="TestEvol Architecture"/>
+
+                                                            </div>
+                                                        </div>
+                                                        <br style="clear: both"/>
+
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <!-- / features -->
+
+                            </div>
+                        </div>
+                        <!-- / content column -->
+
+                    </div>
+                </div>
+            </div>
+            <br/>
+            <br/>
+            <br/>
+            <br/>
+            <br/>
+            <!-- / main body -->
+        </div>
+    </body>
+</html>
