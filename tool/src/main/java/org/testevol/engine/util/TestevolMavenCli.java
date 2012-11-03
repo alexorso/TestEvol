@@ -3,18 +3,14 @@ package org.testevol.engine.util;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
-import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.cli.MavenCli;
-import org.testevol.domain.Version;
 
 public class TestevolMavenCli {
 
@@ -55,7 +51,7 @@ public class TestevolMavenCli {
 				IOUtils.write(line+"\n", baos);
 			}
 		}
-		System.out.println(baos.toString());
+		//System.out.println(baos.toString());
 		return baos.toString();
 	}
 

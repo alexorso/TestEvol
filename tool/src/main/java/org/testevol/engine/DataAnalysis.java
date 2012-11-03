@@ -6,6 +6,7 @@ package org.testevol.engine;
 import java.io.File;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.testevol.domain.Project;
 import org.testevol.domain.Version;
 import org.testevol.engine.domain.TestEvolLog;
@@ -61,6 +62,9 @@ public class DataAnalysis {
 
 			log.logStrong("Starting Execution...");			
 			for (Version version : versions) {
+				File versionCopy = new File(executionFolder, version.getName());
+				FileUtils.copyDirectory(version.getDirectory(), versionCopy);
+				version.setDirectory(versionCopy);
 				log.log("Setting up version " + version.getName());
 				if(!version.setUp(new File(testevolConfigRoot))){
 					log.logError("Error while setting up version "+version.getName());
@@ -81,6 +85,9 @@ public class DataAnalysis {
 			reportGenerator.go();
 
 		}finally {
+			for (Version version : versions) {
+				FileUtils.deleteDirectory(version.getDirectory());
+			}
 			long end = System.currentTimeMillis();
 			if(log != null){
 				log.addLine();
