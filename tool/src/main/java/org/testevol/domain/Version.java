@@ -215,6 +215,12 @@ public class Version {
 					}
 				}
 			}
+			if(mavenModel.getProperties().containsKey("maven.compile.source")){
+				String javaVersion = mavenModel.getProperties().getProperty("maven.compile.source");
+				if(javaVersion != null && !javaVersion.trim().isEmpty()){
+					return javaVersion;
+				}
+			}
 			return "1.5";
 		}
 
