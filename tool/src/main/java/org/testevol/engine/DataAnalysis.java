@@ -57,6 +57,7 @@ public class DataAnalysis {
 
 		long init = System.currentTimeMillis();
 		TestEvolLog log = null;
+		boolean setUpSuccessFully = false;
 		try {
 			log = new TestEvolLog(new File(executionFolder, "log.txt"));
 
@@ -71,6 +72,7 @@ public class DataAnalysis {
 					throw new RuntimeException();
 				}
 			}
+			setUpSuccessFully = true;
 			Compiler compiler = new Compiler(versions, log);
 			Runner runner = new Runner(versions, log);
 			Differ differ = new Differ(versions, testevolConfigRoot, log);
@@ -85,8 +87,10 @@ public class DataAnalysis {
 			reportGenerator.go();
 
 		}finally {
-			for (Version version : versions) {
-				FileUtils.deleteDirectory(version.getDirectory());
+			if(setUpSuccessFully){
+				for (Version version : versions) {
+					FileUtils.deleteDirectory(version.getDirectory());
+				}				
 			}
 			long end = System.currentTimeMillis();
 			if(log != null){
