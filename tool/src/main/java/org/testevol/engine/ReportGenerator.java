@@ -60,7 +60,7 @@ public class ReportGenerator extends Task {
 			Results results = resultsMap.get(versionPair);
 			
 			if(!skipCoverageAnalysis){
-				log.log("Analysing covergae for pair "  + oldVersion.getName() + " - " + version.getName());
+				log.log("Analysing coverage for pair "  + oldVersion.getName() + " - " + version.getName());
 				CategoryC5 categoryC5 = results.getCategoryC5();
 				categoryC5.analyseCoverage();
 				

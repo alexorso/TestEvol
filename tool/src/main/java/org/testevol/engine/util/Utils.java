@@ -28,7 +28,7 @@ import java.util.zip.ZipInputStream;
 import org.testevol.engine.TestRunner;
 
 public class Utils {
-	private static boolean diagnosticOn = true;
+	private static boolean diagnosticOn = false;
 
 	private static PrintStream out = System.out;
 

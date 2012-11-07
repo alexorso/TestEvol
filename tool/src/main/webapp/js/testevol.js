@@ -163,7 +163,7 @@ function createTable(category) {
 			line.className = "packageAndClass";
 			$("#dataTable").append(line);
 
-			var tests = classes[j]["value"]
+			var tests = classes[j]["value"];
 			for(var w = 0; w < tests.length; w++) {
 				line = document.createElement("tr");
 				col1 = document.createElement("td");
@@ -175,13 +175,13 @@ function createTable(category) {
 					link.innerHTML = testName;
 					col1.appendChild(link);
 				} else if(category == 'TESTDEL (P)') {
-					if(tests[w]['good_coverage']) {
+					if( hasCoverageInfo(category, completeTestName) && tests[w]['good_coverage']) {
 						col1.innerHTML = "<span style='float:left;padding-right:10px;'>" + tests[w]['name'] + "</span><span class='ui-state-error' style='border:none;cursor:pointer;' onclick='showCoverageLost(\"" + completeTestName + "\")'><span class='ui-icon ui-icon-alert' title='Some statements covered by this test are not covered by the new test suite.<br><br>Click for more details.' style='background-color:transparent;'></span></span>";
 					} else {
 						col1.innerHTML = tests[w]['name'];
 					}
 				} else if(category == 'TESTADD (P)') {
-					if(tests[w]['good_coverage']) {
+					if(hasCoverageInfo(category, completeTestName) && tests[w]['good_coverage']) {
 						col1.innerHTML = "<span style='float:left;padding-right:10px;'>" + tests[w]['name'] + "</span><span class='ui-state-highlight' style='border:none;cursor:pointer;' onclick='showCoverageImprovement(\"" + completeTestName + "\")'><span class='ui-icon ui-icon-star' title='This test has helped to increase the coverage of the test suite.<br><br>Click for more details.' style='background-color:transparent;'></span></span>";
 					} else {
 						col1.innerHTML = tests[w]['name'];
@@ -247,6 +247,16 @@ function populateSummaryBody() {
 //		line.appendChild(col2);
 		$("#leftmenu_det_report").append(li_cat);
 	}
+}
+
+function hasCoverageInfo(category, testName){
+	var coverageInfo = '';
+	if(category == 'TESTDEL (P)') {
+		coverageInfo = getCoverageLost()[testName];
+	} else if(category == 'TESTADD (P)') {
+		coverageInfo = getCoverageImprovement()[testName];
+	}
+	return (typeof coverageInfo != 'undefined');
 }
 
 function showCoverageLost(testName) {
