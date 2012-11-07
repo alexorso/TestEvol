@@ -146,39 +146,47 @@
 								<input type="hidden" name="project" id="project">
 								<input type="hidden" name="version" id="version">
 								<fieldset>
+								
+									<div class="control-group">
+										<label class="control-label" for="basedirOnRepository">Base dir inside version folder - <b>&#36;{base_dir}</b></label>
+										<div class="controls">
+											<input class="input-xlarge focused" id="basedirOnRepository" name="basedirOnRepository"
+												type="text" placeholder="Relative folder in version dir. Default: empty" style="margin-top:5px;">
+										</div>
+									</div>
 									<div class="control-group">
 										<label class="control-label" for="source">Application/Library sources directory</label>
 										<div class="controls">
 											<input class="input-xlarge focused" id="source" name="source"
-												type="text" placeholder="(Using default value: src/main/java)" style="margin-top:5px;">
+												type="text" placeholder="(Default value: &#36;{base_dir}/src/main/java)" style="margin-top:5px;">
 										</div>
 									</div>
 									<div class="control-group">
 										<label class="control-label" for="resource">Application/Library resources directory</label>
 										<div class="controls">
 											<input class="input-xlarge" id="resource" name="resource"
-												type="text" placeholder="(Using default value: src/main/resources)"  style="margin-top:5px;">
+												type="text" placeholder="(Default value: &#36;{base_dir}/src/main/resources)"  style="margin-top:5px;">
 										</div>
 									</div>
 									<div class="control-group">
 										<label class="control-label" for="testSources">Test Sources directory</label>
 										<div class="controls">
 											<input class="input-xlarge" id="testSources" name="testSources"
-												type="text" placeholder="(Using default value: src/test/java)">
+												type="text" placeholder="(Default value: &#36;{base_dir}/src/test/java)">
 										</div>
 									</div>
 									<div class="control-group">
 										<label class="control-label" for="testResource">Test resources directory</label>
 										<div class="controls">
 											<input class="input-xlarge" id="testResource" name="testResource"
-												type="text" placeholder="(Using default value: src/test/resources)"  style="margin-top:5px;">
+												type="text" placeholder="(Using default value: &#36;{base_dir}/src/test/resources)"  style="margin-top:5px;">
 										</div>
 									</div>
 									<div class="control-group">
 										<label class="control-label" for="lib">Classpath directory</label>
 										<div class="controls">
 											<input class="input-xlarge" id="lib" name="lib"
-												type="text" placeholder="(Using default value: lib)">
+												type="text" placeholder="(Using default value: &#36;{base_dir}/lib)">
 										</div>
 									</div>
 									<div class="control-group">

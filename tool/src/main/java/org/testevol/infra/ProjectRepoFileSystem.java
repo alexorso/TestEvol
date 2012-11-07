@@ -274,6 +274,7 @@ public class ProjectRepoFileSystem implements ProjectRepository {
 		properties.setProperty(Version.TESTS_RESOURCES, versionSettings.getTestResource());
 		properties.setProperty(Version.LIB_DIR, versionSettings.getLib());
 		properties.setProperty(Version.JAVA_VERSION, versionSettings.getJavaversion());
+		properties.setProperty(Version.BASE_DIR_REPO, versionSettings.getBasedirOnRepository());
 
 		Version version = new Version(versionDir);
 		File configFile = version.getTestEvolConfigFile();
