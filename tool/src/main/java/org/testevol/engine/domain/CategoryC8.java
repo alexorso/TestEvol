@@ -17,7 +17,6 @@ import org.testevol.domain.Version;
 import org.testevol.engine.domain.coverage.Coverage;
 import org.testevol.engine.domain.coverage.CoverageUtil;
 import org.testevol.engine.driver.TestCoverageDriver;
-import org.testevol.engine.util.Utils;
 
 public class CategoryC8 extends Category {
 
@@ -58,10 +57,8 @@ public class CategoryC8 extends Category {
 	
 	public void analyseCoverage(Results results, AddedTestMethods addedTestMethods) throws FileNotFoundException, IOException{
 		if(getTestsOnThisCategory().isEmpty()){
-			Utils.println("No tests in category C8, no coverage analysis needed.");
 			return;
 		}
-		Utils.println(getTestsOnThisCategory().size()+" tests in category C8, starting coverage analysis.");
 		
 		CoverageUtil.deleteCoverageInfo(version.getBuildDir());
 		

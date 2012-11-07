@@ -14,6 +14,7 @@ import org.testevol.engine.domain.TestEvolLog;
 import org.testevol.engine.domain.VersionPair;
 import org.testevol.engine.report.CSVReport;
 import org.testevol.engine.report.HtmlReport;
+import org.testevol.engine.util.Utils;
 
 public class ReportGenerator extends Task {
 
@@ -62,23 +63,31 @@ public class ReportGenerator extends Task {
 			if(!skipCoverageAnalysis){
 				log.log("Analysing coverage for pair "  + oldVersion.getName() + " - " + version.getName());
 				CategoryC5 categoryC5 = results.getCategoryC5();
-				categoryC5.analyseCoverage();
+				if(categoryC5.getTestsOnThisCategory().isEmpty()){
+					log.log("No tests in category TESTDEL (P), no coverage analysis needed.");
+				}
+				else{
+					log.log(categoryC5.getTestsOnThisCategory().size()+" tests in category TESTDEL (P), starting coverage analysis for tests in this category.");
+					categoryC5.analyseCoverage();
+				}
 				
-				CategoryC8 categoryC8 = results.getCategoryC8();
-
 	            //Set<String> modifiedMethodsLines = javaDiffCode.getSetOfLinesRelatedToModifiedMethods();
 	            //Set<String> addedMethodsLines = javaDiffCode.getSetOfLinesRelatedToAddedMethods();
 	            
-	        	AddedTestMethods addedTestMethods = new AddedTestMethods(oldVersion, version, results.getAddedMethods());
-	        	addedTestMethods.analyseCoverage();
+//	        	AddedTestMethods addedTestMethods = new AddedTestMethods(oldVersion, version, results.getAddedMethods());
+//	        	addedTestMethods.analyseCoverage();
 	        	
-	        	
-	            //AddedTestMethods addedTestMethods = new AddedTestMethods(oldVersion, version, categoryC8.getTestsOnThisCategory());
-	        	//addedTestMethods.analyseCoverageBasedOnUpdatedMethods(modifiedMethodsLines, addedMethodsLines);
-	        	//addedTestMethods.saveSummary();
-	        	
-	        	
-	            categoryC8.analyseCoverage(results,addedTestMethods);
+				CategoryC8 categoryC8 = results.getCategoryC8();
+				if(!categoryC8.getTestsOnThisCategory().isEmpty()){
+					log.log(categoryC8.getTestsOnThisCategory().size()+" tests in category TESTADD (P), starting coverage analysis for tests in this category.");
+
+		        	AddedTestMethods addedTestMethods = new AddedTestMethods(oldVersion, version, categoryC8.getTestsOnThisCategory());
+		        	addedTestMethods.analyseCoverage();
+		        	categoryC8.analyseCoverage(results,addedTestMethods);
+				}
+				else{
+					log.log("No tests in category TESTADD (P), no coverage analysis needed.");
+				}
 
 	           // TypesOfModificationsReport.generateReport(oldVersion, version, categoryC1);	
 			}		

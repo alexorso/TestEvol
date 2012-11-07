@@ -16,6 +16,7 @@ import java.util.Set;
 import org.apache.commons.io.FileUtils;
 import org.testevol.engine.TestRunner;
 import org.testevol.engine.domain.coverage.Coverage;
+import org.testevol.engine.domain.coverage.CoverageUtil;
 import org.testevol.engine.util.TrexClassLoader;
 
 /**
@@ -58,14 +59,6 @@ public class TestCoverageDriver
 	{			
 		try
 		{
-
-			//Instrument the files using cobertura. Don't specify destination. Source files will be overwritten
-			List<String> dirsToInstrument = new ArrayList<String>();
-			for (int i = 0; i < srcJarFiles.size(); i++) {
-					File jarFile = new File(srcJarFiles.get(i));
-					FileUtils.copyFile(jarFile, new File(jarFile.getParent(), jarFile.getName()+".NotInstrumented.jar"));
-					dirsToInstrument.add(srcJarFiles.get(i));
-			}			
 			
 			//Loading all URLs including all from class paths as well
 			List<URL> allUrls = new ArrayList<URL>();
@@ -89,9 +82,31 @@ public class TestCoverageDriver
 			TrexClassLoader clsLoader = new TrexClassLoader(urlsToLoad);
 
 			File cobertura_ser = new File(destination, "cobertura.ser");
+			File cobertura_ser_copy = new File(destination, "cobertura.copy");
 			
-			if(instrument){
-				TestCoverageDriver.instrument(null, cobertura_ser, null, null, null, null, dirsToInstrument, clsLoader);				
+			if (instrument) {
+				List<String> dirsToInstrument = new ArrayList<String>();
+				//Instrument the files using cobertura. Don't specify destination. Source files will be overwritten
+				for (int i = 0; i < srcJarFiles.size(); i++) {
+					File jarFile = new File(srcJarFiles.get(i));
+					FileUtils.copyFile(jarFile, new File(jarFile.getParent(),
+							jarFile.getName() + ".NotInstrumented.jar"));
+					dirsToInstrument.add(srcJarFiles.get(i));
+				}
+
+				TestCoverageDriver.instrument(null, cobertura_ser, null, null,
+						null, null, dirsToInstrument, clsLoader);
+				
+				if(cobertura_ser_copy.exists()){
+					cobertura_ser_copy.delete();
+				}
+				FileUtils.copyFile(cobertura_ser, cobertura_ser_copy);
+			}
+			else{
+				if(!cobertura_ser_copy.exists()){
+					throw new RuntimeException();
+				}
+				FileUtils.copyFile(cobertura_ser_copy, cobertura_ser);
 			}
 
 			for(String srcJarFile : srcJarFiles)
@@ -120,7 +135,7 @@ public class TestCoverageDriver
 			}
 			TestCoverageDriver.generateCoverageReport(cobertura_ser, destination, "xml", srcDirectories, clsLoader);
 			coverageXml = new File(destination,"coverage.xml");
-			Coverage coverage = Coverage.getInstance(new FileInputStream(new File(destination, "coverage.xml")));
+			Coverage coverage = Coverage.getInstance(new FileInputStream(coverageXml));
 			return coverage;
 			
 		}
@@ -128,22 +143,24 @@ public class TestCoverageDriver
 		{
 			ex.printStackTrace();
 		}
-		finally{
-			try{
-				for (int i = 0; i < srcJarFiles.size(); i++) {
-					File jarFile = new File(srcJarFiles.get(i));
-					jarFile.delete();
-					File notIntrumentedJar = new File(jarFile.getParent(), jarFile.getName()+".NotInstrumented.jar");
-					FileUtils.copyFile(notIntrumentedJar, jarFile);
-					notIntrumentedJar.delete();
-				}
-			}
-			catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
 		
 		return null;
+	}
+	
+	public static void cleanUpCoverage(List<String> srcJarFiles){
+		try{
+			for (int i = 0; i < srcJarFiles.size(); i++) {
+				File jarFile = new File(srcJarFiles.get(i));
+				jarFile.delete();
+				File notIntrumentedJar = new File(jarFile.getParent(), jarFile.getName()+".NotInstrumented.jar");
+				FileUtils.copyFile(notIntrumentedJar, jarFile);
+				notIntrumentedJar.delete();
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 	}
 	
 	private static boolean runTests( 

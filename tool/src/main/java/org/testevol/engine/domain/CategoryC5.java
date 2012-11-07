@@ -58,11 +58,8 @@ public class CategoryC5 extends Category {
 	
 	public void analyseCoverage() throws FileNotFoundException, IOException{
 		if(getTestsOnThisCategory().isEmpty()){
-			Utils.println("No tests in category C5, no coverage analysis needed.");
 			return;
 		}
-		Utils.println(getTestsOnThisCategory().size()+" tests in category C5, starting coverage analysis.");
-		
 		CoverageUtil.deleteCoverageInfo(version.getBuildDir());
 		
 		List<String> code = new ArrayList<String>();
@@ -86,7 +83,7 @@ public class CategoryC5 extends Category {
 																			version.getBuildDir().getAbsolutePath(),
 																			true);
 		
-		System.out.println("\nTest Suite coverageCoverage:"+testSuiteCoverage.toString()+"\n");
+		System.out.println("\nTest Suite coverage: "+testSuiteCoverage.toString()+"\n");
         
 		for(String test:getTestsOnThisCategory()){
 			
@@ -96,7 +93,7 @@ public class CategoryC5 extends Category {
 			
 			String fullClassName = test.substring(0, test.lastIndexOf("."));			
 			
-			Utils.println("Running only method:"+fullClassName+"."+testName);
+			//Utils.println("Running only method:"+fullClassName+"."+testName);
 			
 			Set testsToInclude = new HashSet();
 	        testsToInclude.add(fullClassName+"."+testName);
@@ -109,13 +106,16 @@ public class CategoryC5 extends Category {
 																		testsToInclude,
 																		null,
 																		version.getBuildDir().getAbsolutePath(),
-																		true);
+																		false);
 
 			List<String> notCoveredLines = hasDecreasedCoverage(testSuiteCoverage, testCoverage);
 			coverageHasDecreased.put(test, 	notCoveredLines.isEmpty());
 			this.notCoveredLines.put(test, notCoveredLines);
+			
 			System.out.println("\nCoverage:"+testCoverage.toString()+"\n");
 		}
+		
+		TestCoverageDriver.cleanUpCoverage(code);
 	}
 	
 	public int getNumberOfTestsWithSameCoverage(){

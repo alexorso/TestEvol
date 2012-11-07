@@ -50,6 +50,7 @@ public class AddedTestMethods {
 		}
 
 		String[] srcDirs = new String[] { version.getSourceDir().getAbsolutePath() };
+		boolean instrument = true;
 		for (String test : addedTestMethods) {
 
 			CoverageUtil.deleteCoverageInfo(version.getBuildDir());
@@ -59,12 +60,20 @@ public class AddedTestMethods {
 
 			Coverage testCoverage = TestCoverageDriver.computeCoverage(code,
 					srcDirs, classpath, Arrays.asList(version.getTestsJar().getAbsolutePath()), testsToInclude, null, version
-							.getBuildDir().getAbsolutePath(), true);
+							.getBuildDir().getAbsolutePath(), instrument);
 
+			
 			coveragesInfo.put(test, testCoverage);
+			//instrument only the first time
+			instrument = false;
+			
 			System.out.println("Coverage:" + testCoverage.toString());
+			
 
 		}
+		
+		
+		TestCoverageDriver.cleanUpCoverage(code);
 	}
 
 	public Coverage getCoverage(String addedTest) {
