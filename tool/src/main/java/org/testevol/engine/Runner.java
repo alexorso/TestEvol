@@ -158,7 +158,7 @@ public class Runner extends Task {
                 	File runtimeError = new File(buildDir, "data-testout-"+ TestOutcome.RUNTIME_ERROR + "-" + versions + ".txt");
                 	
                 	if(assertError.length() > 0 || compilationError.length() > 0 || runtimeError.length() > 0 ){
-                		log.logError("Tests from version "+version.getName()+" contain errors!");
+                		//log.logError("Tests from version "+version.getName()+" contain errors!");
                 		//continue nextVersion;
                 		//return false;
                 	}

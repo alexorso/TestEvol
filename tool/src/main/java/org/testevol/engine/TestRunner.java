@@ -68,6 +68,8 @@ public class TestRunner {
 	// Returns null in the case of abstract classes
 	public Map<String, TestResult> runTests(String className) {
 		
+		Thread.currentThread().setContextClassLoader(trexClsLoader);		
+		
 		Map<String, TestResult> results = new HashMap<String, TestResult>();
 		Class<?> klass = null;
 
