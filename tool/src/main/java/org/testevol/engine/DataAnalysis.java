@@ -4,6 +4,7 @@
 package org.testevol.engine;
 
 import java.io.File;
+import java.io.StringWriter;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
@@ -96,10 +97,41 @@ public class DataAnalysis {
 			if(log != null){
 				log.addLine();
 				log.addLineSeparator(25);
-				log.logStrong("Total execution time: " + ((end - init) / 1000) + " seconds");
+				log.logStrong("Total execution time: " + formatTime(((end - init) / 1000)));
 				log.addLineSeparator(25);
 			}
-
 		}
 	}
+	
+	private String formatTime(long time){
+		long numberOfHours = time/36000;
+		long remainder = time % 3600;
+		long numberOfMinutes = remainder/60;
+		long numberOfSeconds = remainder % 60;
+		
+		StringWriter formatedTime = new StringWriter();
+		if(numberOfHours > 0){
+			formatedTime.append(String.valueOf(numberOfHours)).append(" ").append(" hr");
+			if(numberOfHours > 1){
+				formatedTime.append("s");	
+			}
+			formatedTime.append(" ");
+		}
+		if(numberOfMinutes > 0){
+			formatedTime.append(String.valueOf(numberOfMinutes)).append(" ").append(" min");
+			if(numberOfMinutes > 1){
+				formatedTime.append("s");	
+			}
+			formatedTime.append(" ");
+		}
+		if(numberOfSeconds > 0){
+			formatedTime.append(String.valueOf(numberOfSeconds)).append(" ").append(" sec");
+			if(numberOfMinutes > 1){
+				formatedTime.append("s");	
+			}
+		}
+		
+		return formatedTime.toString();
+	}
+	
 }
