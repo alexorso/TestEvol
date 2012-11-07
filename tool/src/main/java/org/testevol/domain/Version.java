@@ -209,7 +209,14 @@ public class Version {
 					if ("configuration".equals(dom.getName())) {
 						for (Xpp3Dom children : dom.getChildren()) {
 							if (children.getName().matches("target|source")) {
-								return children.getValue();
+								String value = children.getValue();
+								if(value.startsWith("$")){
+									String propertyKey = value.substring(value.indexOf("${") + 1,value.indexOf("}"));
+									if(mavenModel.getProperties().containsKey(propertyKey)){
+										value = mavenModel.getProperties().getProperty(propertyKey);										
+										return value;
+									}
+								}
 							}
 						}
 					}

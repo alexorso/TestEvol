@@ -250,11 +250,11 @@ public class TestRunner {
 
 	public Map<String, TestResult> logError(String className,
 			Throwable e, Class<?> klass, Map<String, TestResult> results) {
-		System.err.println("====== test class <" + className + " beg> ======");
-		System.err.println("");
-		System.err.println("[treated as a compilation error]");
-		System.err.println("");
-		e.printStackTrace();
+		//System.err.println("====== test class <" + className + " beg> ======");
+		//System.err.println("");
+		//System.err.println("[treated as a compilation error]");
+		//System.err.println("");
+		//e.printStackTrace();
 		if (klass != null) {
 			try {
 				for (Method method : klass.getDeclaredMethods()) {
@@ -268,17 +268,17 @@ public class TestRunner {
 					}
 				}
 			} catch (NoClassDefFoundError ex) {
-				System.err.println("======< additional error beg>======");
-				ex.printStackTrace();
-				System.err.println("======< additional error end>======");
+				//System.err.println("======< additional error beg>======");
+				//ex.printStackTrace();
+				//System.err.println("======< additional error end>======");
 			} catch (VerifyError ex) {
-				System.err.println("======< additional error beg>======");
-				ex.printStackTrace();
-				System.err.println("======< additional error end>======");
+				//System.err.println("======< additional error beg>======");
+				//ex.printStackTrace();
+				//System.err.println("======< additional error end>======");
 			} catch (IncompatibleClassChangeError e2) {
-				System.err.println("======< additional error beg>======");
-				e2.printStackTrace();
-				System.err.println("======< additional error end>======");
+				//System.err.println("======< additional error beg>======");
+				//e2.printStackTrace();
+				//System.err.println("======< additional error end>======");
 			}
 
 			System.err.println("==================<" + className
