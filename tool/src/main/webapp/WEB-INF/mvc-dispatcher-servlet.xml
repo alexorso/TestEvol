@@ -59,7 +59,8 @@
 					password="5ea31ff90aab047dcc26272004960e9de8a1b704" authorities="ROLE_USER" />
                               <security:user name="leandro"
                                         password="5ea31ff90aab047dcc26272004960e9de8a1b704" authorities="ROLE_USER" />
-
+                              <security:user name="edwards@cs.vt.edu"
+                                        password="dfd0261b97e00eddd021c1e2403e4d74fe8d93f8" authorities="ROLE_USER" />
 			</security:user-service>
 		</security:authentication-provider>
 	</security:authentication-manager>
