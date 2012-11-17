@@ -18,7 +18,7 @@ public class VersionSettings {
 	}
 
 	public VersionSettings(String source, String resource, String testSources,
-			String testResource, String lib, String javaversion) {
+			String testResource, String lib, String javaversion, String basedirOnRepository) {
 		super();
 		
 		this.source = correct(source);
@@ -27,6 +27,7 @@ public class VersionSettings {
 		this.testResource = correct(testResource);
 		this.lib = correct(lib);
 		this.javaversion = correct(javaversion);
+		this.basedirOnRepository = correct(basedirOnRepository);
 	}
 
 	private String correct(String value){
@@ -51,6 +52,10 @@ public class VersionSettings {
 	public void setVersion(String version) {
 		this.version = version;
 	}
+	
+	public void setBasedir(String basedir) {
+		this.basedirOnRepository = basedir;
+	}
 
 	private String project;
 	private String version;
@@ -60,6 +65,7 @@ public class VersionSettings {
 	private String testResource;
 	private String lib;
 	private String javaversion;
+	private String basedirOnRepository;
 
 	public String getSource() {
 		return source;
@@ -108,19 +114,21 @@ public class VersionSettings {
 	public void setJavaversion(String javaversion) {
 		this.javaversion = javaversion;
 	}
+	
+	public String getBasedirOnRepository() {
+		return basedirOnRepository;
+	}
+	
+	public void setBasedirOnRepository(String basedirOnRepository) {
+		this.basedirOnRepository = basedirOnRepository;
+	}
 
 	@JsonIgnore
 	public String getJsonRepresentation() throws JsonGenerationException, JsonMappingException, IOException{
 		ObjectMapper objectMapper = new ObjectMapper();
 		StringWriter sw = new StringWriter();
 		objectMapper.writeValue(sw, this);
-		return sw.toString();//.replaceAll("\"", "");
-	}
-	
-	public static void main(String[] args) throws JsonGenerationException, JsonMappingException, IOException {
-		VersionSettings v = new VersionSettings("a","","","","","");
-		v.setSource("a");
-		System.out.println(v.getJsonRepresentation());
+		return sw.toString();
 	}
 	
 }
