@@ -29,28 +29,21 @@ public class TestevolMavenCli {
 			args.add(goal);
 		}
 
-		Process process = new ProcessBuilder(args).directory(workingDir).start();
-		process.waitFor();
+		ProcessBuilder processBuilder = new ProcessBuilder(args).directory(workingDir);
+		processBuilder.redirectErrorStream();
+		Process process = processBuilder.start();
 
 		String line;
+		InputStream is = process.getInputStream();
+		InputStreamReader isr = new InputStreamReader(is);
+		BufferedReader br = new BufferedReader(isr);
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		if (process.exitValue() != 0) {
-			InputStreamReader isr2 = new InputStreamReader(
-					process.getErrorStream());
-			BufferedReader br2 = new BufferedReader(isr2);
-
-			while ((line = br2.readLine()) != null) {
-				IOUtils.write(line+"\n", baos);
-				
-			}
-		} else {
-			InputStream is = process.getInputStream();
-			InputStreamReader isr = new InputStreamReader(is);
-			BufferedReader br = new BufferedReader(isr);
-			while ((line = br.readLine()) != null) {
-				IOUtils.write(line+"\n", baos);
-			}
+		while ((line = br.readLine()) != null) {
+			//System.out.println(line);
+			IOUtils.write(line+"\n", baos);
 		}
+		
+		process.waitFor();
 		//System.out.println(baos.toString());
 		return baos.toString();
 	}
