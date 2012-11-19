@@ -61,6 +61,10 @@
                                         password="5ea31ff90aab047dcc26272004960e9de8a1b704" authorities="ROLE_USER" />
                               <security:user name="edwards@cs.vt.edu"
                                         password="dfd0261b97e00eddd021c1e2403e4d74fe8d93f8" authorities="ROLE_USER" />
+			      <security:user name="idagoo@cse.ust.hk"
+                                        password="e6030285a7f8aa4c026fb9c3c39597ea5b03ee9e" authorities="ROLE_USER" />
+			      <security:user name="vgarousi@gmail.com"
+                                        password="47c0c018e411f108bed35bf6fb9dfc76344f58d4" authorities="ROLE_USER" />
 			</security:user-service>
 		</security:authentication-provider>
 	</security:authentication-manager>
