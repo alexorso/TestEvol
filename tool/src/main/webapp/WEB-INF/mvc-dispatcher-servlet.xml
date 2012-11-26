@@ -65,6 +65,10 @@
                                         password="e6030285a7f8aa4c026fb9c3c39597ea5b03ee9e" authorities="ROLE_USER" />
 			      <security:user name="vgarousi@gmail.com"
                                         password="47c0c018e411f108bed35bf6fb9dfc76344f58d4" authorities="ROLE_USER" />
+                             <security:user name="guoweiyang@utexas.edu"
+                                        password="c132458327a725650ab4da491a2a5f2fe1bd1bf6" authorities="ROLE_USER" />
+
+
 			</security:user-service>
 		</security:authentication-provider>
 	</security:authentication-manager>
