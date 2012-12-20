@@ -68,7 +68,9 @@
                              <security:user name="guoweiyang@utexas.edu"
                                         password="c132458327a725650ab4da491a2a5f2fe1bd1bf6" authorities="ROLE_USER" />
 			     <security:user name="xianlingzibiying@yahoo.cn"
-					password="c5e3af8e955d4ea270dda529e41f48904049faa6" authorities="ROLE_USER" />	
+					password="c5e3af8e955d4ea270dda529e41f48904049faa6" authorities="ROLE_USER" />
+<security:user name="rcwang@hust.edu.cn"
+					password="84ac870b98e402c9a4f51161852e17b9fe4db31e" authorities="ROLE_USER" />
 
 			</security:user-service>
 		</security:authentication-provider>
