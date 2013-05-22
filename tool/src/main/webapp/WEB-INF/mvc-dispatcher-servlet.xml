@@ -69,9 +69,10 @@
                                         password="c132458327a725650ab4da491a2a5f2fe1bd1bf6" authorities="ROLE_USER" />
 			     <security:user name="xianlingzibiying@yahoo.cn"
 					password="c5e3af8e955d4ea270dda529e41f48904049faa6" authorities="ROLE_USER" />
-<security:user name="rcwang@hust.edu.cn"
+                             <security:user name="rcwang@hust.edu.cn"
 					password="84ac870b98e402c9a4f51161852e17b9fe4db31e" authorities="ROLE_USER" />
-
+                             <security:user name="abboud.79@gmail.com"
+					password="1deb50d350fa35693c3f4ac6b03cfdcd1d6f33d6" authorities="ROLE_USER" />
 			</security:user-service>
 		</security:authentication-provider>
 	</security:authentication-manager>
